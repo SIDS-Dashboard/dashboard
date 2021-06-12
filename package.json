@@ -1,0 +1,25 @@
+{
+  "name": "dashboard",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SIDS-Dashboard/dashboard.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SIDS-Dashboard/dashboard/issues"
+  },
+  "homepage": "https://github.com/SIDS-Dashboard/dashboard#readme",
+  "dependencies": {
+    "bootstrap": "^5.0.1",
+    "d3": "^7.0.0",
+    "mapbox-gl": "^2.3.0"
+  }
+}
