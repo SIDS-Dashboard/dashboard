@@ -40604,8 +40604,9 @@ _mapboxGl.default.accessToken = "pk.eyJ1Ijoic2ViYXN0aWFuLWNoIiwiYSI6ImNpejkxdzZ5
 var map = new _mapboxGl.default.Map({
   container: "map",
   // container ID
-  //style: 'mapbox://styles/mapbox/light-v10?optimize=true', //?optimize=true
-  style: 'mapbox://styles/mapbox/satellite-v9',
+  style: 'mapbox://styles/mapbox/light-v10?optimize=true',
+  //?optimize=true
+  //style: 'mapbox://styles/mapbox/satellite-v9',
   center: [-172.14, -13.79],
   // starting position [lng, lat]
   zoom: 8 // starting zoom
@@ -40860,7 +40861,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57262" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57389" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

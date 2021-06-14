@@ -17,8 +17,8 @@ mapboxgl.accessToken =
 
 const map = new mapboxgl.Map({
   container: "map", // container ID
-  //style: 'mapbox://styles/mapbox/light-v10?optimize=true', //?optimize=true
-  style: 'mapbox://styles/mapbox/satellite-v9',
+  style: 'mapbox://styles/mapbox/light-v10?optimize=true', //?optimize=true
+  //style: 'mapbox://styles/mapbox/satellite-v9',
   center: [-172.14, -13.79], // starting position [lng, lat]
   zoom: 8, // starting zoom
 });
