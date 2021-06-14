@@ -1,8 +1,43 @@
 html, body {
-    height: 100%;
     margin: 0;
+    padding: 0;
 }
 
-#map {
-    height: 100vh;
+#map, #sidebar {
+   height: 100vh;
+   padding: 0;
+   margin: 0;
 }
+
+
+#map {
+    position: absolute;
+    left: 25%;
+    width: 75%;
+    top: 0;
+    bottom: 0;
+}
+
+#sidebar {
+
+    position: absolute;
+    width: 25%;
+    top: 0;
+    left: 0;
+    text-align: center;
+
+}
+
+button {
+    background-color: #0468b1;
+    margin: 10px;
+    padding: 20px;
+    width: 90%;
+    color: white;
+}
+
+
+
+
+
+
