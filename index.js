@@ -1,16 +1,24 @@
-import MapboxLegendControl from "@watergis/mapbox-gl-legend";
-import '@watergis/mapbox-gl-legend/css/styles.css';
+
 import mapboxgl from "mapbox-gl";
 import 'mapbox-gl/dist/mapbox-gl.css';
+
+import { MapboxStyleDefinition, MapboxStyleSwitcherControl } from "mapbox-gl-style-switcher";
+import "mapbox-gl-style-switcher/styles.css";
+
+//import gjn from './data/allsids.geojson'
+
+import names from './data/sidsNames.json'
+
 import * as d3 from 'd3-fetch';
 import Pbf from 'pbf'
 import geobuf from 'geobuf';
-
+import _ from 'lodash';
 import bbox from '@turf/bbox'
 import bboxPolygon from "@turf/bbox-polygon";
 import hexGrid from "@turf/hex-grid";
 
 import './style.css'
+//import fetch from "node-fetch";
 
 
 mapboxgl.accessToken =
@@ -26,9 +34,73 @@ const map = new mapboxgl.Map({
   zoom: 3, // starting zoom
 });
 
+
+
+//console.log(names);//
+
 //const admin1Regions = 'https://sebastian-ch.github.io/sidsDataTest/data/gadm1.pbf';
 
 map.on('load', function() {
+
+  const countryDrop = document.getElementById('countryDrop')
+  
+  names.map(function(x) {
+    //console.log(x.GID_0)
+    var btn = document.createElement("BUTTON"); 
+    btn.innerHTML = x.NAME_0;
+    //btn.classList.add(x.GID_0.toString())
+    btn.setAttribute('id', x.GID_0)
+    countryDrop.appendChild(btn)
+  } )
+
+/******* BUTTON FUNCTIONALITY ********/
+
+  const wrapper = document.getElementById('buttonWrap');
+
+  wrapper.addEventListener('click', (event) => {
+    const isButton = event.target.nodeName === 'BUTTON';
+    if (!isButton) {
+      return;
+    }
+
+    console.dir(event.target.id);
+
+
+    if(event.target.id !== 'EEZ') {
+      var currbb = _.find(names, ['GID_0', event.target.id ])
+      var v2 = new mapboxgl.LngLatBounds([currbb.bb[0], currbb.bb[1]])
+      //map.fitBounds(getAndFixBbox(), {
+        console.log(v2)
+        map.fitBounds(v2, {
+        linear: true,
+        padding: {top: 10, bottom:25, left: 15, right: 5}
+      });
+    }
+
+   /* if(event.target.id ==='admin') {
+      d3.buffer(admin1Regions).then(function(data) {
+        addAdminToMap(geobuf.decode(new Pbf(data)))
+      })
+    } */
+
+  }) 
+
+  const styles =[
+    {
+        title: "Satellite Imagery",
+        uri:'mapbox://styles/mapbox/satellite-v9'
+    },
+    {
+        title: "Light",
+        uri:'mapbox://styles/mapbox/light-v10?optimize=true'
+    },
+    {
+      title: "Satellite With Labels",
+      uri: 'mapbox://styles/mapbox/satellite-streets-v11'
+    }
+  ];
+
+  map.addControl(new MapboxStyleSwitcherControl(styles), 'top-left');
 
   const samoaUrl = 'https://sebastian-ch.github.io/sidsDataTest/data/sa.pbf';
   const fijiUrl = 'https://sebastian-ch.github.io/sidsDataTest/data/fiji.pbf';
@@ -65,11 +137,46 @@ map.on('load', function() {
 
     //console.log(fiji)
     //addToMap(samoa, fiji, saEez, fEez)
-
-    allSidsToMap(eezlines_gjn)
+    //addSamoa(samoa)
+    //allSidsToMap(eezlines_gjn)
 
   })
 })
+
+
+function addSamoa(x) {
+
+  var sourceName = x.name + '-source';
+  var layerName = x.name + '-layer';
+
+  map.addSource(sourceName, {
+    'type': 'geojson', 
+    'data': x
+  });
+
+  map.addLayer({
+    'id': layerName,
+    'type': 'fill', 
+    'source': sourceName,
+    'layout': {
+      'visibility': 'visible'
+      },
+    'paint': {
+        'fill-color': 'purple',
+        'fill-opacity': 0.5
+        }
+    });
+
+
+
+    map.on('style.load', function() {
+      addSamoa(x)
+      map.addControl(new mapboxgl.Minimap(), 'bottom-right');
+    })
+
+}
+
+
 
 function allSidsToMap(data) {
 
@@ -179,31 +286,7 @@ function addToMap(samoa, fiji, saEez, fEez) {
   });
 
 
-   const wrapper = document.getElementById('dropdown');
-
-  wrapper.addEventListener('click', (event) => {
-    const isButton = event.target.nodeName === 'BUTTON';
-    if (!isButton) {
-      return;
-    }
-
-    console.dir(event.target.id);
-
-
-    if(event.target.id === 'fiji' || event.target.id === 'samoa') {
-      map.fitBounds(getAndFixBbox(window[event.target.id]), {
-        linear: true,
-        padding: {top: 10, bottom:25, left: 15, right: 5}
-      });
-    }
-
-   /* if(event.target.id ==='admin') {
-      d3.buffer(admin1Regions).then(function(data) {
-        addAdminToMap(geobuf.decode(new Pbf(data)))
-      })
-    } */
-
-  }) 
+   
 
 
   function addAdminToMap(data) {
