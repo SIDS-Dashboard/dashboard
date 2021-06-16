@@ -1,9 +1,11 @@
+import MapboxLegendControl from "@watergis/mapbox-gl-legend";
+import '@watergis/mapbox-gl-legend/css/styles.css';
 import mapboxgl from "mapbox-gl";
 import 'mapbox-gl/dist/mapbox-gl.css';
-
 import * as d3 from 'd3-fetch';
 import Pbf from 'pbf'
 import geobuf from 'geobuf';
+
 import bbox from '@turf/bbox'
 import bboxPolygon from "@turf/bbox-polygon";
 import hexGrid from "@turf/hex-grid";
@@ -15,58 +17,129 @@ mapboxgl.accessToken =
   "pk.eyJ1Ijoic2ViYXN0aWFuLWNoIiwiYSI6ImNpejkxdzZ5YzAxa2gyd21udGpmaGU0dTgifQ.IrEd_tvrl6MuypVNUGU5SQ";
 
 
+//const map = new mapboxgl.Map({
 const map = new mapboxgl.Map({
   container: "map", // container ID
-  style: 'mapbox://styles/mapbox/light-v10?optimize=true', //?optimize=true
-  //style: 'mapbox://styles/mapbox/satellite-v9',
+  //style: 'mapbox://styles/mapbox/light-v10', //?optimize=true
+  style: 'mapbox://styles/mapbox/satellite-v9',
   center: [-172.14, -13.79], // starting position [lng, lat]
-  zoom: 8, // starting zoom
+  zoom: 3, // starting zoom
 });
 
-
+//const admin1Regions = 'https://sebastian-ch.github.io/sidsDataTest/data/gadm1.pbf';
 
 map.on('load', function() {
 
-
   const samoaUrl = 'https://sebastian-ch.github.io/sidsDataTest/data/sa.pbf';
   const fijiUrl = 'https://sebastian-ch.github.io/sidsDataTest/data/fiji.pbf';
-  const samoaEez = 'https://sebastian-ch.github.io/sidsDataTest/data/samoaEEZ.pbf';
-  const fijiEez = 'https://sebastian-ch.github.io/sidsDataTest/data/fijieez.pbf'
-
+  //const samoaEez = 'https://sebastian-ch.github.io/sidsDataTest/data/samoaEEZ.pbf';
+  //const fijiEez = 'https://sebastian-ch.github.io/sidsDataTest/data/fijieez.pbf';
+  //const allSids = 'https://sebastian-ch.github.io/sidsDataTest/data/allSids.pbf';
+  const EEZlines = 'https://sebastian-ch.github.io/sidsDataTest/data/eezlines.pbf';
+  //const underWaterCables = 'https://sebastian-ch.github.io/sidsDataTest/data/cablesSids.pbf';
+  
   var files = [
     samoaUrl,
     fijiUrl,
-    samoaEez,
-    fijiEez
+    EEZlines
+    //samoaEez,
+    //fijiEez
   ];
 
   var promises = [];
 
+
   files.forEach(function(url) {
     promises.push(d3.buffer(url))
-    
-  })
-
-  /* d3.buffer(dataUrl).then(function(data) {
-    var gjn = geobuf.decode(new Pbf(data));
-    addToMap(gjn)
-  }) */
+  
+  }) 
 
   Promise.all(promises).then(function(allData) {
     //console.log(allData)
     var samoa = geobuf.decode(new Pbf(allData[0]));
     var fiji = geobuf.decode(new Pbf(allData[1]));
-    var saEez = geobuf.decode(new Pbf(allData[2]));
-    var fEez = geobuf.decode(new Pbf(allData[3]));
+    var allSids = geobuf.decode(new Pbf(allData[2]));
+    var eezlines_gjn = geobuf.decode(new Pbf(allData[2]));
+    //var saEez = geobuf.decode(new Pbf(allData[2]));
+    //var fEez = geobuf.decode(new Pbf(allData[3]));
 
     //console.log(fiji)
+    //addToMap(samoa, fiji, saEez, fEez)
 
-    addToMap(samoa, fiji, saEez, fEez)
+    allSidsToMap(eezlines_gjn)
 
   })
-
-
 })
+
+function allSidsToMap(data) {
+
+  var sourceName = data.name + '-source';
+  var layerName = data.name + '-layer';
+
+  map.addSource(sourceName, {
+    'type': 'geojson', 
+    'data': data
+  });
+
+  map.addLayer({
+    'id': layerName,
+    'type': 'line', 
+    'source': sourceName,
+    'layout': {
+      'visibility': 'visible',
+      'line-join': 'round',
+      'line-cap': 'round'
+      },
+      'filter': ["all",
+    ["!in", 'LINE_TYPE', 'Unsettled', 'Unsettled median line']
+    ],
+    'paint': {
+     /* 'line-color': [
+        'match',
+        ['get', 'LINE_TYPE'],
+        'Treaty', 'blue',
+        'Unsettled median line', 'red',
+        'green'
+      ], */
+      'line-color': 'blue',
+      'line-width': 3,
+      /*'line-dasharray': [5,5] */
+        
+    }
+    },
+);
+
+map.addLayer({
+  'id': 'disputed',
+  'type': 'line', 
+  'source': sourceName,
+  'layout': {
+    'visibility': 'visible',
+    'line-join': 'round',
+    'line-cap': 'round'
+    },
+    //'filter': ['==', 'LINE_TYPE', 'Unsettled median line']
+    'filter': ["all",
+    ["in", 'LINE_TYPE', 'Unsettled', 'Unsettled median line']
+    ],
+    
+  'paint': {
+   /* 'line-color': [
+      'match',
+      ['get', 'LINE_TYPE'],
+      'Treaty', 'blue',
+      'Unsettled median line', 'red',
+      'green'
+    ], */
+    'line-color': 'red',
+    'line-width': 3,
+    'line-dasharray': [2,4]
+      
+  }
+  },
+);
+
+}
 
 function addToMap(samoa, fiji, saEez, fEez) {
 
@@ -82,7 +155,7 @@ function addToMap(samoa, fiji, saEez, fEez) {
       'data': x
     });
 
-    map.addLayer({
+    /*map.addLayer({
       'id': layerName,
       'type': 'fill', 
       'source': sourceName,
@@ -94,19 +167,84 @@ function addToMap(samoa, fiji, saEez, fEez) {
           'fill-opacity': 0.5
           }
       },
-      //'aeroway-line' 
-  );
+      'aeroway-line' 
+  ); */
 
 
-  })
+  }) 
 
   map.fitBounds(bbox(samoa), {
     linear: true,
     padding: {top: 10, bottom:25, left: 15, right: 5}
   });
 
+
+   const wrapper = document.getElementById('dropdown');
+
+  wrapper.addEventListener('click', (event) => {
+    const isButton = event.target.nodeName === 'BUTTON';
+    if (!isButton) {
+      return;
+    }
+
+    console.dir(event.target.id);
+
+
+    if(event.target.id === 'fiji' || event.target.id === 'samoa') {
+      map.fitBounds(getAndFixBbox(window[event.target.id]), {
+        linear: true,
+        padding: {top: 10, bottom:25, left: 15, right: 5}
+      });
+    }
+
+   /* if(event.target.id ==='admin') {
+      d3.buffer(admin1Regions).then(function(data) {
+        addAdminToMap(geobuf.decode(new Pbf(data)))
+      })
+    } */
+
+  }) 
+
+
+  function addAdminToMap(data) {
+
+    console.log(data);
+    var sourceName = 'adminregions';
+    var layerName = data.name+ '-layer';
+
+    map.addSource(sourceName, {
+      'type': 'geojson', 
+      'data': data
+    });
+
+    map.addLayer({
+      'id': layerName,
+      'type': 'fill', 
+      'source': sourceName,
+      'layout': {
+        'visibility': 'visible'
+        },
+      'paint': {
+          'fill-color': 'orange',
+          'fill-opacity': 0.5,
+          'fill-outline-color': 'black'
+          }
+      },
+      'aeroway-line' 
+  );
+
+
+  }
+
+
+
+
+
   
-  document.getElementById('samoa').addEventListener('click', function() {
+
+
+  
+  /*document.getElementById('samoa').addEventListener('click', function() {
     map.fitBounds(bbox(samoa), {
       linear: true,
       padding: {top: 10, bottom:25, left: 15, right: 5}
@@ -205,11 +343,29 @@ document.getElementById('fiji-EEZ').addEventListener('click', function() {
     document.getElementById('fiji-EEZ').innerHTML = 'Add EEZ';
 
   }
-})
+}) */
+
+  
 
 }
 
 
+
+function getAndFixBbox(data) {
+
+  var theBbox = bbox(data);
+  for (var x in theBbox) {
+    if(theBbox[x] > 0) {
+      theBbox[x] = theBbox[x] - 360;
+    };
+
+  }
+
+  return theBbox
+
+
+
+}
 
 function addHexToMap(data) {
   
