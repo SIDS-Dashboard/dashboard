@@ -102,7 +102,7 @@ function allSidsToMap(data) {
         'green'
       ], */
       'line-color': 'blue',
-      'line-width': 1.5,
+      'line-width': 1,
       /*'line-dasharray': [5,5] */
         
     }
