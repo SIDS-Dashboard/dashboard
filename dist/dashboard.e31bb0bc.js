@@ -60282,6 +60282,10 @@ function addSources(sids, eez) {
     'type': 'geojson',
     'data': eez
   });
+
+  if (map.getSource(eezSourceName)) {
+    document.getElementById('loader').remove();
+  }
 }
 
 function addSidOutline(name) {
@@ -60306,11 +60310,14 @@ function addSidOutline(name) {
     }
   });
 }
+
+map.on('idle', function () {
+  console.log('hi');
+});
 /*map.on('style.load', function() {
   addSamoa(x)
   map.addControl(new mapboxgl.Minimap(), 'bottom-right');
 }) */
-
 
 function allEez() {
   if (map.getLayer('eez-layer')) {
@@ -60367,16 +60374,6 @@ function allEez() {
     });
   }
 }
-
-map.fitBounds((0, _bbox.default)(samoa), {
-  linear: true,
-  padding: {
-    top: 10,
-    bottom: 25,
-    left: 15,
-    right: 5
-  }
-});
 
 function addAdminToMap(data) {
   console.log(data);
@@ -60521,7 +60518,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54236" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54478" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

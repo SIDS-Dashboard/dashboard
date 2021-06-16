@@ -162,6 +162,11 @@ function addSources(sids, eez) {
     'data': eez
   })
 
+if (map.getSource(eezSourceName)) {
+  document.getElementById('loader').remove()
+}
+  
+
 }
 
 
@@ -192,6 +197,13 @@ function addSidOutline(name) {
 
 }
 
+
+map.on('idle', function() {
+  console.log('hi')
+  
+
+
+})
 
 
 /*map.on('style.load', function() {
@@ -265,24 +277,9 @@ function allEez() {
     }
     },
   );
-
-
   }
 
-
-  
-
 }
-
-
-
-  map.fitBounds(bbox(samoa), {
-    linear: true,
-    padding: {top: 10, bottom:25, left: 15, right: 5}
-  });
-
-
-   
 
 
   function addAdminToMap(data) {
@@ -327,8 +324,6 @@ function getAndFixBbox(data) {
   }
 
   return theBbox
-
-
 
 }
 
