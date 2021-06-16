@@ -42,8 +42,9 @@ const map = new mapboxgl.Map({
 
 map.on('load', function() {
 
+  /**** CREATE COUNTRY DROP DOWN  */
+
   const countryDrop = document.getElementById('countryDrop')
-  
   names.map(function(x) {
     //console.log(x.GID_0)
     var btn = document.createElement("BUTTON"); 
@@ -53,7 +54,7 @@ map.on('load', function() {
     countryDrop.appendChild(btn)
   } )
 
-/******* BUTTON FUNCTIONALITY ********/
+/******* BUTTON FUNCTIONALITY ************************/
 
   const wrapper = document.getElementById('buttonWrap');
 
@@ -75,6 +76,13 @@ map.on('load', function() {
         linear: true,
         padding: {top: 10, bottom:25, left: 15, right: 5}
       });
+
+      addSidOutline(currbb.NAME_0);
+    }
+
+    if (event.target.id === 'EEZ') {
+      allEez();
+      
     }
 
    /* if(event.target.id ==='admin') {
@@ -102,20 +110,17 @@ map.on('load', function() {
 
   map.addControl(new MapboxStyleSwitcherControl(styles), 'top-left');
 
-  const samoaUrl = 'https://sebastian-ch.github.io/sidsDataTest/data/sa.pbf';
-  const fijiUrl = 'https://sebastian-ch.github.io/sidsDataTest/data/fiji.pbf';
-  //const samoaEez = 'https://sebastian-ch.github.io/sidsDataTest/data/samoaEEZ.pbf';
-  //const fijiEez = 'https://sebastian-ch.github.io/sidsDataTest/data/fijieez.pbf';
-  //const allSids = 'https://sebastian-ch.github.io/sidsDataTest/data/allSids.pbf';
+  /*const samoaUrl = 'https://sebastian-ch.github.io/sidsDataTest/data/sa.pbf';
+  const fijiUrl = 'https://sebastian-ch.github.io/sidsDataTest/data/fiji.pbf'; */
+
+  const admin1Regions = 'https://sebastian-ch.github.io/sidsDataTest/data/gadm1.pbf';
+  const allSids = 'https://sebastian-ch.github.io/sidsDataTest/data/allSids.pbf';
   const EEZlines = 'https://sebastian-ch.github.io/sidsDataTest/data/eezlines.pbf';
-  //const underWaterCables = 'https://sebastian-ch.github.io/sidsDataTest/data/cablesSids.pbf';
   
   var files = [
-    samoaUrl,
-    fijiUrl,
+    allSids,
     EEZlines
-    //samoaEez,
-    //fijiEez
+    
   ];
 
   var promises = [];
@@ -127,79 +132,124 @@ map.on('load', function() {
   }) 
 
   Promise.all(promises).then(function(allData) {
-    //console.log(allData)
-    var samoa = geobuf.decode(new Pbf(allData[0]));
-    var fiji = geobuf.decode(new Pbf(allData[1]));
-    var allSids = geobuf.decode(new Pbf(allData[2]));
-    var eezlines_gjn = geobuf.decode(new Pbf(allData[2]));
-    //var saEez = geobuf.decode(new Pbf(allData[2]));
-    //var fEez = geobuf.decode(new Pbf(allData[3]));
-
+    
+    var allSids = geobuf.decode(new Pbf(allData[0]));
+    var eezlines_gjn = geobuf.decode(new Pbf(allData[1]));
+    
     //console.log(fiji)
     //addToMap(samoa, fiji, saEez, fEez)
     //addSamoa(samoa)
     //allSidsToMap(eezlines_gjn)
 
+
+    addSources(allSids, eezlines_gjn);
+
   })
 })
 
+function addSources(sids, eez) {
+  //console.log(sids);
+  var sidsSourceName = 'allsids-source';
+  var eezSourceName = 'eez-source'
 
-function addSamoa(x) {
-
-  var sourceName = x.name + '-source';
-  var layerName = x.name + '-layer';
-
-  map.addSource(sourceName, {
+  map.addSource(sidsSourceName, {
     'type': 'geojson', 
-    'data': x
+    'data': sids
   });
 
+  map.addSource(eezSourceName, {
+    'type': 'geojson',
+    'data': eez
+  })
+
+}
+
+
+function addSidOutline(name) {
+
+  //console.log(map.getStyle().sources)
+
+  if (map.getLayer('outline')) {
+    map.removeLayer('outline');
+  }
+
   map.addLayer({
-    'id': layerName,
-    'type': 'fill', 
-    'source': sourceName,
+    'id': 'outline',
+    'type': 'line', 
+    'source': 'allsids-source',
     'layout': {
       'visibility': 'visible'
       },
+    'filter': ['==', 'NAME_0', name],
     'paint': {
-        'fill-color': 'purple',
-        'fill-opacity': 0.5
+        'line-color': 'red',
+        /*'line-opacity': 0.3, */
+        'line-width': 2
         }
-    });
-
-
-
-    map.on('style.load', function() {
-      addSamoa(x)
-      map.addControl(new mapboxgl.Minimap(), 'bottom-right');
-    })
+    },
+    
+);
 
 }
 
 
 
-function allSidsToMap(data) {
+/*map.on('style.load', function() {
+  addSamoa(x)
+  map.addControl(new mapboxgl.Minimap(), 'bottom-right');
+}) */
 
-  var sourceName = data.name + '-source';
-  var layerName = data.name + '-layer';
 
-  map.addSource(sourceName, {
-    'type': 'geojson', 
-    'data': data
-  });
 
+function allEez() {
+
+  if (map.getLayer('eez-layer')) {
+    map.removeLayer('eez-layer');
+    map.removeLayer('disputed');
+  } else {
+
+    map.addLayer({
+      'id': 'eez-layer',
+      'type': 'line', 
+      'source': 'eez-source',
+      'layout': {
+        'visibility': 'visible',
+        'line-join': 'round',
+        'line-cap': 'round'
+        },
+        'filter': ["all",
+      ["!in", 'LINE_TYPE', 'Unsettled', 'Unsettled median line']
+      ],
+      'paint': {
+       /* 'line-color': [
+          'match',
+          ['get', 'LINE_TYPE'],
+          'Treaty', 'blue',
+          'Unsettled median line', 'red',
+          'green'
+        ], */
+        'line-color': 'blue',
+        'line-width': 1,
+        /*'line-dasharray': [5,5] */
+          
+      }
+      },
+  );
+  
   map.addLayer({
-    'id': layerName,
+    'id': 'disputed',
     'type': 'line', 
-    'source': sourceName,
+    'source': 'eez-source',
     'layout': {
       'visibility': 'visible',
       'line-join': 'round',
       'line-cap': 'round'
       },
+      //'filter': ['==', 'LINE_TYPE', 'Unsettled median line']
       'filter': ["all",
-    ["!in", 'LINE_TYPE', 'Unsettled', 'Unsettled median line']
-    ],
+      ["in", 'LINE_TYPE', 'Unsettled', 'Unsettled median line']
+      ],
+      
     'paint': {
      /* 'line-color': [
         'match',
@@ -208,77 +258,23 @@ function allSidsToMap(data) {
         'Unsettled median line', 'red',
         'green'
       ], */
-      'line-color': 'blue',
-      'line-width': 1,
-      /*'line-dasharray': [5,5] */
+      'line-color': 'red',
+      'line-width': 3,
+      'line-dasharray': [2,4]
         
     }
     },
-);
+  );
 
-map.addLayer({
-  'id': 'disputed',
-  'type': 'line', 
-  'source': sourceName,
-  'layout': {
-    'visibility': 'visible',
-    'line-join': 'round',
-    'line-cap': 'round'
-    },
-    //'filter': ['==', 'LINE_TYPE', 'Unsettled median line']
-    'filter': ["all",
-    ["in", 'LINE_TYPE', 'Unsettled', 'Unsettled median line']
-    ],
-    
-  'paint': {
-   /* 'line-color': [
-      'match',
-      ['get', 'LINE_TYPE'],
-      'Treaty', 'blue',
-      'Unsettled median line', 'red',
-      'green'
-    ], */
-    'line-color': 'red',
-    'line-width': 3,
-    'line-dasharray': [2,4]
-      
+
   }
-  },
-);
+
+
+  
 
 }
 
-function addToMap(samoa, fiji, saEez, fEez) {
 
-  const both = [samoa, fiji];
-
-  both.forEach(function(x) {
-
-    var sourceName = x.name + '-source';
-    var layerName = x.name + '-layer';
-
-    map.addSource(sourceName, {
-      'type': 'geojson', 
-      'data': x
-    });
-
-    /*map.addLayer({
-      'id': layerName,
-      'type': 'fill', 
-      'source': sourceName,
-      'layout': {
-        'visibility': 'visible'
-        },
-      'paint': {
-          'fill-color': 'purple',
-          'fill-opacity': 0.5
-          }
-      },
-      'aeroway-line' 
-  ); */
-
-
-  }) 
 
   map.fitBounds(bbox(samoa), {
     linear: true,
@@ -318,120 +314,6 @@ function addToMap(samoa, fiji, saEez, fEez) {
 
 
   }
-
-
-
-
-
-  
-
-
-  
-  /*document.getElementById('samoa').addEventListener('click', function() {
-    map.fitBounds(bbox(samoa), {
-      linear: true,
-      padding: {top: 10, bottom:25, left: 15, right: 5}
-    });
-  })
-
-  document.getElementById('fiji').addEventListener('click', function() {
-    map.easeTo({
-      center: [179, -18.1],
-      zoom: 6,
-      linear: true,
-      speed: 3
-    })
-  })
-
-  document.getElementById('samoa-pur').addEventListener('click', function() {
-
-    var currentLayout = map.getLayer('samoa-layer').visibility;
-    console.log(currentLayout)
-
-    if(currentLayout === 'visible') {
-      map.setLayoutProperty('samoa-layer', 'visibility','none');
-      document.getElementById('samoa-pur').innerHTML = 'turn purple on';
-    } else {
-      map.setLayoutProperty('samoa-layer', 'visibility','visible');
-      document.getElementById('samoa-pur').innerHTML = 'turn purple off';
-    }
-    
-  })
-
-  document.getElementById('fiji-pur').addEventListener('click', function() {
-
-    var currentLayout = map.getLayer('fiji-layer').visibility;
-    console.log(currentLayout)
-
-    if(currentLayout === 'visible') {
-      map.setLayoutProperty('fiji-layer', 'visibility','none');
-      document.getElementById('fiji-pur').innerHTML = 'turn purple on';
-    } else {
-      map.setLayoutProperty('fiji-layer', 'visibility','visible');
-      document.getElementById('fiji-pur').innerHTML = 'turn purple off';
-    }
-    
-  })
-
-  document.getElementById('bounding-box').addEventListener('click', function(){
-
-    if(!map.getLayer('bbox-layer')) {
-      addBoundingBoxToMap(bbox(samoa))
-    } else {
-      map.removeLayer('bbox-layer')
-      map.removeSource('bbox-source')
-
-    }
-    
-  })
-
-
-
-document.getElementById('hexgrid').addEventListener('click', function() {
-
-  if(!map.getLayer('hex-layer')) {
-    addHexToMap(bbox(samoa))
-  } else {
-    map.removeLayer('hex-layer')
-    map.removeSource('hex-source')
-
-  }
-
-
-
-})
-
-document.getElementById('samoa-EEZ').addEventListener('click', function() {
-
-  if(!map.getLayer('samoaEEZ-layer')) {
-    addEezToMap(saEez, 'samoaEEZ')
-    document.getElementById('samoa-EEZ').innerHTML = 'Remove EEZ';
-  } else {
-    map.removeLayer('samoaEEZ-layer')
-    map.removeSource('samoaEEZ-source')
-    document.getElementById('samoa-EEZ').innerHTML = 'Add EEZ';
-
-  }
-})
-
-
-document.getElementById('fiji-EEZ').addEventListener('click', function() {
-
-  if(!map.getLayer('fijiEEZ-layer')) {
-    addEezToMap(fEez, 'fijiEEZ')
-    document.getElementById('fiji-EEZ').innerHTML = 'Remove EEZ';
-  } else {
-    map.removeLayer('fijiEEZ-layer')
-    map.removeSource('fijiEEZ-source')
-    document.getElementById('fiji-EEZ').innerHTML = 'Add EEZ';
-
-  }
-}) */
-
-  
-
-}
-
 
 
 function getAndFixBbox(data) {
