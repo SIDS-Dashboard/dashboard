@@ -74,11 +74,12 @@ html, body {
     z-index: 1;
     left: 75%;
     overflow-y:auto;
-    min-height: 200px;
+    min-height: 400px;
     width: 180px;
 
-
   }
+
+  
   
   .dropdown-content {
     display: none;
