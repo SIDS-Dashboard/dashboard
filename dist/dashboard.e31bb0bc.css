@@ -39,108 +39,41 @@
     background-repeat: no-repeat;
     background-size: 70%;
 }
-html, body {
+body {
     margin: 0;
     padding: 0;
-    height: 100vh;
-    /* overflow: hidden; */
 }
 
 
-
-#map {
+#sidebar {
     position: absolute;
-    width: 100%;
-    height: 100vh;   
-    padding: 0;
-    margin: 0;
-    top: 0;    
-}
-
-.dropbtn {
-    background-color: #0468b1;
-    margin: 5px;
-    padding: 10px;
-    color: white;
-}
-
-.dropbtn:hover {
-    cursor: pointer;
-}
-
-.dropdown {
-    position: relative;
-    display: inline-block;
-    z-index: 1;
-    left: 75%;
-    overflow-y:auto;
-    min-height: 400px;
-    width: 180px;
-
+    width: 25%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    overflow: auto;
+    border-right: 1px solid rgba(0, 0, 0, 0.25);
+    text-align: center;
   }
 
-  
-  
-  .dropdown-content {
-    display: none;
+  #sids {
+      display: flex;
+      flex-direction: column;
+      text-align: center;
+      justify-content: center;
+      width: 60%;
+      margin: 10px auto 10px auto;
+      margin-top: 0;
+     
+  }
+
+
+  #map {
     position: absolute;
-    background-color: #f1f1f1;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-    height: 90%;
-    
-    
+    left: 25%;
+    width: 75%;
+    top: 0;
+    bottom: 0;
   }
-  
-  .dropdown-content button {
-    background-color: #0468b1;
-    margin: 5px;
-    padding: 10px;
-    width: 90%;
-    color: white;
-    display: block;
-    
-  }
-
-.dropdown-content button:hover {background-color: #ddd;}
-
-.dropdown:hover .dropdown-content {
-  display: block;
-  
-}
-
-.dropdown:hover .dropbtn {background-color: #3e8e41;}
-
-.loader {
-  position:absolute;
-  border: 16px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 16px solid #3498db;
-  width: 120px;
-  height: 120px;
-  -webkit-animation: spin 2s linear infinite; /* Safari */
-  animation: spin 2s linear infinite;
-  z-index: 999999999;
-  left: 40%;
-  top: 30%;
-}
-
-/* Safari */
-@-webkit-keyframes spin {
-  0% { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(360deg); }
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-
-
-
-
-
 
 /*# sourceMappingURL=/dashboard.e31bb0bc.css.map */

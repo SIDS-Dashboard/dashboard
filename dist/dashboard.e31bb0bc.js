@@ -37813,6 +37813,905 @@ function property(path) {
 
 module.exports = find;
 
+},{}],"node_modules/lodash.uniq/index.js":[function(require,module,exports) {
+var global = arguments[3];
+/**
+ * lodash (Custom Build) <https://lodash.com/>
+ * Build: `lodash modularize exports="npm" -o ./`
+ * Copyright jQuery Foundation and other contributors <https://jquery.org/>
+ * Released under MIT license <https://lodash.com/license>
+ * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+ * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ */
+
+/** Used as the size to enable large array optimizations. */
+var LARGE_ARRAY_SIZE = 200;
+
+/** Used to stand-in for `undefined` hash values. */
+var HASH_UNDEFINED = '__lodash_hash_undefined__';
+
+/** Used as references for various `Number` constants. */
+var INFINITY = 1 / 0;
+
+/** `Object#toString` result references. */
+var funcTag = '[object Function]',
+    genTag = '[object GeneratorFunction]';
+
+/**
+ * Used to match `RegExp`
+ * [syntax characters](http://ecma-international.org/ecma-262/7.0/#sec-patterns).
+ */
+var reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
+
+/** Used to detect host constructors (Safari). */
+var reIsHostCtor = /^\[object .+?Constructor\]$/;
+
+/** Detect free variable `global` from Node.js. */
+var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
+
+/** Detect free variable `self`. */
+var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
+
+/** Used as a reference to the global object. */
+var root = freeGlobal || freeSelf || Function('return this')();
+
+/**
+ * A specialized version of `_.includes` for arrays without support for
+ * specifying an index to search from.
+ *
+ * @private
+ * @param {Array} [array] The array to inspect.
+ * @param {*} target The value to search for.
+ * @returns {boolean} Returns `true` if `target` is found, else `false`.
+ */
+function arrayIncludes(array, value) {
+  var length = array ? array.length : 0;
+  return !!length && baseIndexOf(array, value, 0) > -1;
+}
+
+/**
+ * This function is like `arrayIncludes` except that it accepts a comparator.
+ *
+ * @private
+ * @param {Array} [array] The array to inspect.
+ * @param {*} target The value to search for.
+ * @param {Function} comparator The comparator invoked per element.
+ * @returns {boolean} Returns `true` if `target` is found, else `false`.
+ */
+function arrayIncludesWith(array, value, comparator) {
+  var index = -1,
+      length = array ? array.length : 0;
+
+  while (++index < length) {
+    if (comparator(value, array[index])) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * The base implementation of `_.findIndex` and `_.findLastIndex` without
+ * support for iteratee shorthands.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {Function} predicate The function invoked per iteration.
+ * @param {number} fromIndex The index to search from.
+ * @param {boolean} [fromRight] Specify iterating from right to left.
+ * @returns {number} Returns the index of the matched value, else `-1`.
+ */
+function baseFindIndex(array, predicate, fromIndex, fromRight) {
+  var length = array.length,
+      index = fromIndex + (fromRight ? 1 : -1);
+
+  while ((fromRight ? index-- : ++index < length)) {
+    if (predicate(array[index], index, array)) {
+      return index;
+    }
+  }
+  return -1;
+}
+
+/**
+ * The base implementation of `_.indexOf` without `fromIndex` bounds checks.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {*} value The value to search for.
+ * @param {number} fromIndex The index to search from.
+ * @returns {number} Returns the index of the matched value, else `-1`.
+ */
+function baseIndexOf(array, value, fromIndex) {
+  if (value !== value) {
+    return baseFindIndex(array, baseIsNaN, fromIndex);
+  }
+  var index = fromIndex - 1,
+      length = array.length;
+
+  while (++index < length) {
+    if (array[index] === value) {
+      return index;
+    }
+  }
+  return -1;
+}
+
+/**
+ * The base implementation of `_.isNaN` without support for number objects.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is `NaN`, else `false`.
+ */
+function baseIsNaN(value) {
+  return value !== value;
+}
+
+/**
+ * Checks if a cache value for `key` exists.
+ *
+ * @private
+ * @param {Object} cache The cache to query.
+ * @param {string} key The key of the entry to check.
+ * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+ */
+function cacheHas(cache, key) {
+  return cache.has(key);
+}
+
+/**
+ * Gets the value at `key` of `object`.
+ *
+ * @private
+ * @param {Object} [object] The object to query.
+ * @param {string} key The key of the property to get.
+ * @returns {*} Returns the property value.
+ */
+function getValue(object, key) {
+  return object == null ? undefined : object[key];
+}
+
+/**
+ * Checks if `value` is a host object in IE < 9.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a host object, else `false`.
+ */
+function isHostObject(value) {
+  // Many host objects are `Object` objects that can coerce to strings
+  // despite having improperly defined `toString` methods.
+  var result = false;
+  if (value != null && typeof value.toString != 'function') {
+    try {
+      result = !!(value + '');
+    } catch (e) {}
+  }
+  return result;
+}
+
+/**
+ * Converts `set` to an array of its values.
+ *
+ * @private
+ * @param {Object} set The set to convert.
+ * @returns {Array} Returns the values.
+ */
+function setToArray(set) {
+  var index = -1,
+      result = Array(set.size);
+
+  set.forEach(function(value) {
+    result[++index] = value;
+  });
+  return result;
+}
+
+/** Used for built-in method references. */
+var arrayProto = Array.prototype,
+    funcProto = Function.prototype,
+    objectProto = Object.prototype;
+
+/** Used to detect overreaching core-js shims. */
+var coreJsData = root['__core-js_shared__'];
+
+/** Used to detect methods masquerading as native. */
+var maskSrcKey = (function() {
+  var uid = /[^.]+$/.exec(coreJsData && coreJsData.keys && coreJsData.keys.IE_PROTO || '');
+  return uid ? ('Symbol(src)_1.' + uid) : '';
+}());
+
+/** Used to resolve the decompiled source of functions. */
+var funcToString = funcProto.toString;
+
+/** Used to check objects for own properties. */
+var hasOwnProperty = objectProto.hasOwnProperty;
+
+/**
+ * Used to resolve the
+ * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+ * of values.
+ */
+var objectToString = objectProto.toString;
+
+/** Used to detect if a method is native. */
+var reIsNative = RegExp('^' +
+  funcToString.call(hasOwnProperty).replace(reRegExpChar, '\\$&')
+  .replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
+);
+
+/** Built-in value references. */
+var splice = arrayProto.splice;
+
+/* Built-in method references that are verified to be native. */
+var Map = getNative(root, 'Map'),
+    Set = getNative(root, 'Set'),
+    nativeCreate = getNative(Object, 'create');
+
+/**
+ * Creates a hash object.
+ *
+ * @private
+ * @constructor
+ * @param {Array} [entries] The key-value pairs to cache.
+ */
+function Hash(entries) {
+  var index = -1,
+      length = entries ? entries.length : 0;
+
+  this.clear();
+  while (++index < length) {
+    var entry = entries[index];
+    this.set(entry[0], entry[1]);
+  }
+}
+
+/**
+ * Removes all key-value entries from the hash.
+ *
+ * @private
+ * @name clear
+ * @memberOf Hash
+ */
+function hashClear() {
+  this.__data__ = nativeCreate ? nativeCreate(null) : {};
+}
+
+/**
+ * Removes `key` and its value from the hash.
+ *
+ * @private
+ * @name delete
+ * @memberOf Hash
+ * @param {Object} hash The hash to modify.
+ * @param {string} key The key of the value to remove.
+ * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+ */
+function hashDelete(key) {
+  return this.has(key) && delete this.__data__[key];
+}
+
+/**
+ * Gets the hash value for `key`.
+ *
+ * @private
+ * @name get
+ * @memberOf Hash
+ * @param {string} key The key of the value to get.
+ * @returns {*} Returns the entry value.
+ */
+function hashGet(key) {
+  var data = this.__data__;
+  if (nativeCreate) {
+    var result = data[key];
+    return result === HASH_UNDEFINED ? undefined : result;
+  }
+  return hasOwnProperty.call(data, key) ? data[key] : undefined;
+}
+
+/**
+ * Checks if a hash value for `key` exists.
+ *
+ * @private
+ * @name has
+ * @memberOf Hash
+ * @param {string} key The key of the entry to check.
+ * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+ */
+function hashHas(key) {
+  var data = this.__data__;
+  return nativeCreate ? data[key] !== undefined : hasOwnProperty.call(data, key);
+}
+
+/**
+ * Sets the hash `key` to `value`.
+ *
+ * @private
+ * @name set
+ * @memberOf Hash
+ * @param {string} key The key of the value to set.
+ * @param {*} value The value to set.
+ * @returns {Object} Returns the hash instance.
+ */
+function hashSet(key, value) {
+  var data = this.__data__;
+  data[key] = (nativeCreate && value === undefined) ? HASH_UNDEFINED : value;
+  return this;
+}
+
+// Add methods to `Hash`.
+Hash.prototype.clear = hashClear;
+Hash.prototype['delete'] = hashDelete;
+Hash.prototype.get = hashGet;
+Hash.prototype.has = hashHas;
+Hash.prototype.set = hashSet;
+
+/**
+ * Creates an list cache object.
+ *
+ * @private
+ * @constructor
+ * @param {Array} [entries] The key-value pairs to cache.
+ */
+function ListCache(entries) {
+  var index = -1,
+      length = entries ? entries.length : 0;
+
+  this.clear();
+  while (++index < length) {
+    var entry = entries[index];
+    this.set(entry[0], entry[1]);
+  }
+}
+
+/**
+ * Removes all key-value entries from the list cache.
+ *
+ * @private
+ * @name clear
+ * @memberOf ListCache
+ */
+function listCacheClear() {
+  this.__data__ = [];
+}
+
+/**
+ * Removes `key` and its value from the list cache.
+ *
+ * @private
+ * @name delete
+ * @memberOf ListCache
+ * @param {string} key The key of the value to remove.
+ * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+ */
+function listCacheDelete(key) {
+  var data = this.__data__,
+      index = assocIndexOf(data, key);
+
+  if (index < 0) {
+    return false;
+  }
+  var lastIndex = data.length - 1;
+  if (index == lastIndex) {
+    data.pop();
+  } else {
+    splice.call(data, index, 1);
+  }
+  return true;
+}
+
+/**
+ * Gets the list cache value for `key`.
+ *
+ * @private
+ * @name get
+ * @memberOf ListCache
+ * @param {string} key The key of the value to get.
+ * @returns {*} Returns the entry value.
+ */
+function listCacheGet(key) {
+  var data = this.__data__,
+      index = assocIndexOf(data, key);
+
+  return index < 0 ? undefined : data[index][1];
+}
+
+/**
+ * Checks if a list cache value for `key` exists.
+ *
+ * @private
+ * @name has
+ * @memberOf ListCache
+ * @param {string} key The key of the entry to check.
+ * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+ */
+function listCacheHas(key) {
+  return assocIndexOf(this.__data__, key) > -1;
+}
+
+/**
+ * Sets the list cache `key` to `value`.
+ *
+ * @private
+ * @name set
+ * @memberOf ListCache
+ * @param {string} key The key of the value to set.
+ * @param {*} value The value to set.
+ * @returns {Object} Returns the list cache instance.
+ */
+function listCacheSet(key, value) {
+  var data = this.__data__,
+      index = assocIndexOf(data, key);
+
+  if (index < 0) {
+    data.push([key, value]);
+  } else {
+    data[index][1] = value;
+  }
+  return this;
+}
+
+// Add methods to `ListCache`.
+ListCache.prototype.clear = listCacheClear;
+ListCache.prototype['delete'] = listCacheDelete;
+ListCache.prototype.get = listCacheGet;
+ListCache.prototype.has = listCacheHas;
+ListCache.prototype.set = listCacheSet;
+
+/**
+ * Creates a map cache object to store key-value pairs.
+ *
+ * @private
+ * @constructor
+ * @param {Array} [entries] The key-value pairs to cache.
+ */
+function MapCache(entries) {
+  var index = -1,
+      length = entries ? entries.length : 0;
+
+  this.clear();
+  while (++index < length) {
+    var entry = entries[index];
+    this.set(entry[0], entry[1]);
+  }
+}
+
+/**
+ * Removes all key-value entries from the map.
+ *
+ * @private
+ * @name clear
+ * @memberOf MapCache
+ */
+function mapCacheClear() {
+  this.__data__ = {
+    'hash': new Hash,
+    'map': new (Map || ListCache),
+    'string': new Hash
+  };
+}
+
+/**
+ * Removes `key` and its value from the map.
+ *
+ * @private
+ * @name delete
+ * @memberOf MapCache
+ * @param {string} key The key of the value to remove.
+ * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+ */
+function mapCacheDelete(key) {
+  return getMapData(this, key)['delete'](key);
+}
+
+/**
+ * Gets the map value for `key`.
+ *
+ * @private
+ * @name get
+ * @memberOf MapCache
+ * @param {string} key The key of the value to get.
+ * @returns {*} Returns the entry value.
+ */
+function mapCacheGet(key) {
+  return getMapData(this, key).get(key);
+}
+
+/**
+ * Checks if a map value for `key` exists.
+ *
+ * @private
+ * @name has
+ * @memberOf MapCache
+ * @param {string} key The key of the entry to check.
+ * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+ */
+function mapCacheHas(key) {
+  return getMapData(this, key).has(key);
+}
+
+/**
+ * Sets the map `key` to `value`.
+ *
+ * @private
+ * @name set
+ * @memberOf MapCache
+ * @param {string} key The key of the value to set.
+ * @param {*} value The value to set.
+ * @returns {Object} Returns the map cache instance.
+ */
+function mapCacheSet(key, value) {
+  getMapData(this, key).set(key, value);
+  return this;
+}
+
+// Add methods to `MapCache`.
+MapCache.prototype.clear = mapCacheClear;
+MapCache.prototype['delete'] = mapCacheDelete;
+MapCache.prototype.get = mapCacheGet;
+MapCache.prototype.has = mapCacheHas;
+MapCache.prototype.set = mapCacheSet;
+
+/**
+ *
+ * Creates an array cache object to store unique values.
+ *
+ * @private
+ * @constructor
+ * @param {Array} [values] The values to cache.
+ */
+function SetCache(values) {
+  var index = -1,
+      length = values ? values.length : 0;
+
+  this.__data__ = new MapCache;
+  while (++index < length) {
+    this.add(values[index]);
+  }
+}
+
+/**
+ * Adds `value` to the array cache.
+ *
+ * @private
+ * @name add
+ * @memberOf SetCache
+ * @alias push
+ * @param {*} value The value to cache.
+ * @returns {Object} Returns the cache instance.
+ */
+function setCacheAdd(value) {
+  this.__data__.set(value, HASH_UNDEFINED);
+  return this;
+}
+
+/**
+ * Checks if `value` is in the array cache.
+ *
+ * @private
+ * @name has
+ * @memberOf SetCache
+ * @param {*} value The value to search for.
+ * @returns {number} Returns `true` if `value` is found, else `false`.
+ */
+function setCacheHas(value) {
+  return this.__data__.has(value);
+}
+
+// Add methods to `SetCache`.
+SetCache.prototype.add = SetCache.prototype.push = setCacheAdd;
+SetCache.prototype.has = setCacheHas;
+
+/**
+ * Gets the index at which the `key` is found in `array` of key-value pairs.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {*} key The key to search for.
+ * @returns {number} Returns the index of the matched value, else `-1`.
+ */
+function assocIndexOf(array, key) {
+  var length = array.length;
+  while (length--) {
+    if (eq(array[length][0], key)) {
+      return length;
+    }
+  }
+  return -1;
+}
+
+/**
+ * The base implementation of `_.isNative` without bad shim checks.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a native function,
+ *  else `false`.
+ */
+function baseIsNative(value) {
+  if (!isObject(value) || isMasked(value)) {
+    return false;
+  }
+  var pattern = (isFunction(value) || isHostObject(value)) ? reIsNative : reIsHostCtor;
+  return pattern.test(toSource(value));
+}
+
+/**
+ * The base implementation of `_.uniqBy` without support for iteratee shorthands.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {Function} [iteratee] The iteratee invoked per element.
+ * @param {Function} [comparator] The comparator invoked per element.
+ * @returns {Array} Returns the new duplicate free array.
+ */
+function baseUniq(array, iteratee, comparator) {
+  var index = -1,
+      includes = arrayIncludes,
+      length = array.length,
+      isCommon = true,
+      result = [],
+      seen = result;
+
+  if (comparator) {
+    isCommon = false;
+    includes = arrayIncludesWith;
+  }
+  else if (length >= LARGE_ARRAY_SIZE) {
+    var set = iteratee ? null : createSet(array);
+    if (set) {
+      return setToArray(set);
+    }
+    isCommon = false;
+    includes = cacheHas;
+    seen = new SetCache;
+  }
+  else {
+    seen = iteratee ? [] : result;
+  }
+  outer:
+  while (++index < length) {
+    var value = array[index],
+        computed = iteratee ? iteratee(value) : value;
+
+    value = (comparator || value !== 0) ? value : 0;
+    if (isCommon && computed === computed) {
+      var seenIndex = seen.length;
+      while (seenIndex--) {
+        if (seen[seenIndex] === computed) {
+          continue outer;
+        }
+      }
+      if (iteratee) {
+        seen.push(computed);
+      }
+      result.push(value);
+    }
+    else if (!includes(seen, computed, comparator)) {
+      if (seen !== result) {
+        seen.push(computed);
+      }
+      result.push(value);
+    }
+  }
+  return result;
+}
+
+/**
+ * Creates a set object of `values`.
+ *
+ * @private
+ * @param {Array} values The values to add to the set.
+ * @returns {Object} Returns the new set.
+ */
+var createSet = !(Set && (1 / setToArray(new Set([,-0]))[1]) == INFINITY) ? noop : function(values) {
+  return new Set(values);
+};
+
+/**
+ * Gets the data for `map`.
+ *
+ * @private
+ * @param {Object} map The map to query.
+ * @param {string} key The reference key.
+ * @returns {*} Returns the map data.
+ */
+function getMapData(map, key) {
+  var data = map.__data__;
+  return isKeyable(key)
+    ? data[typeof key == 'string' ? 'string' : 'hash']
+    : data.map;
+}
+
+/**
+ * Gets the native function at `key` of `object`.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @param {string} key The key of the method to get.
+ * @returns {*} Returns the function if it's native, else `undefined`.
+ */
+function getNative(object, key) {
+  var value = getValue(object, key);
+  return baseIsNative(value) ? value : undefined;
+}
+
+/**
+ * Checks if `value` is suitable for use as unique object key.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is suitable, else `false`.
+ */
+function isKeyable(value) {
+  var type = typeof value;
+  return (type == 'string' || type == 'number' || type == 'symbol' || type == 'boolean')
+    ? (value !== '__proto__')
+    : (value === null);
+}
+
+/**
+ * Checks if `func` has its source masked.
+ *
+ * @private
+ * @param {Function} func The function to check.
+ * @returns {boolean} Returns `true` if `func` is masked, else `false`.
+ */
+function isMasked(func) {
+  return !!maskSrcKey && (maskSrcKey in func);
+}
+
+/**
+ * Converts `func` to its source code.
+ *
+ * @private
+ * @param {Function} func The function to process.
+ * @returns {string} Returns the source code.
+ */
+function toSource(func) {
+  if (func != null) {
+    try {
+      return funcToString.call(func);
+    } catch (e) {}
+    try {
+      return (func + '');
+    } catch (e) {}
+  }
+  return '';
+}
+
+/**
+ * Creates a duplicate-free version of an array, using
+ * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
+ * for equality comparisons, in which only the first occurrence of each
+ * element is kept.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Array
+ * @param {Array} array The array to inspect.
+ * @returns {Array} Returns the new duplicate free array.
+ * @example
+ *
+ * _.uniq([2, 1, 2]);
+ * // => [2, 1]
+ */
+function uniq(array) {
+  return (array && array.length)
+    ? baseUniq(array)
+    : [];
+}
+
+/**
+ * Performs a
+ * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
+ * comparison between two values to determine if they are equivalent.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to compare.
+ * @param {*} other The other value to compare.
+ * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
+ * @example
+ *
+ * var object = { 'a': 1 };
+ * var other = { 'a': 1 };
+ *
+ * _.eq(object, object);
+ * // => true
+ *
+ * _.eq(object, other);
+ * // => false
+ *
+ * _.eq('a', 'a');
+ * // => true
+ *
+ * _.eq('a', Object('a'));
+ * // => false
+ *
+ * _.eq(NaN, NaN);
+ * // => true
+ */
+function eq(value, other) {
+  return value === other || (value !== value && other !== other);
+}
+
+/**
+ * Checks if `value` is classified as a `Function` object.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a function, else `false`.
+ * @example
+ *
+ * _.isFunction(_);
+ * // => true
+ *
+ * _.isFunction(/abc/);
+ * // => false
+ */
+function isFunction(value) {
+  // The use of `Object#toString` avoids issues with the `typeof` operator
+  // in Safari 8-9 which returns 'object' for typed array and other constructors.
+  var tag = isObject(value) ? objectToString.call(value) : '';
+  return tag == funcTag || tag == genTag;
+}
+
+/**
+ * Checks if `value` is the
+ * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
+ * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+ * @example
+ *
+ * _.isObject({});
+ * // => true
+ *
+ * _.isObject([1, 2, 3]);
+ * // => true
+ *
+ * _.isObject(_.noop);
+ * // => true
+ *
+ * _.isObject(null);
+ * // => false
+ */
+function isObject(value) {
+  var type = typeof value;
+  return !!value && (type == 'object' || type == 'function');
+}
+
+/**
+ * This method returns `undefined`.
+ *
+ * @static
+ * @memberOf _
+ * @since 2.3.0
+ * @category Util
+ * @example
+ *
+ * _.times(2, _.noop);
+ * // => [undefined, undefined]
+ */
+function noop() {
+  // No operation performed.
+}
+
+module.exports = uniq;
+
 },{}],"style.css":[function(require,module,exports) {
 var reloadCSS = require('_css_loader');
 
@@ -37839,6 +38738,8 @@ var _geobuf = _interopRequireDefault(require("geobuf"));
 
 var _lodash = _interopRequireDefault(require("lodash.find"));
 
+var _lodash2 = _interopRequireDefault(require("lodash.uniq"));
+
 require("./style.css");
 
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
@@ -37847,230 +38748,286 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/* import bbox from '@turf/bbox'
-import bboxPolygon from "@turf/bbox-polygon";
-import hexGrid from "@turf/hex-grid"; */
-//import fetch from "node-fetch";
-_mapboxGl.default.accessToken = "pk.eyJ1Ijoic2ViYXN0aWFuLWNoIiwiYSI6ImNpejkxdzZ5YzAxa2gyd21udGpmaGU0dTgifQ.IrEd_tvrl6MuypVNUGU5SQ"; //const map = new mapboxgl.Map({
+var sidsHolder = document.getElementById('sids');
 
+_sidsNames.default.map(function (x) {
+  var btn = document.createElement("BUTTON");
+  btn.innerHTML = x.NAME_0;
+  btn.classList.add('sidsb');
+  btn.setAttribute('id', x.GID_0);
+  sids.appendChild(btn);
+});
+
+_mapboxGl.default.accessToken = "pk.eyJ1Ijoic2ViYXN0aWFuLWNoIiwiYSI6ImNpejkxdzZ5YzAxa2gyd21udGpmaGU0dTgifQ.IrEd_tvrl6MuypVNUGU5SQ";
 var map = new _mapboxGl.default.Map({
   container: "map",
   // container ID
   //style: 'mapbox://styles/mapbox/light-v10', //?optimize=true
   style: 'mapbox://styles/mapbox/satellite-v9',
-  center: [-172.14, -13.79],
+  center: [0, 0],
   // starting position [lng, lat]
-  zoom: 3 // starting zoom
+  zoom: 2 // starting zoom
 
-}); //const admin1Regions = 'https://sebastian-ch.github.io/sidsDataTest/data/gadm1.pbf';
+}); //var sources = ['pop3d', 'allSids-source']
 
-map.on('load', function () {
-  /**** CREATE COUNTRY DROP DOWN  */
-  var countryDrop = document.getElementById('countryDrop');
-
-  _sidsNames.default.map(function (x) {
-    //console.log(x.GID_0)
-    var btn = document.createElement("BUTTON");
-    btn.innerHTML = x.NAME_0; //btn.classList.add(x.GID_0.toString())
-
-    btn.setAttribute('id', x.GID_0);
-    countryDrop.appendChild(btn);
+var sourceData = {
+  hexSource: {
+    name: 'hex-source',
+    data: null
+  },
+  allSidsSource: {
+    name: 'allSids-source',
+    data: [],
+    lastName: null
+  }
+};
+var currentGeojsonLayers = [];
+map.on("load", function () {
+  var nav = new _mapboxGl.default.NavigationControl({
+    visualizePitch: true
   });
-  /******* BUTTON FUNCTIONALITY ************************/
-
-
-  var wrapper = document.getElementById('buttonWrap');
-  wrapper.addEventListener('click', function (event) {
-    var isButton = event.target.nodeName === 'BUTTON';
-
-    if (!isButton) {
-      return;
-    }
-
-    console.dir(event.target.id); //if(event.target.id !== 'EEZ' && event.target.id !== 'hex' && event.target.id !== 'hex1' && event.target.id !== 'pop') 
-
-    if (event.target.id === 'EEZ') {
-      allEez();
-    }
-
-    if (event.target.id === 'hex') {
-      addHex(event.target.id);
-    }
-
-    if (event.target.id === 'hex1') {
-      addHex(event.target.id);
-    }
-
-    if (event.target.id === 'pop') {
-      addHex(event.target.id);
-    } else {
-      {
-        var currbb = (0, _lodash.default)(_sidsNames.default, ['GID_0', event.target.id]);
-        var v2 = new _mapboxGl.default.LngLatBounds([currbb.bb[0], currbb.bb[1]]);
-        map.fitBounds(v2, {
-          linear: true,
-          padding: {
-            top: 10,
-            bottom: 25,
-            left: 15,
-            right: 5
-          }
-        });
-        addSidOutline(currbb.NAME_0);
-      }
-    }
-  });
+  map.addControl(nav, 'top-left');
   var styles = [{
     title: "Satellite Imagery",
-    uri: 'mapbox://styles/mapbox/satellite-v9'
+    uri: "mapbox://styles/mapbox/satellite-v9"
   }, {
     title: "Light",
-    uri: 'mapbox://styles/mapbox/light-v10?optimize=true'
+    uri: "mapbox://styles/mapbox/light-v10?optimize=true"
   }, {
     title: "Satellite With Labels",
-    uri: 'mapbox://styles/mapbox/satellite-streets-v11'
+    uri: "mapbox://styles/mapbox/satellite-streets-v11"
   }];
-  map.addControl(new _mapboxGlStyleSwitcher.MapboxStyleSwitcherControl(styles), 'top-left');
-  var admin1Regions = 'https://sebastian-ch.github.io/sidsDataTest/data/gadm1.pbf';
-  var EEZlines = 'https://sebastian-ch.github.io/sidsDataTest/data/eezlines.pbf';
+  map.addControl(new _mapboxGlStyleSwitcher.MapboxStyleSwitcherControl(styles), 'top-right');
+  addHexSource();
+  addSidsSource();
+});
+map.on('style.load', function () {
+  if (sourceData.hexSource.data != null) {
+    map.addSource('hex', {
+      type: "geojson",
+      data: _geobuf.default.decode(new _pbf.default(sourceData.hexSource.data))
+    });
+    map.addSource("allSids-source", {
+      type: "geojson",
+      data: _geobuf.default.decode(new _pbf.default(sourceData.allSidsSource.data))
+    });
+  }
+
+  for (var x in currentGeojsonLayers) {
+    if (currentGeojsonLayers[x] === 'hex') {
+      addHex();
+    }
+
+    if (currentGeojsonLayers[x] === 'outline') {
+      addSidsOutline(sourceData.allSidsSource.lastName); //console.log('hi')
+    }
+
+    if (currentGeojsonLayers[x] === 'pop3d') {
+      add3dHex();
+    }
+
+    if (currentGeojsonLayers[x] === 'popDen') {
+      addPopDen();
+    }
+  }
 });
 
+function addHexSource() {
+  var hexTest = "https://sebastian-ch.github.io/sidsDataTest/data/hex.pbf";
+  d3.buffer(hexTest).then(function (data) {
+    map.addSource('hex', {
+      type: "geojson",
+      data: _geobuf.default.decode(new _pbf.default(data))
+    });
+    sourceData.hexSource.data = data;
+  });
+}
+
+function addSidsSource() {
+  var allSids = "https://sebastian-ch.github.io/sidsDataTest/data/allSids.pbf";
+  d3.buffer(allSids).then(function (data) {
+    map.addSource("allSids-source", {
+      type: "geojson",
+      data: _geobuf.default.decode(new _pbf.default(data))
+    });
+    sourceData.allSidsSource.data = data;
+  });
+}
+
+var wrapper = document.getElementById('sids');
+wrapper.addEventListener('click', function (event) {
+  var isButton = event.target.nodeName === 'BUTTON';
+
+  if (!isButton) {
+    return;
+  }
+
+  console.dir(event.target.id);
+
+  if (!event.target.id.includes('data')) {
+    var currbb = (0, _lodash.default)(_sidsNames.default, ['GID_0', event.target.id]);
+    sourceData.allSidsSource.lastName = currbb.NAME_0;
+    var v2 = new _mapboxGl.default.LngLatBounds([currbb.bb[0], currbb.bb[1]]);
+    map.fitBounds(v2, {
+      linear: true,
+      padding: {
+        top: 10,
+        bottom: 25,
+        left: 15,
+        right: 5
+      },
+      pitch: 0
+    });
+    addSidsOutline(currbb.NAME_0);
+  } else if (event.target.id.includes('pop3d')) {
+    add3dHex(event.target.id);
+  } else if (event.target.id.includes('hex')) {
+    addHex(event.target.id);
+  } else if (event.target.id.includes('popd')) {
+    addPopDen();
+  }
+});
+
+function addPopDen() {
+  currentGeojsonLayers = (0, _lodash2.default)(currentGeojsonLayers);
+
+  if (map.getLayer('popDen')) {
+    var thisIndex = currentGeojsonLayers.indexOf('popDen');
+
+    if (thisIndex > -1) {
+      currentGeojsonLayers.splice(thisIndex, 1);
+    }
+
+    map.removeLayer('popDen');
+    console.log(currentGeojsonLayers);
+  } else {
+    currentGeojsonLayers.push('popDen');
+    console.log(currentGeojsonLayers);
+    map.addLayer({
+      'id': 'popDen',
+      'type': 'fill',
+      'source': 'hex',
+      'layout': {
+        'visibility': 'visible'
+      },
+      'paint': {
+        'fill-color': ['interpolate', ['linear'], ['get', '_mean'], 0, '#ffffcc', 345, '#c7e9b4', 2408, '#7fcdbb', 7190, '#41b6c4', 19764, '#2c7fb8', 58223, '#B86B25'],
+        'fill-opacity': 0.5
+      }
+    });
+  }
+
+  map.easeTo({
+    center: map.getCenter(),
+    pitch: 0
+  });
+}
+
 function addHex(name) {
-  var style1 = [];
+  currentGeojsonLayers = (0, _lodash2.default)(currentGeojsonLayers);
 
-  if (name === 'hex') {
-    style1 = ['interpolate', ['linear'], ['get', 'rando_1'], 0, '#f7fcfd', 100, '#e0ecf4', 300, '#bfd3e6', 400, '#8c96c6', 500, '#8c6bb1', 700, '#6e016b'];
-  } else if (name === 'hex1') {
-    style1 = ['match', ['get', 'rando_3'], 1, 'red', 2, 'blue', 3, 'yellow', 4, 'orange', 5, 'gray', 'green'];
-  } else if (name === 'pop') {
-    style1 = ['interpolate', ['linear'], ['get', '_mean'], 0, '#eff3ff', 553, '#c6dbef', 2302, '#9ecae1', 5544, '#6baed6', 12070, '#3182bd', 33737, '#08519c'];
+  if (map.getLayer('hex')) {
+    var thisIndex = currentGeojsonLayers.indexOf('hex');
+
+    if (thisIndex > -1) {
+      currentGeojsonLayers.splice(thisIndex, 1);
+    }
+
+    map.removeLayer('hex');
+    console.log(currentGeojsonLayers);
+  } else {
+    currentGeojsonLayers.push('hex');
+    console.log(currentGeojsonLayers);
+    var style1 = ['match', ['get', 'rando_3'], 1, 'red', 2, 'blue', 3, 'yellow', 4, 'orange', 5, 'gray', 'green'];
+    map.addLayer({
+      'id': 'hex',
+      'type': 'fill',
+      'source': 'hex',
+      'layout': {
+        'visibility': 'visible'
+      },
+      'paint': {
+        'fill-color': style1,
+        'fill-opacity': 0.5
+      }
+    });
   }
 
-  var hexTest = 'https://sebastian-ch.github.io/sidsDataTest/data/hex.pbf';
+  map.easeTo({
+    center: map.getCenter(),
+    pitch: 0
+  });
+}
 
-  if (map.getSource('hex-source')) {
-    map.setPaintProperty('hex', 'fill-color', style1);
+function add3dHex() {
+  currentGeojsonLayers = (0, _lodash2.default)(currentGeojsonLayers);
+
+  if (map.getLayer('pop3d')) {
+    var thisIndex = currentGeojsonLayers.indexOf('pop3d');
+
+    if (thisIndex > -1) {
+      currentGeojsonLayers.splice(thisIndex, 1);
+    }
+
+    map.removeLayer('pop3d');
   } else {
-    d3.buffer(hexTest).then(function (data) {
-      var gjn = _geobuf.default.decode(new _pbf.default(data));
+    currentGeojsonLayers.push('pop3d');
+    map.addLayer({
+      id: 'pop3d',
+      type: "fill-extrusion",
+      source: 'hex',
+      layout: {
+        visibility: "visible"
+      },
+      paint: {
+        "fill-extrusion-color": ['interpolate', ['linear'], ['get', '_mean'], 0, '#ffffcc', 345, '#c7e9b4', 2408, '#7fcdbb', 7190, '#41b6c4', 19764, '#2c7fb8', 58223, '#B86B25'],
+        "fill-extrusion-height": ["get", "_mean"],
+        "fill-extrusion-opacity": 0.75
+      }
+    });
+  }
 
-      map.addSource('hex-source', {
-        'type': 'geojson',
-        'data': gjn
-      });
-      map.addLayer({
-        'id': 'hex',
-        'type': 'fill',
-        'source': 'hex-source',
-        'layout': {
-          'visibility': 'visible'
-        },
-        'paint': {
-          'fill-color': style1,
-          'fill-opacity': 0.75
-        }
-      });
+  var v2 = new _mapboxGl.default.LngLatBounds([[103.60905, 1.16639], [104.0858, 1.47139]]);
+  /*map.fitBounds(v2, {
+    linear: true,
+    padding: { top: 10, bottom: 25, left: 15, right: 5 },
+    pitch: 55,
+    }); */
+
+  console.log(map.getCenter());
+  map.easeTo({
+    center: map.getCenter(),
+    pitch: 55
+  }); //map.setPitch(55);
+}
+
+function addSidsOutline(name) {
+  console.log(name);
+  currentGeojsonLayers = (0, _lodash2.default)(currentGeojsonLayers);
+
+  if (map.getLayer("outline")) {
+    map.setFilter("outline", ["==", "NAME_0", name]);
+  } else {
+    currentGeojsonLayers.push('outline');
+    console.log(currentGeojsonLayers);
+    map.addLayer({
+      id: "outline",
+      type: "line",
+      source: "allSids-source",
+      layout: {
+        visibility: "visible"
+      },
+      filter: ["==", "NAME_0", name],
+      paint: {
+        "line-color": "red",
+
+        /*'line-opacity': 0.3, */
+        "line-width": 2
+      }
     });
   }
 }
-
-function addSidOutline(name) {
-  if (map.getLayer('outline')) {
-    map.setFilter('outline', ['==', 'NAME_0', name]);
-  } else {
-    var allSids = 'https://sebastian-ch.github.io/sidsDataTest/data/allSids.pbf';
-    d3.buffer(allSids).then(function (data) {
-      var gjn = _geobuf.default.decode(new _pbf.default(data));
-
-      map.addSource('outline-source', {
-        'type': 'geojson',
-        'data': gjn
-      });
-      map.addLayer({
-        'id': 'outline',
-        'type': 'line',
-        'source': 'outline-source',
-        'layout': {
-          'visibility': 'visible'
-        },
-        'filter': ['==', 'NAME_0', name],
-        'paint': {
-          'line-color': 'red',
-
-          /*'line-opacity': 0.3, */
-          'line-width': 2
-        }
-      });
-    });
-  }
-}
-
-function allEez() {
-  var EEZlines = 'https://sebastian-ch.github.io/sidsDataTest/data/eezlines.pbf';
-
-  if (map.getLayer('eez-layer')) {
-    map.removeLayer('eez-layer');
-    map.removeLayer('disputed');
-  } else {
-    d3.buffer(EEZlines).then(function (data) {
-      var gjn = _geobuf.default.decode(new _pbf.default(data));
-
-      map.addSource('eez-source', {
-        'type': 'geojson',
-        'data': gjn
-      });
-      map.addLayer({
-        'id': 'eez-layer',
-        'type': 'line',
-        'source': 'eez-source',
-        'layout': {
-          'visibility': 'visible',
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-        'filter': ["all", ["!in", 'LINE_TYPE', 'Unsettled', 'Unsettled median line']],
-        'paint': {
-          /* 'line-color': [
-             'match',
-             ['get', 'LINE_TYPE'],
-             'Treaty', 'blue',
-             'Unsettled median line', 'red',
-             'green'
-           ], */
-          'line-color': 'blue',
-          'line-width': 1
-          /*'line-dasharray': [5,5] */
-
-        }
-      });
-      map.addLayer({
-        'id': 'disputed',
-        'type': 'line',
-        'source': 'eez-source',
-        'layout': {
-          'visibility': 'visible',
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-        //'filter': ['==', 'LINE_TYPE', 'Unsettled median line']
-        'filter': ["all", ["in", 'LINE_TYPE', 'Unsettled', 'Unsettled median line']],
-        'paint': {
-          /* 'line-color': [
-             'match',
-             ['get', 'LINE_TYPE'],
-             'Treaty', 'blue',
-             'Unsettled median line', 'red',
-             'green'
-           ], */
-          'line-color': 'red',
-          'line-width': 3,
-          'line-dasharray': [2, 4]
-        }
-      });
-    });
-  }
-}
-},{"mapbox-gl":"node_modules/mapbox-gl/dist/mapbox-gl.js","mapbox-gl/dist/mapbox-gl.css":"node_modules/mapbox-gl/dist/mapbox-gl.css","mapbox-gl-style-switcher":"node_modules/mapbox-gl-style-switcher/dist/index.js","mapbox-gl-style-switcher/styles.css":"node_modules/mapbox-gl-style-switcher/styles.css","./data/sidsNames.json":"data/sidsNames.json","d3-fetch":"node_modules/d3-fetch/src/index.js","pbf":"node_modules/pbf/index.js","geobuf":"node_modules/geobuf/index.js","lodash.find":"node_modules/lodash.find/index.js","./style.css":"style.css"}],"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"mapbox-gl":"node_modules/mapbox-gl/dist/mapbox-gl.js","mapbox-gl/dist/mapbox-gl.css":"node_modules/mapbox-gl/dist/mapbox-gl.css","mapbox-gl-style-switcher":"node_modules/mapbox-gl-style-switcher/dist/index.js","mapbox-gl-style-switcher/styles.css":"node_modules/mapbox-gl-style-switcher/styles.css","./data/sidsNames.json":"data/sidsNames.json","d3-fetch":"node_modules/d3-fetch/src/index.js","pbf":"node_modules/pbf/index.js","geobuf":"node_modules/geobuf/index.js","lodash.find":"node_modules/lodash.find/index.js","lodash.uniq":"node_modules/lodash.uniq/index.js","./style.css":"style.css"}],"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -38098,7 +39055,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57207" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63970" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
