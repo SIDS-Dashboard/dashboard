@@ -32,7 +32,7 @@ mapboxgl.accessToken =
     //style: 'mapbox://styles/mapbox/light-v10', //?optimize=true
     style: 'mapbox://styles/mapbox/satellite-v9',
     center: [0, 0], // starting position [lng, lat]
-    zoom: 2, // starting zoom
+    zoom: 4, // starting zoom
   });
 
   //var sources = ['pop3d', 'allSids-source']
