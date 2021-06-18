@@ -42301,21 +42301,44 @@ dataWrapper.addEventListener('click', function (event) {
       addLegend(colorRamp, breaks, event.target.id);
     }
   }
-  /* map.easeTo({
-     center: map.getCenter(),
-     pitch: 0
-  
-   }) */
 
+  map.on('moveend', function () {
+    if (map.getLayer('hex')) {
+      var features = map.queryRenderedFeatures({
+        layers: ['hex']
+      });
+
+      if (features) {
+        var uniFeatures = getUniqueFeatures(features, 'hexid'); //console.log(uniFeatures[0].properties._mean);
+        //console.log(uniFeatures);
+
+        var selecteData = uniFeatures.map(function (x) {
+          return x.properties[currentGeojsonLayers.dataLayer];
+        });
+        console.log(selecteData);
+        var max = Math.max.apply(Math, _toConsumableArray(selecteData));
+        var min = Math.min.apply(Math, _toConsumableArray(selecteData)); //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
+
+        var breaks = _chromaJs.default.limits(selecteData, 'q', 4); //console.log(breaks)
+        //console.log(colorz.classes)
+
+
+        currentGeojsonLayers.breaks = breaks;
+        map.setPaintProperty('hex', 'fill-color', ['interpolate', ['linear'], ['get', currentGeojsonLayers.dataLayer], breaks[0], currentGeojsonLayers.color[0], breaks[1], currentGeojsonLayers.color[1], breaks[2], currentGeojsonLayers.color[2], breaks[3], currentGeojsonLayers.color[3], breaks[4], currentGeojsonLayers.color[4]]);
+        map.setPaintProperty('hex', 'fill-opacity', 0.5);
+        map.setFilter('hex', ['has', currentGeojsonLayers.dataLayer]);
+        addLegend(colorRamp, breaks, currentGeojsonLayers.dataLayer);
+      }
+    }
+  });
 }); //addLegend()
 
 function addLegend(colors, breaks, current) {
   //console.log(allLayers)
-  var legData = (0, _lodash.default)(allLayers, ['field_name', current]);
-  console.log(legData);
+  var legData = (0, _lodash.default)(allLayers, ['field_name', current]); //console.log(legData)
 
   if (!map.hasControl(legendControl)) {
-    map.addControl(legendControl, 'bottom-left');
+    map.addControl(legendControl, 'bottom-right');
   }
 
   var infoBox = document.getElementById('infoBox');
@@ -42442,7 +42465,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63523" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64707" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

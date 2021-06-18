@@ -9,30 +9,12 @@ Field_Name,Description,Temporal,Name,Unit,Desc_long,Source_Name,Source_Link
 1c3,Population density 2010,2010,Population Density 2010,Population per km4,"The Gridded Population of the World, Version 4 (GPWv4) consists of estimates of human population (number of persons per pixel) consistent with national censuses and population registers with respect to relative spatial distribution. ","CIESIN, Columbia University (2018)",https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-count-adjusted-to-2015-unwpp-country-totals-rev11
 1c4,Population density 2015,2015,Population Density 2015,Population per km5,"The Gridded Population of the World, Version 4 (GPWv4) consists of estimates of human population (number of persons per pixel) consistent with national censuses and population registers with respect to relative spatial distribution. ","CIESIN, Columbia University (2018)",https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-count-adjusted-to-2015-unwpp-country-totals-rev11
 1c5,Population density 2020,2020,Population Density 2020,Population per km6,"The Gridded Population of the World, Version 4 (GPWv4) consists of estimates of human population (number of persons per pixel) consistent with national censuses and population registers with respect to relative spatial distribution. ","CIESIN, Columbia University (2018)",https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-count-adjusted-to-2015-unwpp-country-totals-rev11
-2a1,food insecurity hotspots - duration - crisis,,,,,"CIESIN, Columbia University (2020)",https://sedac.ciesin.columbia.edu/data/set/food-food-insecurity-hotspots
-2a2,food insecurity hotspots - duration - emergency,,,,,"CIESIN, Columbia University (2020)",https://sedac.ciesin.columbia.edu/data/set/food-food-insecurity-hotspots
-2a3,food insecurity hotspots - duration - famine,,,,,"CIESIN, Columbia University (2020)",https://sedac.ciesin.columbia.edu/data/set/food-food-insecurity-hotspots
-2a4,food insecurity hotspots - duration - minimal,,,,,"CIESIN, Columbia University (2020)",https://sedac.ciesin.columbia.edu/data/set/food-food-insecurity-hotspots
-2a5,food insecurity hotspots - duration - stressed,,,,,"CIESIN, Columbia University (2020)",https://sedac.ciesin.columbia.edu/data/set/food-food-insecurity-hotspots
-2a6,food insecurity hotspots - frequency - crisis,,,,,"CIESIN, Columbia University (2020)",https://sedac.ciesin.columbia.edu/data/set/food-food-insecurity-hotspots
-2a7,food insecurity hotspots - frequency - emergency,,,,,"CIESIN, Columbia University (2020)",https://sedac.ciesin.columbia.edu/data/set/food-food-insecurity-hotspots
-2a8,food insecurity hotspots - frequency - famine,,,,,"CIESIN, Columbia University (2020)",https://sedac.ciesin.columbia.edu/data/set/food-food-insecurity-hotspots
-2a9,food insecurity hotspots - frequency - minimal,,,,,"CIESIN, Columbia University (2020)",https://sedac.ciesin.columbia.edu/data/set/food-food-insecurity-hotspots
-2a10,food insecurity hotspots - frequency - stressed,,,,,"CIESIN, Columbia University (2020)",https://sedac.ciesin.columbia.edu/data/set/food-food-insecurity-hotspots
-2a11,food insecurity hotspots - standarddeviation,,,,,"CIESIN, Columbia University (2020)",https://sedac.ciesin.columbia.edu/data/set/food-food-insecurity-hotspots
-2a12,food insecurity hotspots - average,,,,,"CIESIN, Columbia University (2020)",https://sedac.ciesin.columbia.edu/data/set/food-food-insecurity-hotspots
 6c1,domestic water use - cons,,Domestic Water Use (Consumed),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437035
 6c2,domestic water use - withd,,Domestic Water Use (Withdrawn),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437036
 6c3,electricity water use - cons,,Electricity Water Use (Consumed),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437037
 6c4,electricity water use - withd,,Electricity Water Use (Consumed),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437038
-6c5,irrigation water use - cons - model h08,,Irrigation Water Use (Consumed),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437039
-6c6,irrigation water use - cons - model jpjml,,Irrigation Water Use (Consumed),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437040
 6c7,irrigation water use - cons - model pcr,,Irrigation Water Use (Consumed),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437041
-6c8,irrigation water use - cons - model watergap,,Irrigation Water Use (Consumed),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437042
-6c9,irrigation water use - withd - model h08,,Irrigation Water Use (Withdrawn),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437043
-6c10,irrigation water use - withd - model lpjml,,Irrigation Water Use (Withdrawn),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437044
 6c11,irrigation water use - withd - model pcrglobwb,,Irrigation Water Use (Withdrawn),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437045
-6c12,irrigation water use - withd - model watergap,,Irrigation Water Use (Withdrawn),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437046
 6c13,livestock water use - cons,,Livestock Water Use (Consumed),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437047
 6c14,livestock water use - withd,,Livestock Water Use (Withdrawn),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437048
 6c15,manufacturing water use - cons,,Manufacturing Water Use (Consumed),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437049

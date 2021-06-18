@@ -392,13 +392,55 @@ mapboxgl.accessToken =
   
     } 
 
-   /* map.easeTo({
-      center: map.getCenter(),
-      pitch: 0
-  
-    }) */
-  
+   map.on('moveend', function(){
+
+    if(map.getLayer('hex')) {
+    var features = map.queryRenderedFeatures({
+      layers: ['hex']
+    })
+
+    if(features) {
+
+      var uniFeatures = getUniqueFeatures(features, 'hexid');
+      //console.log(uniFeatures[0].properties._mean);
+      //console.log(uniFeatures);
+      var selecteData = uniFeatures.map(x => x.properties[currentGeojsonLayers.dataLayer])
+      console.log(selecteData);
+      var max = Math.max(...selecteData)
+      var min = Math.min(...selecteData)
+
+
+      //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
+      var breaks = chroma.limits(selecteData, 'q', 4)
+      //console.log(breaks)
+     
+      
+      //console.log(colorz.classes)
+    
+      currentGeojsonLayers.breaks = breaks;
+
+        map.setPaintProperty('hex', 'fill-color',
+        [
+          'interpolate',
+          ['linear'],
+          ['get', currentGeojsonLayers.dataLayer],
+          breaks[0], currentGeojsonLayers.color[0],
+          breaks[1], currentGeojsonLayers.color[1],
+          breaks[2], currentGeojsonLayers.color[2],
+          breaks[3], currentGeojsonLayers.color[3],
+          breaks[4], currentGeojsonLayers.color[4],
+          ]
+        
+        )
+        map.setPaintProperty('hex','fill-opacity', 0.5)
+        map.setFilter('hex',['has',currentGeojsonLayers.dataLayer])
+        addLegend(colorRamp, breaks, currentGeojsonLayers.dataLayer)
+
+        }
+      }
   })
+
+})
 
 //addLegend()
 function addLegend(colors, breaks, current) {
@@ -406,10 +448,10 @@ function addLegend(colors, breaks, current) {
   //console.log(allLayers)
   
   var legData = find(allLayers, ['field_name', current])
-  console.log(legData)
+  //console.log(legData)
 
   if(!map.hasControl(legendControl)) {
-    map.addControl(legendControl, 'bottom-left')
+    map.addControl(legendControl, 'bottom-right')
   }
 var infoBox = document.getElementById('infoBox')
   infoBox.style.display = "block";
