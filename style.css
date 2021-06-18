@@ -65,6 +65,8 @@ html, body {
     overflow-x: hidden;
     text-align: center;
     background-color: #2980B9;
+    border: 1px solid #3498DB;
+    border-radius: 2%;
   }
 
   .dropdown-data {
@@ -77,6 +79,8 @@ html, body {
     overflow-x: hidden;
     text-align: center;
     background-color: #2980B9;
+    
+    
   }
   
   .dropdown-content {
@@ -153,7 +157,7 @@ html, body {
 
   .legend {
     margin-left: 10px;
-    border: 1px solid red;
+    border: 2px solid black;
     padding: 5px;
     height: 150px;
     width: 150px;

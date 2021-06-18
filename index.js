@@ -174,7 +174,7 @@ mapboxgl.accessToken =
           'layout': {
             'visibility': 'visible'
             },
-          
+          //'filter': ['!=', "null"],
           'paint': {
               'fill-color': [
                 'interpolate',
@@ -197,25 +197,6 @@ mapboxgl.accessToken =
         }); */
 
       }
-
-      
-     /* for (var x in currentGeojsonLayers) {
-        if (currentGeojsonLayers[x] === 'hex') {
-          addHex();
-        }
-        if(currentGeojsonLayers[x] === 'outline') {
-          addSidsOutline(sourceData.allSidsSource.lastName)
-          //console.log('hi')
-        }
-        if(currentGeojsonLayers[x] === 'pop3d') {
-
-          add3dHex();
-        }
-        if(currentGeojsonLayers[x] === 'popDen') {
-          addPopDen();
-        }
-
-      } */
 
   })
 
@@ -252,7 +233,6 @@ mapboxgl.accessToken =
   }
 
   
-
   const wrapper = document.getElementById('myDropdown');
   wrapper.addEventListener('click', (event) => {
     const isButton = event.target.nodeName === 'BUTTON';
@@ -325,8 +305,14 @@ mapboxgl.accessToken =
         //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
         var breaks = chroma.limits(selecteData, 'q', 4)
         console.log(breaks)
-        var colorRamp = chroma.scale(['#fafa6e','#2A4858']).mode('lch').colors(5)
+        var colorRamp3 = chroma.scale(['#fafa6e','#2A4858']).mode('lch').colors(5)
+        var colorRamp1 = ['#edf8fb', '#b2e2e2','#66c2a4','#2ca25f', '#006d2c' ]
+        var colorRamp2 = ['#f2f0f7','#cbc9e2' ,'#9e9ac8' , '#756bb1' , '#54278f' ]
         //console.log(colorz.classes)
+        var ramps = [colorRamp1, colorRamp2, colorRamp3]
+
+        var colorRamp = ramps[Math.floor(Math.random() * 3)];
+
         currentGeojsonLayers.breaks = breaks;
         currentGeojsonLayers.color = colorRamp;
 
@@ -344,7 +330,7 @@ mapboxgl.accessToken =
         
         )
         map.setPaintProperty('hex','fill-opacity', 0.5)
-
+        map.setFilter('hex',['!=',event.target.id, 'null'])
         addLegend(colorRamp, breaks)
         
       } 

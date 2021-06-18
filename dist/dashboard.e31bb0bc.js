@@ -42146,6 +42146,7 @@ map.on('style.load', function () {
       'layout': {
         'visibility': 'visible'
       },
+      //'filter': ['!=', "null"],
       'paint': {
         'fill-color': ['interpolate', ['linear'], ['get', currentGeojsonLayers.dataLayer], currentGeojsonLayers.breaks[0], currentGeojsonLayers.color[0], currentGeojsonLayers.breaks[1], currentGeojsonLayers.color[1], currentGeojsonLayers.breaks[2], currentGeojsonLayers.color[2], currentGeojsonLayers.breaks[3], currentGeojsonLayers.color[3], currentGeojsonLayers.breaks[4], currentGeojsonLayers.color[4]],
         'fill-opacity': 0.7
@@ -42156,22 +42157,6 @@ map.on('style.load', function () {
        data: geobuf.decode(new Pbf(sourceData.allSidsSource.data)),
      }); */
   }
-  /* for (var x in currentGeojsonLayers) {
-     if (currentGeojsonLayers[x] === 'hex') {
-       addHex();
-     }
-     if(currentGeojsonLayers[x] === 'outline') {
-       addSidsOutline(sourceData.allSidsSource.lastName)
-       //console.log('hi')
-     }
-     if(currentGeojsonLayers[x] === 'pop3d') {
-         add3dHex();
-     }
-     if(currentGeojsonLayers[x] === 'popDen') {
-       addPopDen();
-     }
-     } */
-
 });
 
 function addHexSource() {
@@ -42267,13 +42252,18 @@ dataWrapper.addEventListener('click', function (event) {
 
       console.log(breaks);
 
-      var colorRamp = _chromaJs.default.scale(['#fafa6e', '#2A4858']).mode('lch').colors(5); //console.log(colorz.classes)
+      var colorRamp3 = _chromaJs.default.scale(['#fafa6e', '#2A4858']).mode('lch').colors(5);
 
+      var colorRamp1 = ['#edf8fb', '#b2e2e2', '#66c2a4', '#2ca25f', '#006d2c'];
+      var colorRamp2 = ['#f2f0f7', '#cbc9e2', '#9e9ac8', '#756bb1', '#54278f']; //console.log(colorz.classes)
 
+      var ramps = [colorRamp1, colorRamp2, colorRamp3];
+      var colorRamp = ramps[Math.floor(Math.random() * 3)];
       currentGeojsonLayers.breaks = breaks;
       currentGeojsonLayers.color = colorRamp;
       map.setPaintProperty('hex', 'fill-color', ['interpolate', ['linear'], ['get', event.target.id], breaks[0], colorRamp[0], breaks[1], colorRamp[1], breaks[2], colorRamp[2], breaks[3], colorRamp[3], breaks[4], colorRamp[4]]);
       map.setPaintProperty('hex', 'fill-opacity', 0.5);
+      map.setFilter('hex', ['!=', event.target.id, 'null']);
       addLegend(colorRamp, breaks);
     }
   }
@@ -42409,7 +42399,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51354" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54061" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
