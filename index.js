@@ -24,6 +24,7 @@ d3.csv(allTheLayers).then(function(d){
   d.map(function(x) {
     allLayers.push(
       {'field_name':x.Field_Name,
+      'title': x.Name,
       'desc': x.Description, 
       'units': x.Unit,
       'desc_long':x.Desc_long, 
@@ -61,8 +62,8 @@ mapboxgl.accessToken =
     container: "map", // container ID
     //style: 'mapbox://styles/mapbox/light-v10', //?optimize=true
     style: 'mapbox://styles/mapbox/satellite-v9',
-    center: [0, 0], // starting position [lng, lat]
-    zoom: 4, // starting zoom
+    center: [-71.4, 19.1], // starting position [lng, lat]
+    zoom: 7, // starting zoom
   });
 
   //var sources = ['pop3d', 'allSids-source']
@@ -123,7 +124,7 @@ mapboxgl.accessToken =
     //map.addControl(legendControl, 'bottom-left');
     
     addHexSource()
-    /* addSidsSource() */
+    addSidsSource()
 
     
   });
@@ -151,11 +152,6 @@ mapboxgl.accessToken =
      
     return uniqueFeatures;
     }
-
-  map.on('moveend', function() {
-
-  
-  })
 
   map.on('style.load', function(){
     var layers = map.getStyle().layers;
@@ -239,6 +235,32 @@ mapboxgl.accessToken =
 
   }
 
+  const adminWrap = document.getElementById('admin');
+  adminWrap.addEventListener('click', (event) => {
+
+
+    if(map.getLayer('admin')) {
+      map.removeLayer('admin')
+    } else {
+      map.addLayer({
+        id: "admin",
+        type: "line",
+        source: "allSids-source",
+        layout: {
+          visibility: "visible",
+        },
+        paint: {
+          "line-color": "red",
+          /*'line-opacity': 0.3, */
+          "line-width": 2,
+        },
+      });
+    }
+    
+
+
+  })
+
   
   const wrapper = document.getElementById('myDropdown');
   wrapper.addEventListener('click', (event) => {
@@ -261,6 +283,54 @@ mapboxgl.accessToken =
           padding: {top: 10, bottom:25, left: 15, right: 5},
           pitch: 0
         });
+
+        /*map.on('moveend', function(){
+
+          if(map.getLayer('hex')) {
+          var features = map.queryRenderedFeatures({
+            layers: ['hex']
+          })
+      
+          if(features) {
+      
+            var uniFeatures = getUniqueFeatures(features, 'hexid');
+            //console.log(uniFeatures[0].properties._mean);
+            //console.log(uniFeatures);
+            var selecteData = uniFeatures.map(x => x.properties[currentGeojsonLayers.dataLayer])
+            //console.log(selecteData);
+            var max = Math.max(...selecteData)
+            var min = Math.min(...selecteData)
+      
+      
+            //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
+            var breaks = chroma.limits(selecteData, 'q', 4)
+            //console.log(breaks)
+           
+            
+            //console.log(colorz.classes)
+          
+            currentGeojsonLayers.breaks = breaks;
+      
+              map.setPaintProperty('hex', 'fill-color',
+              [
+                'interpolate',
+                ['linear'],
+                ['get', currentGeojsonLayers.dataLayer],
+                breaks[0], currentGeojsonLayers.color[0],
+                breaks[1], currentGeojsonLayers.color[1],
+                breaks[2], currentGeojsonLayers.color[2],
+                breaks[3], currentGeojsonLayers.color[3],
+                breaks[4], currentGeojsonLayers.color[4],
+                ]
+              
+              )
+              map.setPaintProperty('hex','fill-opacity', 0.5)
+              map.setFilter('hex',['has',currentGeojsonLayers.dataLayer])
+              addLegend(colorRamp, breaks, currentGeojsonLayers.dataLayer)
+      
+              }
+            }
+        }) */
         //addSidsOutline(currbb.NAME_0);
     } 
    /*  else if(event.target.id.includes('pop3d')) {
@@ -384,7 +454,7 @@ mapboxgl.accessToken =
           ]
         
         )
-        map.setPaintProperty('hex','fill-opacity', 0.5)
+        map.setPaintProperty('hex','fill-opacity', 0.6)
         map.setFilter('hex',['has',event.target.id])
         addLegend(colorRamp, breaks, event.target.id)
         
@@ -405,7 +475,7 @@ mapboxgl.accessToken =
       //console.log(uniFeatures[0].properties._mean);
       //console.log(uniFeatures);
       var selecteData = uniFeatures.map(x => x.properties[currentGeojsonLayers.dataLayer])
-      console.log(selecteData);
+      //console.log(selecteData);
       var max = Math.max(...selecteData)
       var min = Math.min(...selecteData)
 
@@ -433,13 +503,13 @@ mapboxgl.accessToken =
         
         )
         map.setPaintProperty('hex','fill-opacity', 0.5)
-        map.setFilter('hex',['has',currentGeojsonLayers.dataLayer])
-        addLegend(colorRamp, breaks, currentGeojsonLayers.dataLayer)
+        //map.setFilter('hex',['has',currentGeojsonLayers.dataLayer])
+        addLegend(currentGeojsonLayers.color, breaks, currentGeojsonLayers.dataLayer)
 
         }
       }
-  })
-
+  
+})
 })
 
 //addLegend()
@@ -456,7 +526,7 @@ function addLegend(colors, breaks, current) {
 var infoBox = document.getElementById('infoBox')
   infoBox.style.display = "block";
 
-  infoBox.innerHTML = '<p>'+ legData.desc_long + '</p>' +
+  infoBox.innerHTML = '<h2>'+ legData.title + '</h2><p>'+ legData.desc_long + '</p>' +
    '<b>Reference: </b>' + legData.source_name + ' - ' +
     legData.link.link();
   
@@ -469,18 +539,16 @@ var infoBox = document.getElementById('infoBox')
   legend.innerHTML = '<h3>' + legData.units + '</h3>';
   for (var x in colors) {
     legend.innerHTML+= '<span style="background:'+ colors[x] + '"></span>' +
-    '<label>'+ Number.parseFloat(breaks[x]).toFixed(2)+'</label>'
+    '<label>'+ Number.parseFloat(breaks[x]).toFixed(3)+'</label>'
 
   }
     
 }
 
-
 function add3dHex() {
 
   currentGeojsonLayers = uniq(currentGeojsonLayers)
   
-
   if (map.getLayer('pop3d')) {
     var thisIndex = currentGeojsonLayers.indexOf('pop3d');
         if (thisIndex > -1) {
@@ -529,7 +597,7 @@ function add3dHex() {
     pitch: 55,
     }); */
 
-  console.log(map.getCenter())
+  //console.log(map.getCenter())
 
   map.easeTo({
     center: map.getCenter(),
@@ -542,9 +610,9 @@ function add3dHex() {
 }
 
 
-/*function addSidsSource() {
+function addSidsSource() {
 
-    const allSids = "https://sebastian-ch.github.io/sidsDataTest/data/allSids.pbf";
+    const allSids = "https://sebastian-ch.github.io/sidsDataTest/data/gadm1.pbf";
 
     d3.buffer(allSids).then(function (data) {
         map.addSource("allSids-source", {
@@ -554,10 +622,7 @@ function add3dHex() {
 
         sourceData.allSidsSource.data = data;
       });
-  } */
-
-
-
+  }
 function addSidsOutline(name) {
 
   console.log(name)

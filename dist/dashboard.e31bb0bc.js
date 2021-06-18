@@ -42008,6 +42008,7 @@ d3.csv(_csv_data.default).then(function (d) {
   d.map(function (x) {
     allLayers.push({
       'field_name': x.Field_Name,
+      'title': x.Name,
       'desc': x.Description,
       'units': x.Unit,
       'desc_long': x.Desc_long,
@@ -42037,9 +42038,9 @@ var map = new _mapboxGl.default.Map({
   // container ID
   //style: 'mapbox://styles/mapbox/light-v10', //?optimize=true
   style: 'mapbox://styles/mapbox/satellite-v9',
-  center: [0, 0],
+  center: [-71.4, 19.1],
   // starting position [lng, lat]
-  zoom: 4 // starting zoom
+  zoom: 7 // starting zoom
 
 }); //var sources = ['pop3d', 'allSids-source']
 
@@ -42106,7 +42107,7 @@ map.on("load", function () {
   legendControl = new MyCustomControl(); //map.addControl(legendControl, 'bottom-left');
 
   addHexSource();
-  /* addSidsSource() */
+  addSidsSource();
 });
 /* map.on('click', function(){
    map.removeControl(myCustomControl)
@@ -42128,7 +42129,6 @@ function getUniqueFeatures(array, comparatorProperty) {
   return uniqueFeatures;
 }
 
-map.on('moveend', function () {});
 map.on('style.load', function () {
   var layers = map.getStyle().layers; // Find the index of the first symbol layer in the map style
 
@@ -42189,6 +42189,27 @@ function addHexSource() {
   });
 }
 
+var adminWrap = document.getElementById('admin');
+adminWrap.addEventListener('click', function (event) {
+  if (map.getLayer('admin')) {
+    map.removeLayer('admin');
+  } else {
+    map.addLayer({
+      id: "admin",
+      type: "line",
+      source: "allSids-source",
+      layout: {
+        visibility: "visible"
+      },
+      paint: {
+        "line-color": "red",
+
+        /*'line-opacity': 0.3, */
+        "line-width": 2
+      }
+    });
+  }
+});
 var wrapper = document.getElementById('myDropdown');
 wrapper.addEventListener('click', function (event) {
   var isButton = event.target.nodeName === 'BUTTON';
@@ -42212,7 +42233,49 @@ wrapper.addEventListener('click', function (event) {
         right: 5
       },
       pitch: 0
-    }); //addSidsOutline(currbb.NAME_0);
+    });
+    /*map.on('moveend', function(){
+        if(map.getLayer('hex')) {
+      var features = map.queryRenderedFeatures({
+        layers: ['hex']
+      })
+              if(features) {
+                var uniFeatures = getUniqueFeatures(features, 'hexid');
+        //console.log(uniFeatures[0].properties._mean);
+        //console.log(uniFeatures);
+        var selecteData = uniFeatures.map(x => x.properties[currentGeojsonLayers.dataLayer])
+        //console.log(selecteData);
+        var max = Math.max(...selecteData)
+        var min = Math.min(...selecteData)
+          
+        //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
+        var breaks = chroma.limits(selecteData, 'q', 4)
+        //console.log(breaks)
+       
+        
+        //console.log(colorz.classes)
+      
+        currentGeojsonLayers.breaks = breaks;
+                  map.setPaintProperty('hex', 'fill-color',
+          [
+            'interpolate',
+            ['linear'],
+            ['get', currentGeojsonLayers.dataLayer],
+            breaks[0], currentGeojsonLayers.color[0],
+            breaks[1], currentGeojsonLayers.color[1],
+            breaks[2], currentGeojsonLayers.color[2],
+            breaks[3], currentGeojsonLayers.color[3],
+            breaks[4], currentGeojsonLayers.color[4],
+            ]
+          
+          )
+          map.setPaintProperty('hex','fill-opacity', 0.5)
+          map.setFilter('hex',['has',currentGeojsonLayers.dataLayer])
+          addLegend(colorRamp, breaks, currentGeojsonLayers.dataLayer)
+                  }
+        }
+    }) */
+    //addSidsOutline(currbb.NAME_0);
   }
   /*  else if(event.target.id.includes('pop3d')) {
          add3dHex(event.target.id)
@@ -42296,7 +42359,7 @@ dataWrapper.addEventListener('click', function (event) {
       }
 
       map.setPaintProperty('hex', 'fill-color', ['interpolate', ['linear'], ['get', event.target.id], breaks[0], colorRamp[0], breaks[1], colorRamp[1], breaks[2], colorRamp[2], breaks[3], colorRamp[3], breaks[4], colorRamp[4]]);
-      map.setPaintProperty('hex', 'fill-opacity', 0.5);
+      map.setPaintProperty('hex', 'fill-opacity', 0.6);
       map.setFilter('hex', ['has', event.target.id]);
       addLegend(colorRamp, breaks, event.target.id);
     }
@@ -42314,8 +42377,8 @@ dataWrapper.addEventListener('click', function (event) {
 
         var selecteData = uniFeatures.map(function (x) {
           return x.properties[currentGeojsonLayers.dataLayer];
-        });
-        console.log(selecteData);
+        }); //console.log(selecteData);
+
         var max = Math.max.apply(Math, _toConsumableArray(selecteData));
         var min = Math.min.apply(Math, _toConsumableArray(selecteData)); //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
 
@@ -42325,9 +42388,9 @@ dataWrapper.addEventListener('click', function (event) {
 
         currentGeojsonLayers.breaks = breaks;
         map.setPaintProperty('hex', 'fill-color', ['interpolate', ['linear'], ['get', currentGeojsonLayers.dataLayer], breaks[0], currentGeojsonLayers.color[0], breaks[1], currentGeojsonLayers.color[1], breaks[2], currentGeojsonLayers.color[2], breaks[3], currentGeojsonLayers.color[3], breaks[4], currentGeojsonLayers.color[4]]);
-        map.setPaintProperty('hex', 'fill-opacity', 0.5);
-        map.setFilter('hex', ['has', currentGeojsonLayers.dataLayer]);
-        addLegend(colorRamp, breaks, currentGeojsonLayers.dataLayer);
+        map.setPaintProperty('hex', 'fill-opacity', 0.5); //map.setFilter('hex',['has',currentGeojsonLayers.dataLayer])
+
+        addLegend(currentGeojsonLayers.color, breaks, currentGeojsonLayers.dataLayer);
       }
     }
   });
@@ -42343,7 +42406,7 @@ function addLegend(colors, breaks, current) {
 
   var infoBox = document.getElementById('infoBox');
   infoBox.style.display = "block";
-  infoBox.innerHTML = '<p>' + legData.desc_long + '</p>' + '<b>Reference: </b>' + legData.source_name + ' - ' + legData.link.link(); //console.log('hi')
+  infoBox.innerHTML = '<h2>' + legData.title + '</h2><p>' + legData.desc_long + '</p>' + '<b>Reference: </b>' + legData.source_name + ' - ' + legData.link.link(); //console.log('hi')
   //map.addControl(legendControl, 'bottom-left')
 
   var legend = document.getElementById('legend');
@@ -42351,7 +42414,7 @@ function addLegend(colors, breaks, current) {
   legend.innerHTML = '<h3>' + legData.units + '</h3>';
 
   for (var x in colors) {
-    legend.innerHTML += '<span style="background:' + colors[x] + '"></span>' + '<label>' + Number.parseFloat(breaks[x]).toFixed(2) + '</label>';
+    legend.innerHTML += '<span style="background:' + colors[x] + '"></span>' + '<label>' + Number.parseFloat(breaks[x]).toFixed(3) + '</label>';
   }
 }
 
@@ -42389,27 +42452,24 @@ function add3dHex() {
     padding: { top: 10, bottom: 25, left: 15, right: 5 },
     pitch: 55,
     }); */
+  //console.log(map.getCenter())
 
-  console.log(map.getCenter());
   map.easeTo({
     center: map.getCenter(),
     pitch: 55
   }); //map.setPitch(55);
 }
-/*function addSidsSource() {
 
-    const allSids = "https://sebastian-ch.github.io/sidsDataTest/data/allSids.pbf";
-
-    d3.buffer(allSids).then(function (data) {
-        map.addSource("allSids-source", {
-          type: "geojson",
-          data: geobuf.decode(new Pbf(data)),
-        });
-
-        sourceData.allSidsSource.data = data;
-      });
-  } */
-
+function addSidsSource() {
+  var allSids = "https://sebastian-ch.github.io/sidsDataTest/data/gadm1.pbf";
+  d3.buffer(allSids).then(function (data) {
+    map.addSource("allSids-source", {
+      type: "geojson",
+      data: _geobuf.default.decode(new _pbf.default(data))
+    });
+    sourceData.allSidsSource.data = data;
+  });
+}
 
 function addSidsOutline(name) {
   console.log(name);
@@ -42465,7 +42525,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64707" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56382" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
