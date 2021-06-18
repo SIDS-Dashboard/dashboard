@@ -42255,10 +42255,11 @@ dataWrapper.addEventListener('click', function (event) {
       var colorRamp3 = _chromaJs.default.scale(['#fafa6e', '#2A4858']).mode('lch').colors(5);
 
       var colorRamp1 = ['#edf8fb', '#b2e2e2', '#66c2a4', '#2ca25f', '#006d2c'];
-      var colorRamp2 = ['#f2f0f7', '#cbc9e2', '#9e9ac8', '#756bb1', '#54278f']; //console.log(colorz.classes)
+      var colorRamp2 = ['#f2f0f7', '#cbc9e2', '#9e9ac8', '#756bb1', '#54278f'];
+      var colorRamp4 = ['#ca0020', '#f4a582', '#f7f7f7', '#92c5de', '#0571b0']; //console.log(colorz.classes)
 
-      var ramps = [colorRamp1, colorRamp2, colorRamp3];
-      var colorRamp = ramps[Math.floor(Math.random() * 3)];
+      var ramps = [colorRamp1, colorRamp2, colorRamp3, colorRamp4];
+      var colorRamp = ramps[Math.floor(Math.random() * 4)];
       currentGeojsonLayers.breaks = breaks;
       currentGeojsonLayers.color = colorRamp;
       map.setPaintProperty('hex', 'fill-color', ['interpolate', ['linear'], ['get', event.target.id], breaks[0], colorRamp[0], breaks[1], colorRamp[1], breaks[2], colorRamp[2], breaks[3], colorRamp[3], breaks[4], colorRamp[4]]);
@@ -42399,7 +42400,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54061" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54535" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

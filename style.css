@@ -1,8 +1,11 @@
+
+
 html, body {
     margin: 0;
     padding: 0;
     overflow-y: hidden;
     width: 100%;
+    font-family: 'proxima-nova', sans-serif;
     
 }
 
@@ -18,7 +21,7 @@ html, body {
     text-align: center;
   }
 
-  #sids {
+  /* #sids {
       display: flex;
       flex-direction: column;
       text-align: center;
@@ -27,6 +30,20 @@ html, body {
       margin: 10px auto 10px auto;
       margin-top: 0;
      
+  } */
+
+  #infoBox {
+    padding: 20px;
+    position: absolute;
+    width: 300px;
+    border-radius: 25px;
+    height: 200px;
+    z-index: 1;
+    color: white;
+    background-color: red;
+    bottom: 10%;
+    left: 30%;
+
   }
 
 
@@ -65,8 +82,8 @@ html, body {
     overflow-x: hidden;
     text-align: center;
     background-color: #2980B9;
-    border: 1px solid #3498DB;
-    border-radius: 2%;
+    
+    border-radius: 25px;
   }
 
   .dropdown-data {
@@ -79,7 +96,7 @@ html, body {
     overflow-x: hidden;
     text-align: center;
     background-color: #2980B9;
-    
+    border-radius: 25px;
     
   }
   
@@ -115,36 +132,50 @@ html, body {
   .dropdown-contentData button {
     text-align: center;
     width: 100%;
-    color: red;
+    color: black;
     padding: 5px 5px;
     text-decoration: none;
     display: block;
+    background-color: #3498DB;
   }
 
   .dropdown-content button {
     text-align: center;
     width: 100%;
-    color: black;
+    color: white;
     padding: 5px 5px;
     text-decoration: none;
+    background-color: #3498DB;
     display: block;
   }
+
+  .dropdown-content button:hover {
+    cursor: pointer;
+    background-color: #2980B9;
+  }
+
+  .dropdown-contentData button:hover {
+    cursor: pointer;
+    background-color: #2980B9;
+  }
   
-  .dropdown a:hover {background-color: #ddd;}
+  .dropdown a:hover { background-color: #2980B9;}
   .dropdown-data a:hover {background-color: #ddd;}
   
   .dropdown:hover .dropdown-content {
     display: block;
+    background-color: #2980B9;
   }
 
   .dropdown-data:hover .dropdown-contentData {
     display: block;
+    background-color: #2980B9;
     
   }
 
   .dropdown-data:hover {
 
-    min-height: 200px;
+    min-height: 400px;
     min-width: 140px;
 
   }
@@ -152,6 +183,7 @@ html, body {
 
     min-height: 400px;
     min-width: 140px;
+    
 
   }
 
