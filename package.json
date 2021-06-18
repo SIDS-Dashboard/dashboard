@@ -22,6 +22,7 @@
     "@turf/bbox-polygon": "^6.3.0",
     "@turf/hex-grid": "^6.3.0",
     "bootstrap": "^5.0.1",
+    "chroma-js": "^2.1.2",
     "d3-fetch": "^3.0.1",
     "geobuf": "^3.0.2",
     "jquery-ui": "^1.12.1",
