@@ -1,0 +1,55 @@
+Field_Name,Description,Temporal,Name,Unit,Desc_long,Source_Name,Source_Link
+1a1,GDP PPP 30 arcsec 1990,1990,GDP per capita 1990,USD per capita,GDP (PPP) represents total gross domestic production in a given grid cell in constant 2011 international US dollars. ,Kummu et al. (2018),https://www.nature.com/articles/sdata20184
+1a2,GDP PPP 30 arcsec 2000,2000,GDP per capita 2000,USD per capita,GDP (PPP) represents total gross domestic production in a given grid cell in constant 2011 international US dollars. ,Kummu et al. (2018),https://www.nature.com/articles/sdata20184
+1a3,GDP PPP 30 arcsec 2015,2015,GDP per capita 2015,USD per capita,GDP (PPP) represents total gross domestic production in a given grid cell in constant 2011 international US dollars. ,Kummu et al. (2018),https://www.nature.com/articles/sdata20184
+1b1,Accessibility to Cities,,Accessibilty to Cities,Minutes,"Global accessibility to high-density urban centres at a resolution of 1 x 1 kilometre for 2015, as measured by travel time. ",Weiss et. al (2018),https://malariaatlas.org/research-project/accessibility-to-cities/
+1b2,Friction Surface,,Travel Friction Surface,Minutes per meter traveled,"Friction surface used to map global accessibility to high-density urban centres at a resolution of 1 x 1 kilometre for 2015, as measured by travel time.",Weiss et. al (2018),https://malariaatlas.org/research-project/accessibility-to-cities/
+1c1,Population density 2000,2000,Population Density 2000,Population per km2,"The Gridded Population of the World, Version 4 (GPWv4) consists of estimates of human population (number of persons per pixel) consistent with national censuses and population registers with respect to relative spatial distribution. ","CIESIN, Columbia University (2018)",https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-count-adjusted-to-2015-unwpp-country-totals-rev11
+1c2,Population density 2005,2005,Population Density 2005,Population per km3,"The Gridded Population of the World, Version 4 (GPWv4) consists of estimates of human population (number of persons per pixel) consistent with national censuses and population registers with respect to relative spatial distribution. ","CIESIN, Columbia University (2018)",https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-count-adjusted-to-2015-unwpp-country-totals-rev11
+1c3,Population density 2010,2010,Population Density 2010,Population per km4,"The Gridded Population of the World, Version 4 (GPWv4) consists of estimates of human population (number of persons per pixel) consistent with national censuses and population registers with respect to relative spatial distribution. ","CIESIN, Columbia University (2018)",https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-count-adjusted-to-2015-unwpp-country-totals-rev11
+1c4,Population density 2015,2015,Population Density 2015,Population per km5,"The Gridded Population of the World, Version 4 (GPWv4) consists of estimates of human population (number of persons per pixel) consistent with national censuses and population registers with respect to relative spatial distribution. ","CIESIN, Columbia University (2018)",https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-count-adjusted-to-2015-unwpp-country-totals-rev11
+1c5,Population density 2020,2020,Population Density 2020,Population per km6,"The Gridded Population of the World, Version 4 (GPWv4) consists of estimates of human population (number of persons per pixel) consistent with national censuses and population registers with respect to relative spatial distribution. ","CIESIN, Columbia University (2018)",https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-count-adjusted-to-2015-unwpp-country-totals-rev11
+2a1,food insecurity hotspots - duration - crisis,,,,,"CIESIN, Columbia University (2020)",https://sedac.ciesin.columbia.edu/data/set/food-food-insecurity-hotspots
+2a2,food insecurity hotspots - duration - emergency,,,,,"CIESIN, Columbia University (2020)",https://sedac.ciesin.columbia.edu/data/set/food-food-insecurity-hotspots
+2a3,food insecurity hotspots - duration - famine,,,,,"CIESIN, Columbia University (2020)",https://sedac.ciesin.columbia.edu/data/set/food-food-insecurity-hotspots
+2a4,food insecurity hotspots - duration - minimal,,,,,"CIESIN, Columbia University (2020)",https://sedac.ciesin.columbia.edu/data/set/food-food-insecurity-hotspots
+2a5,food insecurity hotspots - duration - stressed,,,,,"CIESIN, Columbia University (2020)",https://sedac.ciesin.columbia.edu/data/set/food-food-insecurity-hotspots
+2a6,food insecurity hotspots - frequency - crisis,,,,,"CIESIN, Columbia University (2020)",https://sedac.ciesin.columbia.edu/data/set/food-food-insecurity-hotspots
+2a7,food insecurity hotspots - frequency - emergency,,,,,"CIESIN, Columbia University (2020)",https://sedac.ciesin.columbia.edu/data/set/food-food-insecurity-hotspots
+2a8,food insecurity hotspots - frequency - famine,,,,,"CIESIN, Columbia University (2020)",https://sedac.ciesin.columbia.edu/data/set/food-food-insecurity-hotspots
+2a9,food insecurity hotspots - frequency - minimal,,,,,"CIESIN, Columbia University (2020)",https://sedac.ciesin.columbia.edu/data/set/food-food-insecurity-hotspots
+2a10,food insecurity hotspots - frequency - stressed,,,,,"CIESIN, Columbia University (2020)",https://sedac.ciesin.columbia.edu/data/set/food-food-insecurity-hotspots
+2a11,food insecurity hotspots - standarddeviation,,,,,"CIESIN, Columbia University (2020)",https://sedac.ciesin.columbia.edu/data/set/food-food-insecurity-hotspots
+2a12,food insecurity hotspots - average,,,,,"CIESIN, Columbia University (2020)",https://sedac.ciesin.columbia.edu/data/set/food-food-insecurity-hotspots
+6c1,domestic water use - cons,,Domestic Water Use (Consumed),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437035
+6c2,domestic water use - withd,,Domestic Water Use (Withdrawn),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437036
+6c3,electricity water use - cons,,Electricity Water Use (Consumed),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437037
+6c4,electricity water use - withd,,Electricity Water Use (Consumed),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437038
+6c5,irrigation water use - cons - model h08,,Irrigation Water Use (Consumed),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437039
+6c6,irrigation water use - cons - model jpjml,,Irrigation Water Use (Consumed),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437040
+6c7,irrigation water use - cons - model pcr,,Irrigation Water Use (Consumed),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437041
+6c8,irrigation water use - cons - model watergap,,Irrigation Water Use (Consumed),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437042
+6c9,irrigation water use - withd - model h08,,Irrigation Water Use (Withdrawn),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437043
+6c10,irrigation water use - withd - model lpjml,,Irrigation Water Use (Withdrawn),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437044
+6c11,irrigation water use - withd - model pcrglobwb,,Irrigation Water Use (Withdrawn),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437045
+6c12,irrigation water use - withd - model watergap,,Irrigation Water Use (Withdrawn),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437046
+6c13,livestock water use - cons,,Livestock Water Use (Consumed),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437047
+6c14,livestock water use - withd,,Livestock Water Use (Withdrawn),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437048
+6c15,manufacturing water use - cons,,Manufacturing Water Use (Consumed),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437049
+6c16,manufacturing water use - withd,,Manufacturing Water Use (Withdrawn),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437050
+6c17,mining water use - cons,,Mining Water Use (Consumed),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437051
+6c18,mining water use - withd,,Mining Water Use (Withdrawn),km3 yr−1,,Huang et al. (2018),https://www.osti.gov/biblio/1437052
+7a1,predicted low-voltage infrastructure in kilometres,,Predicted Low-voltage Infrastructure,% (maybe),,Arderne et al. (2020),https://www.nature.com/articles/s41597-019-0347-4#citeas
+7d1,Biofuels,,Biofuels Development Potential Index,Index,,Oakleaf et al. (2019),https://www.nature.com/articles/s41597-019-0084-8
+7d2,Coal,,Coal Development Potential Index,Index,,Oakleaf et al. (2019),https://www.nature.com/articles/s41597-019-0084-8
+7d3,Conv Gas,,Conventional Gas Development Potential Index,Index,,Oakleaf et al. (2019),https://www.nature.com/articles/s41597-019-0084-8
+7d4,Conv Oil,,Conventional Oil Development Potential Index,Index,,Oakleaf et al. (2019),https://www.nature.com/articles/s41597-019-0084-8
+7d5,Crop Expansion,,Crop Expansion Development Potential Index,Index,,Oakleaf et al. (2019),https://www.nature.com/articles/s41597-019-0084-8
+7d6,CSP,,Concetrated Solar Power Development Potential Index,Index,,Oakleaf et al. (2019),https://www.nature.com/articles/s41597-019-0084-8
+7d7,Hydro,,Hydroelectric Development Potential Index,Index,,Oakleaf et al. (2019),https://www.nature.com/articles/s41597-019-0084-8
+7d8,Metallic Mining,,Metallic Mining Development Potential Index,Index,,Oakleaf et al. (2019),https://www.nature.com/articles/s41597-019-0084-8
+7d9,Non-metallic Mining,,Non-metallic Mining Development Potential Index,Index,,Oakleaf et al. (2019),https://www.nature.com/articles/s41597-019-0084-8
+7d10,PV,,Photovoltaic Solar Power Development Potential Index,Index,,Oakleaf et al. (2019),https://www.nature.com/articles/s41597-019-0084-8
+7d11,Unconv Gas,,Unconventional Gas Development Potential Index,Index,,Oakleaf et al. (2019),https://www.nature.com/articles/s41597-019-0084-8
+7d12,Unconv Oil,,Unconventional Oil Development Potential Index,Index,,Oakleaf et al. (2019),https://www.nature.com/articles/s41597-019-0084-8
+7d13,Wind,,Wind Power Development Potential Index,Index,,Oakleaf et al. (2019),https://www.nature.com/articles/s41597-019-0084-8

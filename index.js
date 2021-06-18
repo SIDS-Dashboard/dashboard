@@ -5,7 +5,7 @@ import { MapboxStyleDefinition, MapboxStyleSwitcherControl } from "mapbox-gl-sty
 import "mapbox-gl-style-switcher/styles.css";
 
 import names from './data/sidsNames.json'
-import allTheLayers from './data/layerData.csv'
+import allTheLayers from './data/csv_data.csv'
 import * as d3 from 'd3-fetch';
 import Pbf from 'pbf'
 import geobuf from 'geobuf';
@@ -22,12 +22,19 @@ d3.csv(allTheLayers).then(function(d){
   //console.log(d);
   var dataHolder = document.getElementById('dataDrop')
   d.map(function(x) {
-    allLayers.push(x.field_name)
+    allLayers.push(
+      {'field_name':x.Field_Name,
+      'desc': x.Description, 
+      'units': x.Unit,
+      'desc_long':x.Desc_long, 
+      'source_name': x.Source_Name, 
+      'link': x.Source_Link
+    })
 
     var btn1 = document.createElement("BUTTON"); 
-    btn1.innerHTML = x.desc;
+    btn1.innerHTML = x.Name;
     btn1.classList.add('data')
-    btn1.setAttribute('id', x.field_name)
+    btn1.setAttribute('id', x.Field_Name)
     dataHolder.appendChild(btn1)
 
   })
@@ -201,7 +208,7 @@ mapboxgl.accessToken =
   })
 
   function addHexSource() {
-    const hexTest = "https://sebastian-ch.github.io/sidsDataTest/data/hex5.pbf";
+    const hexTest = "https://sebastian-ch.github.io/sidsDataTest/data/hex5u.pbf";
 
     d3.buffer(hexTest).then(function (data) {
       map.addSource('hex', {
@@ -279,6 +286,8 @@ mapboxgl.accessToken =
       return;
     }
 
+   
+
     if(map.getLayoutProperty('hex', 'visibility', 'none')) {
       map.setLayoutProperty('hex','visibility','visible')
     }
@@ -297,14 +306,14 @@ mapboxgl.accessToken =
         //console.log(uniFeatures[0].properties._mean);
         //console.log(uniFeatures);
         var selecteData = uniFeatures.map(x => x.properties[event.target.id])
-        console.log(selecteData);
+        //console.log(selecteData);
         var max = Math.max(...selecteData)
         var min = Math.min(...selecteData)
   
   
         //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
         var breaks = chroma.limits(selecteData, 'q', 4)
-        console.log(breaks)
+        //console.log(breaks)
         var colorRamp3 = chroma.scale(['#fafa6e','#2A4858']).mode('lch').colors(5)
         var colorRamp1 = ['#edf8fb', '#b2e2e2','#66c2a4','#2ca25f', '#006d2c' ]
         var colorRamp2 = ['#f2f0f7','#cbc9e2' ,'#9e9ac8' , '#756bb1' , '#54278f' ]
@@ -317,6 +326,50 @@ mapboxgl.accessToken =
 
         currentGeojsonLayers.breaks = breaks;
         currentGeojsonLayers.color = colorRamp;
+
+        if(event.target.id == '1c5') {
+
+          map.easeTo({
+            center: map.getCenter(),
+            pitch: 55
+        
+          })
+          map.addLayer({
+            id: 'pop3d',
+            type: "fill-extrusion",
+            source: 'hex',
+            layout: {
+              visibility: "visible",
+            },
+            paint: {
+              "fill-extrusion-color": [
+                'interpolate',
+                ['linear'],
+                ['get', event.target.id],
+                breaks[0], colorRamp[0],
+                breaks[1], colorRamp[1],
+                breaks[2], colorRamp[2],
+                breaks[3], colorRamp[3],
+                breaks[4], colorRamp[4],
+                ],
+              "fill-extrusion-height": ["get", event.target.id],
+              "fill-extrusion-opacity": 0.75,
+            },
+          });
+
+          
+    
+        } else if(map.getLayer('pop3d')) {
+            map.removeLayer('pop3d');
+            map.easeTo({
+              center: map.getCenter(),
+              pitch: 0
+          
+            })
+            
+          }
+
+        
 
         map.setPaintProperty('hex', 'fill-color',
         [
@@ -332,33 +385,46 @@ mapboxgl.accessToken =
         
         )
         map.setPaintProperty('hex','fill-opacity', 0.5)
-        map.setFilter('hex',['!=',event.target.id, 'null'])
-        addLegend(colorRamp, breaks)
+        map.setFilter('hex',['has',event.target.id])
+        addLegend(colorRamp, breaks, event.target.id)
         
       } 
   
     } 
 
-    map.easeTo({
+   /* map.easeTo({
       center: map.getCenter(),
       pitch: 0
   
-    })
+    }) */
   
   })
 
 //addLegend()
-function addLegend(colors, breaks) {
+function addLegend(colors, breaks, current) {
+
+  //console.log(allLayers)
+  
+  var legData = find(allLayers, ['field_name', current])
+  console.log(legData)
 
   if(!map.hasControl(legendControl)) {
     map.addControl(legendControl, 'bottom-left')
   }
+var infoBox = document.getElementById('infoBox')
+  infoBox.style.display = "block";
 
-  console.log('hi')
+  infoBox.innerHTML = '<p>'+ legData.desc_long + '</p>' +
+   '<b>Reference: </b>' + legData.source_name + ' - ' +
+    legData.link.link();
+  
+
+  //console.log('hi')
 
   //map.addControl(legendControl, 'bottom-left')
   var legend = document.getElementById('legend');
   legend.innerHTML = '';
+  legend.innerHTML = '<h3>' + legData.units + '</h3>';
   for (var x in colors) {
     legend.innerHTML+= '<span style="background:'+ colors[x] + '"></span>' +
     '<label>'+ Number.parseFloat(breaks[x]).toFixed(2)+'</label>'

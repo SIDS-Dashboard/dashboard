@@ -33599,8 +33599,8 @@ module.exports = [{
   "bb": [[137.48592, 1.02621], [163.03544, 10.09033]],
   "GID_0": ""
 }];
-},{}],"data/layerData.csv":[function(require,module,exports) {
-module.exports = "/layerData.874ba5b8.csv";
+},{}],"data/csv_data.csv":[function(require,module,exports) {
+module.exports = "/csv_data.5248d871.csv";
 },{}],"node_modules/d3-fetch/src/blob.js":[function(require,module,exports) {
 "use strict";
 
@@ -41961,7 +41961,7 @@ require("mapbox-gl-style-switcher/styles.css");
 
 var _sidsNames = _interopRequireDefault(require("./data/sidsNames.json"));
 
-var _layerData = _interopRequireDefault(require("./data/layerData.csv"));
+var _csv_data = _interopRequireDefault(require("./data/csv_data.csv"));
 
 var d3 = _interopRequireWildcard(require("d3-fetch"));
 
@@ -42002,15 +42002,22 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 var allLayers = [];
-d3.csv(_layerData.default).then(function (d) {
+d3.csv(_csv_data.default).then(function (d) {
   //console.log(d);
   var dataHolder = document.getElementById('dataDrop');
   d.map(function (x) {
-    allLayers.push(x.field_name);
+    allLayers.push({
+      'field_name': x.Field_Name,
+      'desc': x.Description,
+      'units': x.Unit,
+      'desc_long': x.Desc_long,
+      'source_name': x.Source_Name,
+      'link': x.Source_Link
+    });
     var btn1 = document.createElement("BUTTON");
-    btn1.innerHTML = x.desc;
+    btn1.innerHTML = x.Name;
     btn1.classList.add('data');
-    btn1.setAttribute('id', x.field_name);
+    btn1.setAttribute('id', x.Field_Name);
     dataHolder.appendChild(btn1);
   });
 });
@@ -42160,7 +42167,7 @@ map.on('style.load', function () {
 });
 
 function addHexSource() {
-  var hexTest = "https://sebastian-ch.github.io/sidsDataTest/data/hex5.pbf";
+  var hexTest = "https://sebastian-ch.github.io/sidsDataTest/data/hex5u.pbf";
   d3.buffer(hexTest).then(function (data) {
     map.addSource('hex', {
       type: "geojson",
@@ -42243,14 +42250,13 @@ dataWrapper.addEventListener('click', function (event) {
 
       var selecteData = uniFeatures.map(function (x) {
         return x.properties[event.target.id];
-      });
-      console.log(selecteData);
+      }); //console.log(selecteData);
+
       var max = Math.max.apply(Math, _toConsumableArray(selecteData));
       var min = Math.min.apply(Math, _toConsumableArray(selecteData)); //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
 
-      var breaks = _chromaJs.default.limits(selecteData, 'q', 4);
+      var breaks = _chromaJs.default.limits(selecteData, 'q', 4); //console.log(breaks)
 
-      console.log(breaks);
 
       var colorRamp3 = _chromaJs.default.scale(['#fafa6e', '#2A4858']).mode('lch').colors(5);
 
@@ -42262,28 +42268,64 @@ dataWrapper.addEventListener('click', function (event) {
       var colorRamp = ramps[Math.floor(Math.random() * 4)];
       currentGeojsonLayers.breaks = breaks;
       currentGeojsonLayers.color = colorRamp;
+
+      if (event.target.id == '1c5') {
+        map.easeTo({
+          center: map.getCenter(),
+          pitch: 55
+        });
+        map.addLayer({
+          id: 'pop3d',
+          type: "fill-extrusion",
+          source: 'hex',
+          layout: {
+            visibility: "visible"
+          },
+          paint: {
+            "fill-extrusion-color": ['interpolate', ['linear'], ['get', event.target.id], breaks[0], colorRamp[0], breaks[1], colorRamp[1], breaks[2], colorRamp[2], breaks[3], colorRamp[3], breaks[4], colorRamp[4]],
+            "fill-extrusion-height": ["get", event.target.id],
+            "fill-extrusion-opacity": 0.75
+          }
+        });
+      } else if (map.getLayer('pop3d')) {
+        map.removeLayer('pop3d');
+        map.easeTo({
+          center: map.getCenter(),
+          pitch: 0
+        });
+      }
+
       map.setPaintProperty('hex', 'fill-color', ['interpolate', ['linear'], ['get', event.target.id], breaks[0], colorRamp[0], breaks[1], colorRamp[1], breaks[2], colorRamp[2], breaks[3], colorRamp[3], breaks[4], colorRamp[4]]);
       map.setPaintProperty('hex', 'fill-opacity', 0.5);
-      map.setFilter('hex', ['!=', event.target.id, 'null']);
-      addLegend(colorRamp, breaks);
+      map.setFilter('hex', ['has', event.target.id]);
+      addLegend(colorRamp, breaks, event.target.id);
     }
   }
+  /* map.easeTo({
+     center: map.getCenter(),
+     pitch: 0
+  
+   }) */
 
-  map.easeTo({
-    center: map.getCenter(),
-    pitch: 0
-  });
 }); //addLegend()
 
-function addLegend(colors, breaks) {
+function addLegend(colors, breaks, current) {
+  //console.log(allLayers)
+  var legData = (0, _lodash.default)(allLayers, ['field_name', current]);
+  console.log(legData);
+
   if (!map.hasControl(legendControl)) {
     map.addControl(legendControl, 'bottom-left');
   }
 
-  console.log('hi'); //map.addControl(legendControl, 'bottom-left')
+  var infoBox = document.getElementById('infoBox');
+  infoBox.style.display = "block";
+  infoBox.innerHTML = '<p>' + legData.desc_long + '</p>' + '<b>Reference: </b>' + legData.source_name + ' - ' + legData.link.link(); //console.log('hi')
+  //map.addControl(legendControl, 'bottom-left')
 
   var legend = document.getElementById('legend');
   legend.innerHTML = '';
+  legend.innerHTML = '<h3>' + legData.units + '</h3>';
 
   for (var x in colors) {
     legend.innerHTML += '<span style="background:' + colors[x] + '"></span>' + '<label>' + Number.parseFloat(breaks[x]).toFixed(2) + '</label>';
@@ -42372,7 +42414,7 @@ function addSidsOutline(name) {
     });
   }
 }
-},{"mapbox-gl":"node_modules/mapbox-gl/dist/mapbox-gl.js","mapbox-gl/dist/mapbox-gl.css":"node_modules/mapbox-gl/dist/mapbox-gl.css","mapbox-gl-style-switcher":"node_modules/mapbox-gl-style-switcher/dist/index.js","mapbox-gl-style-switcher/styles.css":"node_modules/mapbox-gl-style-switcher/styles.css","./data/sidsNames.json":"data/sidsNames.json","./data/layerData.csv":"data/layerData.csv","d3-fetch":"node_modules/d3-fetch/src/index.js","pbf":"node_modules/pbf/index.js","geobuf":"node_modules/geobuf/index.js","lodash.find":"node_modules/lodash.find/index.js","lodash.uniq":"node_modules/lodash.uniq/index.js","chroma-js":"node_modules/chroma-js/chroma.js","./style.css":"style.css"}],"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"mapbox-gl":"node_modules/mapbox-gl/dist/mapbox-gl.js","mapbox-gl/dist/mapbox-gl.css":"node_modules/mapbox-gl/dist/mapbox-gl.css","mapbox-gl-style-switcher":"node_modules/mapbox-gl-style-switcher/dist/index.js","mapbox-gl-style-switcher/styles.css":"node_modules/mapbox-gl-style-switcher/styles.css","./data/sidsNames.json":"data/sidsNames.json","./data/csv_data.csv":"data/csv_data.csv","d3-fetch":"node_modules/d3-fetch/src/index.js","pbf":"node_modules/pbf/index.js","geobuf":"node_modules/geobuf/index.js","lodash.find":"node_modules/lodash.find/index.js","lodash.uniq":"node_modules/lodash.uniq/index.js","chroma-js":"node_modules/chroma-js/chroma.js","./style.css":"style.css"}],"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -42400,7 +42442,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54535" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63523" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
