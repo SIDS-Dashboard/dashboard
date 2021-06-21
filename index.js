@@ -12,61 +12,27 @@ import geobuf from 'geobuf';
 import find from 'lodash.find'
 import uniq from 'lodash.uniq'
 import chroma from "chroma-js";
-
+import addButtons from './setButtons'
 import './style.css'
 
 
 var allLayers = []
-
-d3.csv(allTheLayers).then(function(d){
-  //console.log(d);
-  var dataHolder = document.getElementById('dataDrop')
-  d.map(function(x) {
-    allLayers.push(
-      {'field_name':x.Field_Name,
-      'title': x.Name,
-      'desc': x.Description, 
-      'units': x.Unit,
-      'desc_long':x.Desc_long, 
-      'source_name': x.Source_Name, 
-      'link': x.Source_Link
-    })
-
-    var btn1 = document.createElement("BUTTON"); 
-    btn1.innerHTML = x.Name;
-    btn1.classList.add('data')
-    btn1.setAttribute('id', x.Field_Name)
-    dataHolder.appendChild(btn1)
-
-  })
-  
-})
+export default allLayers
+addButtons(names, allTheLayers);
 
 
-var sidsHolder = document.getElementById('myDropdown');
-
-names.map(function(x) {
-    var btn = document.createElement("BUTTON"); 
-    btn.innerHTML = x.NAME_0;
-    btn.classList.add('sidsb')
-    btn.setAttribute('id', x.GID_0)
-    sidsHolder.appendChild(btn)
-})
-
-
-
+/*Initialize Map */
 mapboxgl.accessToken =
   "pk.eyJ1Ijoic2ViYXN0aWFuLWNoIiwiYSI6ImNpejkxdzZ5YzAxa2gyd21udGpmaGU0dTgifQ.IrEd_tvrl6MuypVNUGU5SQ";
 
   const map = new mapboxgl.Map({
     container: "map", // container ID
     //style: 'mapbox://styles/mapbox/light-v10', //?optimize=true
-    style: 'mapbox://styles/mapbox/satellite-v9',
+    style: 'mapbox://styles/mapbox/satellite-v9', 
     center: [-71.4, 19.1], // starting position [lng, lat]
-    zoom: 7, // starting zoom
+    zoom: 7,
+    pitch: 55
   });
-
-  //var sources = ['pop3d', 'allSids-source']
 
   var sourceData = {
       hexSource: {
@@ -119,23 +85,16 @@ mapboxgl.accessToken =
       }
     } 
     
-    legendControl = new MyCustomControl();
-    
-    //map.addControl(legendControl, 'bottom-left');
+    legendControl = new MyCustomControl(); 
     
     addHexSource()
-    addSidsSource()
+    //addSidsSource()
 
     
   });
 
-
- /* map.on('click', function(){
-    map.removeControl(myCustomControl)
-  }) */
-
   
-
+  //function taken from mapbox that extracts unique features, see comment below
   function getUniqueFeatures(array, comparatorProperty) {
     var existingFeatureKeys = {};
     // Because features come from tiled vector data, feature geometries may be split
@@ -212,7 +171,6 @@ mapboxgl.accessToken =
         data: geobuf.decode(new Pbf(data)),
       });
       sourceData.hexSource.data = data;
-
 
       map.addLayer({
         'id': 'hex',
@@ -399,11 +357,23 @@ mapboxgl.accessToken =
 
         if(event.target.id == '1c5') {
 
-          map.easeTo({
+          function rotateCamera(timestamp) {
+            // clamp the rotation between 0 -360 degrees
+            // Divide timestamp by 100 to slow rotation to ~10 degrees / sec
+            map.rotateTo((timestamp / 100) % 360, { duration: 0 });
+            // Request the next frame of the animation.
+            requestAnimationFrame(rotateCamera);
+            }
+
+          rotateCamera(0)
+
+         /* map.easeTo({
             center: map.getCenter(),
-            pitch: 55
+            pitch: 55,
+            bearing: 180,
+            duration: 4000
         
-          })
+          })*/
           map.addLayer({
             id: 'pop3d',
             type: "fill-extrusion",
@@ -454,7 +424,7 @@ mapboxgl.accessToken =
           ]
         
         )
-        map.setPaintProperty('hex','fill-opacity', 0.6)
+        map.setPaintProperty('hex','fill-opacity', 0.5)
         map.setFilter('hex',['has',event.target.id])
         addLegend(colorRamp, breaks, event.target.id)
         

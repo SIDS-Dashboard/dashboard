@@ -41943,13 +41943,68 @@ var global = arguments[3];
 
 })));
 
-},{}],"style.css":[function(require,module,exports) {
+},{}],"setButtons.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = addButton;
+
+var d3 = _interopRequireWildcard(require("d3-fetch"));
+
+var _index = _interopRequireDefault(require("./index"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+//import names from './data/sidsNames.json'
+function addButton(names, allTheLayers) {
+  var sidsHolder = document.getElementById('myDropdown');
+  names.map(function (x) {
+    var btn = document.createElement("BUTTON");
+    btn.innerHTML = x.NAME_0;
+    btn.classList.add('sidsb');
+    btn.setAttribute('id', x.GID_0);
+    sidsHolder.appendChild(btn);
+  });
+  d3.csv(allTheLayers).then(function (d) {
+    //console.log(d);
+    d.map(function (x) {
+      _index.default.push({
+        'field_name': x.Field_Name,
+        'title': x.Name,
+        'desc': x.Description,
+        'units': x.Unit,
+        'desc_long': x.Desc_long,
+        'source_name': x.Source_Name,
+        'link': x.Source_Link
+      });
+
+      var dataHolder = document.getElementById('dataDrop');
+      var btn1 = document.createElement("BUTTON");
+      btn1.innerHTML = x.Name;
+      btn1.classList.add('data');
+      btn1.setAttribute('id', x.Field_Name);
+      dataHolder.appendChild(btn1);
+    });
+  });
+}
+},{"d3-fetch":"node_modules/d3-fetch/src/index.js","./index":"index.js"}],"style.css":[function(require,module,exports) {
 var reloadCSS = require('_css_loader');
 
 module.hot.dispose(reloadCSS);
 module.hot.accept(reloadCSS);
 },{"_css_loader":"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/css-loader.js"}],"index.js":[function(require,module,exports) {
 "use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
 
 var _mapboxGl = _interopRequireDefault(require("mapbox-gl"));
 
@@ -41974,6 +42029,8 @@ var _lodash = _interopRequireDefault(require("lodash.find"));
 var _lodash2 = _interopRequireDefault(require("lodash.uniq"));
 
 var _chromaJs = _interopRequireDefault(require("chroma-js"));
+
+var _setButtons = _interopRequireDefault(require("./setButtons"));
 
 require("./style.css");
 
@@ -42002,35 +42059,10 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 var allLayers = [];
-d3.csv(_csv_data.default).then(function (d) {
-  //console.log(d);
-  var dataHolder = document.getElementById('dataDrop');
-  d.map(function (x) {
-    allLayers.push({
-      'field_name': x.Field_Name,
-      'title': x.Name,
-      'desc': x.Description,
-      'units': x.Unit,
-      'desc_long': x.Desc_long,
-      'source_name': x.Source_Name,
-      'link': x.Source_Link
-    });
-    var btn1 = document.createElement("BUTTON");
-    btn1.innerHTML = x.Name;
-    btn1.classList.add('data');
-    btn1.setAttribute('id', x.Field_Name);
-    dataHolder.appendChild(btn1);
-  });
-});
-var sidsHolder = document.getElementById('myDropdown');
-
-_sidsNames.default.map(function (x) {
-  var btn = document.createElement("BUTTON");
-  btn.innerHTML = x.NAME_0;
-  btn.classList.add('sidsb');
-  btn.setAttribute('id', x.GID_0);
-  sidsHolder.appendChild(btn);
-});
+var _default = allLayers;
+exports.default = _default;
+(0, _setButtons.default)(_sidsNames.default, _csv_data.default);
+/*Initialize Map */
 
 _mapboxGl.default.accessToken = "pk.eyJ1Ijoic2ViYXN0aWFuLWNoIiwiYSI6ImNpejkxdzZ5YzAxa2gyd21udGpmaGU0dTgifQ.IrEd_tvrl6MuypVNUGU5SQ";
 var map = new _mapboxGl.default.Map({
@@ -42040,10 +42072,9 @@ var map = new _mapboxGl.default.Map({
   style: 'mapbox://styles/mapbox/satellite-v9',
   center: [-71.4, 19.1],
   // starting position [lng, lat]
-  zoom: 7 // starting zoom
-
-}); //var sources = ['pop3d', 'allSids-source']
-
+  zoom: 7,
+  pitch: 55
+});
 var sourceData = {
   hexSource: {
     name: 'hex-source',
@@ -42104,14 +42135,9 @@ map.on("load", function () {
     return MyCustomControl;
   }();
 
-  legendControl = new MyCustomControl(); //map.addControl(legendControl, 'bottom-left');
-
-  addHexSource();
-  addSidsSource();
-});
-/* map.on('click', function(){
-   map.removeControl(myCustomControl)
- }) */
+  legendControl = new MyCustomControl();
+  addHexSource(); //addSidsSource()
+}); //function taken from mapbox that extracts unique features, see comment below
 
 function getUniqueFeatures(array, comparatorProperty) {
   var existingFeatureKeys = {}; // Because features come from tiled vector data, feature geometries may be split
@@ -42333,10 +42359,25 @@ dataWrapper.addEventListener('click', function (event) {
       currentGeojsonLayers.color = colorRamp;
 
       if (event.target.id == '1c5') {
-        map.easeTo({
-          center: map.getCenter(),
-          pitch: 55
-        });
+        function rotateCamera(timestamp) {
+          // clamp the rotation between 0 -360 degrees
+          // Divide timestamp by 100 to slow rotation to ~10 degrees / sec
+          map.rotateTo(timestamp / 100 % 360, {
+            duration: 0
+          }); // Request the next frame of the animation.
+
+          requestAnimationFrame(rotateCamera);
+        }
+
+        rotateCamera(0);
+        /* map.easeTo({
+           center: map.getCenter(),
+           pitch: 55,
+           bearing: 180,
+           duration: 4000
+        
+         })*/
+
         map.addLayer({
           id: 'pop3d',
           type: "fill-extrusion",
@@ -42359,7 +42400,7 @@ dataWrapper.addEventListener('click', function (event) {
       }
 
       map.setPaintProperty('hex', 'fill-color', ['interpolate', ['linear'], ['get', event.target.id], breaks[0], colorRamp[0], breaks[1], colorRamp[1], breaks[2], colorRamp[2], breaks[3], colorRamp[3], breaks[4], colorRamp[4]]);
-      map.setPaintProperty('hex', 'fill-opacity', 0.6);
+      map.setPaintProperty('hex', 'fill-opacity', 0.5);
       map.setFilter('hex', ['has', event.target.id]);
       addLegend(colorRamp, breaks, event.target.id);
     }
@@ -42497,7 +42538,7 @@ function addSidsOutline(name) {
     });
   }
 }
-},{"mapbox-gl":"node_modules/mapbox-gl/dist/mapbox-gl.js","mapbox-gl/dist/mapbox-gl.css":"node_modules/mapbox-gl/dist/mapbox-gl.css","mapbox-gl-style-switcher":"node_modules/mapbox-gl-style-switcher/dist/index.js","mapbox-gl-style-switcher/styles.css":"node_modules/mapbox-gl-style-switcher/styles.css","./data/sidsNames.json":"data/sidsNames.json","./data/csv_data.csv":"data/csv_data.csv","d3-fetch":"node_modules/d3-fetch/src/index.js","pbf":"node_modules/pbf/index.js","geobuf":"node_modules/geobuf/index.js","lodash.find":"node_modules/lodash.find/index.js","lodash.uniq":"node_modules/lodash.uniq/index.js","chroma-js":"node_modules/chroma-js/chroma.js","./style.css":"style.css"}],"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"mapbox-gl":"node_modules/mapbox-gl/dist/mapbox-gl.js","mapbox-gl/dist/mapbox-gl.css":"node_modules/mapbox-gl/dist/mapbox-gl.css","mapbox-gl-style-switcher":"node_modules/mapbox-gl-style-switcher/dist/index.js","mapbox-gl-style-switcher/styles.css":"node_modules/mapbox-gl-style-switcher/styles.css","./data/sidsNames.json":"data/sidsNames.json","./data/csv_data.csv":"data/csv_data.csv","d3-fetch":"node_modules/d3-fetch/src/index.js","pbf":"node_modules/pbf/index.js","geobuf":"node_modules/geobuf/index.js","lodash.find":"node_modules/lodash.find/index.js","lodash.uniq":"node_modules/lodash.uniq/index.js","chroma-js":"node_modules/chroma-js/chroma.js","./setButtons":"setButtons.js","./style.css":"style.css"}],"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -42525,7 +42566,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56382" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63403" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
