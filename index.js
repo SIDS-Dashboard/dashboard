@@ -162,37 +162,8 @@ mapboxgl.accessToken =
 
   })
 
-  function addHexSource() {
-    const hexTest = "https://sebastian-ch.github.io/sidsDataTest/data/hex5u.pbf";
 
-    d3.buffer(hexTest).then(function (data) {
-      map.addSource('hex', {
-        type: "geojson",
-        data: geobuf.decode(new Pbf(data)),
-      });
-      sourceData.hexSource.data = data;
-
-      map.addLayer({
-        'id': 'hex',
-        'type': 'fill', 
-        'source': 'hex',
-        'layout': {
-          'visibility': 'visible'
-          },
-        
-        'paint': {
-            'fill-color': 'blue',
-            'fill-opacity': 0,
-            
-            }
-        });
-
-
-    });
-
-
-  }
-
+  /*****ADMIN BUTTON WRAPPER****/
   const adminWrap = document.getElementById('admin');
   adminWrap.addEventListener('click', (event) => {
 
@@ -314,8 +285,6 @@ mapboxgl.accessToken =
       return;
     }
 
-   
-
     if(map.getLayoutProperty('hex', 'visibility', 'none')) {
       map.setLayoutProperty('hex','visibility','visible')
     }
@@ -432,6 +401,7 @@ mapboxgl.accessToken =
   
     } 
 
+    //each time the map moves, repaint
    map.on('moveend', function(){
 
     if(map.getLayer('hex')) {
@@ -483,6 +453,7 @@ mapboxgl.accessToken =
 })
 
 //addLegend()
+//add the legend
 function addLegend(colors, breaks, current) {
 
   //console.log(allLayers)
@@ -515,6 +486,8 @@ var infoBox = document.getElementById('infoBox')
     
 }
 
+
+//3d function
 function add3dHex() {
 
   currentGeojsonLayers = uniq(currentGeojsonLayers)
@@ -593,6 +566,37 @@ function addSidsSource() {
         sourceData.allSidsSource.data = data;
       });
   }
+
+
+  //add sources
+
+  function addHexSource() {
+    const hexTest = "https://sebastian-ch.github.io/sidsDataTest/data/hex5u.pbf";
+
+    d3.buffer(hexTest).then(function (data) {
+      map.addSource('hex', {
+        type: "geojson",
+        data: geobuf.decode(new Pbf(data)),
+      });
+      sourceData.hexSource.data = data;
+
+      map.addLayer({
+        'id': 'hex',
+        'type': 'fill', 
+        'source': 'hex',
+        'layout': {
+          'visibility': 'visible'
+          },
+        
+        'paint': {
+            'fill-color': 'blue',
+            'fill-opacity': 0,
+            
+            }
+        });
+    });
+  }
+
 function addSidsOutline(name) {
 
   console.log(name)
