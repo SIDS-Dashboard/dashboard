@@ -42072,8 +42072,8 @@ var map = new _mapboxGl.default.Map({
   style: 'mapbox://styles/mapbox/satellite-v9',
   center: [-71.4, 19.1],
   // starting position [lng, lat]
-  zoom: 7,
-  pitch: 55
+  zoom: 7 //pitch: 55
+
 });
 var sourceData = {
   hexSource: {
@@ -42136,7 +42136,8 @@ map.on("load", function () {
   }();
 
   legendControl = new MyCustomControl();
-  addHexSource(); //addSidsSource()
+  addHexSource();
+  addSidsSource();
 }); //function taken from mapbox that extracts unique features, see comment below
 
 function getUniqueFeatures(array, comparatorProperty) {
@@ -42191,29 +42192,7 @@ map.on('style.load', function () {
      }); */
   }
 });
-
-function addHexSource() {
-  var hexTest = "https://sebastian-ch.github.io/sidsDataTest/data/hex5u.pbf";
-  d3.buffer(hexTest).then(function (data) {
-    map.addSource('hex', {
-      type: "geojson",
-      data: _geobuf.default.decode(new _pbf.default(data))
-    });
-    sourceData.hexSource.data = data;
-    map.addLayer({
-      'id': 'hex',
-      'type': 'fill',
-      'source': 'hex',
-      'layout': {
-        'visibility': 'visible'
-      },
-      'paint': {
-        'fill-color': 'blue',
-        'fill-opacity': 0
-      }
-    });
-  });
-}
+/*****ADMIN BUTTON WRAPPER****/
 
 var adminWrap = document.getElementById('admin');
 adminWrap.addEventListener('click', function (event) {
@@ -42260,47 +42239,52 @@ wrapper.addEventListener('click', function (event) {
       },
       pitch: 0
     });
-    /*map.on('moveend', function(){
-        if(map.getLayer('hex')) {
-      var features = map.queryRenderedFeatures({
-        layers: ['hex']
-      })
-              if(features) {
-                var uniFeatures = getUniqueFeatures(features, 'hexid');
-        //console.log(uniFeatures[0].properties._mean);
-        //console.log(uniFeatures);
-        var selecteData = uniFeatures.map(x => x.properties[currentGeojsonLayers.dataLayer])
-        //console.log(selecteData);
-        var max = Math.max(...selecteData)
-        var min = Math.min(...selecteData)
-          
-        //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
-        var breaks = chroma.limits(selecteData, 'q', 4)
-        //console.log(breaks)
-       
+    /* map.on('moveend', function(){
+         if(map.getLayer('hex')) {
+       var features = map.queryRenderedFeatures({
+         layers: ['hex']
+       })
+    
+       if(features) {
+    
+         var uniFeatures = getUniqueFeatures(features, 'hexid');
+         //console.log(uniFeatures[0].properties._mean);
+         console.log(uniFeatures);
+         var selecteData = uniFeatures.map(x => x.properties[currentGeojsonLayers.dataLayer])
+         //console.log(selecteData);
+         var max = Math.max(...selecteData)
+         var min = Math.min(...selecteData)
+    
+    
+         //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
+         var breaks = chroma.limits(selecteData, 'q', 4)
+         //console.log(breaks)
         
-        //console.log(colorz.classes)
-      
-        currentGeojsonLayers.breaks = breaks;
-                  map.setPaintProperty('hex', 'fill-color',
-          [
-            'interpolate',
-            ['linear'],
-            ['get', currentGeojsonLayers.dataLayer],
-            breaks[0], currentGeojsonLayers.color[0],
-            breaks[1], currentGeojsonLayers.color[1],
-            breaks[2], currentGeojsonLayers.color[2],
-            breaks[3], currentGeojsonLayers.color[3],
-            breaks[4], currentGeojsonLayers.color[4],
-            ]
-          
-          )
-          map.setPaintProperty('hex','fill-opacity', 0.5)
-          map.setFilter('hex',['has',currentGeojsonLayers.dataLayer])
-          addLegend(colorRamp, breaks, currentGeojsonLayers.dataLayer)
-                  }
-        }
-    }) */
+         
+         //console.log(colorz.classes)
+       
+         currentGeojsonLayers.breaks = breaks;
+    
+           map.setPaintProperty('hex', 'fill-color',
+           [
+             'interpolate',
+             ['linear'],
+             ['get', currentGeojsonLayers.dataLayer],
+             breaks[0], currentGeojsonLayers.color[0],
+             breaks[1], currentGeojsonLayers.color[1],
+             breaks[2], currentGeojsonLayers.color[2],
+             breaks[3], currentGeojsonLayers.color[3],
+             breaks[4], currentGeojsonLayers.color[4],
+             ]
+           
+           )
+           map.setPaintProperty('hex','fill-opacity', 0.5)
+           map.setFilter('hex',['has',currentGeojsonLayers.dataLayer])
+           addLegend(colorRamp, breaks, currentGeojsonLayers.dataLayer)
+    
+           }
+         }
+     })  */
     //addSidsOutline(currbb.NAME_0);
   }
   /*  else if(event.target.id.includes('pop3d')) {
@@ -42350,34 +42334,28 @@ dataWrapper.addEventListener('click', function (event) {
       var colorRamp3 = _chromaJs.default.scale(['#fafa6e', '#2A4858']).mode('lch').colors(5);
 
       var colorRamp1 = ['#edf8fb', '#b2e2e2', '#66c2a4', '#2ca25f', '#006d2c'];
-      var colorRamp2 = ['#f2f0f7', '#cbc9e2', '#9e9ac8', '#756bb1', '#54278f'];
-      var colorRamp4 = ['#ca0020', '#f4a582', '#f7f7f7', '#92c5de', '#0571b0']; //console.log(colorz.classes)
+      var colorRamp2 = ['#f2f0f7', '#cbc9e2', '#9e9ac8', '#756bb1', '#54278f']; //console.log(colorz.classes)
 
-      var ramps = [colorRamp1, colorRamp2, colorRamp3, colorRamp4];
-      var colorRamp = ramps[Math.floor(Math.random() * 4)];
+      var ramps = [colorRamp1, colorRamp2, colorRamp3];
+      var colorRamp = ramps[Math.floor(Math.random() * 3)];
       currentGeojsonLayers.breaks = breaks;
       currentGeojsonLayers.color = colorRamp;
 
       if (event.target.id == '1c5') {
-        function rotateCamera(timestamp) {
+        /*function rotateCamera(timestamp) {
           // clamp the rotation between 0 -360 degrees
           // Divide timestamp by 100 to slow rotation to ~10 degrees / sec
-          map.rotateTo(timestamp / 100 % 360, {
-            duration: 0
-          }); // Request the next frame of the animation.
-
+          map.rotateTo((timestamp / 100) % 360, { duration: 0 });
+          // Request the next frame of the animation.
           requestAnimationFrame(rotateCamera);
-        }
+          }
+          rotateCamera(0) */
+        map.easeTo({
+          center: map.getCenter(),
+          pitch: 55 //bearing: 180,
+          //duration: 4000
 
-        rotateCamera(0);
-        /* map.easeTo({
-           center: map.getCenter(),
-           pitch: 55,
-           bearing: 180,
-           duration: 4000
-        
-         })*/
-
+        });
         map.addLayer({
           id: 'pop3d',
           type: "fill-extrusion",
@@ -42404,7 +42382,8 @@ dataWrapper.addEventListener('click', function (event) {
       map.setFilter('hex', ['has', event.target.id]);
       addLegend(colorRamp, breaks, event.target.id);
     }
-  }
+  } //each time the map moves, repaint
+
 
   map.on('moveend', function () {
     if (map.getLayer('hex')) {
@@ -42436,6 +42415,7 @@ dataWrapper.addEventListener('click', function (event) {
     }
   });
 }); //addLegend()
+//add the legend
 
 function addLegend(colors, breaks, current) {
   //console.log(allLayers)
@@ -42457,7 +42437,8 @@ function addLegend(colors, breaks, current) {
   for (var x in colors) {
     legend.innerHTML += '<span style="background:' + colors[x] + '"></span>' + '<label>' + Number.parseFloat(breaks[x]).toFixed(3) + '</label>';
   }
-}
+} //3d function
+
 
 function add3dHex() {
   currentGeojsonLayers = (0, _lodash2.default)(currentGeojsonLayers);
@@ -42504,11 +42485,36 @@ function add3dHex() {
 function addSidsSource() {
   var allSids = "https://sebastian-ch.github.io/sidsDataTest/data/gadm1.pbf";
   d3.buffer(allSids).then(function (data) {
+    //console.log(data)
     map.addSource("allSids-source", {
       type: "geojson",
       data: _geobuf.default.decode(new _pbf.default(data))
     });
     sourceData.allSidsSource.data = data;
+  });
+} //add sources
+
+
+function addHexSource() {
+  var hexTest = "https://sebastian-ch.github.io/sidsDataTest/data/hex5u.pbf";
+  d3.buffer(hexTest).then(function (data) {
+    map.addSource('hex', {
+      type: "geojson",
+      data: _geobuf.default.decode(new _pbf.default(data))
+    });
+    sourceData.hexSource.data = data;
+    map.addLayer({
+      'id': 'hex',
+      'type': 'fill',
+      'source': 'hex',
+      'layout': {
+        'visibility': 'visible'
+      },
+      'paint': {
+        'fill-color': 'blue',
+        'fill-opacity': 0
+      }
+    });
   });
 }
 
@@ -42566,7 +42572,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63403" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49766" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

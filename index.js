@@ -4,14 +4,15 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { MapboxStyleDefinition, MapboxStyleSwitcherControl } from "mapbox-gl-style-switcher";
 import "mapbox-gl-style-switcher/styles.css";
 
-import names from './data/sidsNames.json'
+import names from './data/sidsNames.json' //
 import allTheLayers from './data/csv_data.csv'
 import * as d3 from 'd3-fetch';
-import Pbf from 'pbf'
+import Pbf from 'pbf';
 import geobuf from 'geobuf';
 import find from 'lodash.find'
 import uniq from 'lodash.uniq'
 import chroma from "chroma-js";
+
 import addButtons from './setButtons'
 import './style.css'
 
@@ -31,7 +32,7 @@ mapboxgl.accessToken =
     style: 'mapbox://styles/mapbox/satellite-v9', 
     center: [-71.4, 19.1], // starting position [lng, lat]
     zoom: 7,
-    pitch: 55
+    //pitch: 55
   });
 
   var sourceData = {
@@ -88,7 +89,7 @@ mapboxgl.accessToken =
     legendControl = new MyCustomControl(); 
     
     addHexSource()
-    //addSidsSource()
+    addSidsSource()
 
     
   });
@@ -213,7 +214,7 @@ mapboxgl.accessToken =
           pitch: 0
         });
 
-        /*map.on('moveend', function(){
+       /* map.on('moveend', function(){
 
           if(map.getLayer('hex')) {
           var features = map.queryRenderedFeatures({
@@ -224,7 +225,7 @@ mapboxgl.accessToken =
       
             var uniFeatures = getUniqueFeatures(features, 'hexid');
             //console.log(uniFeatures[0].properties._mean);
-            //console.log(uniFeatures);
+            console.log(uniFeatures);
             var selecteData = uniFeatures.map(x => x.properties[currentGeojsonLayers.dataLayer])
             //console.log(selecteData);
             var max = Math.max(...selecteData)
@@ -259,7 +260,7 @@ mapboxgl.accessToken =
       
               }
             }
-        }) */
+        })  */
         //addSidsOutline(currbb.NAME_0);
     } 
    /*  else if(event.target.id.includes('pop3d')) {
@@ -306,27 +307,27 @@ mapboxgl.accessToken =
         //console.log(selecteData);
         var max = Math.max(...selecteData)
         var min = Math.min(...selecteData)
-  
-  
+        
+        
         //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
         var breaks = chroma.limits(selecteData, 'q', 4)
         //console.log(breaks)
         var colorRamp3 = chroma.scale(['#fafa6e','#2A4858']).mode('lch').colors(5)
         var colorRamp1 = ['#edf8fb', '#b2e2e2','#66c2a4','#2ca25f', '#006d2c' ]
         var colorRamp2 = ['#f2f0f7','#cbc9e2' ,'#9e9ac8' , '#756bb1' , '#54278f' ]
-        var colorRamp4 = [ '#ca0020','#f4a582' ,'#f7f7f7' ,'#92c5de' ,'#0571b0' ]
+        
         
         //console.log(colorz.classes)
-        var ramps = [colorRamp1, colorRamp2, colorRamp3, colorRamp4]
+        var ramps = [colorRamp1, colorRamp2, colorRamp3]
 
-        var colorRamp = ramps[Math.floor(Math.random() * 4)];
+        var colorRamp = ramps[Math.floor(Math.random() * 3)];
 
         currentGeojsonLayers.breaks = breaks;
         currentGeojsonLayers.color = colorRamp;
 
         if(event.target.id == '1c5') {
 
-          function rotateCamera(timestamp) {
+          /*function rotateCamera(timestamp) {
             // clamp the rotation between 0 -360 degrees
             // Divide timestamp by 100 to slow rotation to ~10 degrees / sec
             map.rotateTo((timestamp / 100) % 360, { duration: 0 });
@@ -334,15 +335,15 @@ mapboxgl.accessToken =
             requestAnimationFrame(rotateCamera);
             }
 
-          rotateCamera(0)
+          rotateCamera(0) */
 
-         /* map.easeTo({
+          map.easeTo({
             center: map.getCenter(),
             pitch: 55,
-            bearing: 180,
-            duration: 4000
+            //bearing: 180,
+            //duration: 4000
         
-          })*/
+          })
           map.addLayer({
             id: 'pop3d',
             type: "fill-extrusion",
@@ -558,6 +559,7 @@ function addSidsSource() {
     const allSids = "https://sebastian-ch.github.io/sidsDataTest/data/gadm1.pbf";
 
     d3.buffer(allSids).then(function (data) {
+      //console.log(data)
         map.addSource("allSids-source", {
           type: "geojson",
           data: geobuf.decode(new Pbf(data)),
