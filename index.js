@@ -17,6 +17,21 @@ import addButtons from './setButtons'
 import './style.css'
 
 
+var pass = document.getElementById('fname')
+
+pass.addEventListener('input', function(e) {
+
+  console.log(pass.value)
+
+  if(pass.value === 'island') {
+    document.getElementById('password').remove()
+  }
+})
+
+
+
+
+
 var allLayers = []
 export default allLayers
 addButtons(names, allTheLayers);
