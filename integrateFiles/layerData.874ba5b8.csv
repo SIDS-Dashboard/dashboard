@@ -1,0 +1,55 @@
+field_name,desc
+1a1,GDP PPP 30 arcsec 1990
+1a2,GDP PPP 30 arcsec 2000
+1a3,GDP PPP 30 arcsec 2015
+1b1,Accessibility to Cities
+1b2,Friction Surface
+1c1,Population density for the year 2000
+1c2,Population density for the year 2005
+1c3,Population density for the year 2010
+1c4,Population density for the year 2015
+1c5,Population density for the year 2020
+2a1,food insecurity hotspots - duration - crisis
+2a2,food insecurity hotspots - duration - emergency
+2a3,food insecurity hotspots - duration - famine
+2a4,food insecurity hotspots - duration - minimal
+2a5,food insecurity hotspots - duration - stressed
+2a6,food insecurity hotspots - frequency - crisis
+2a7,food insecurity hotspots - frequency - emergency
+2a8,food insecurity hotspots - frequency - famine
+2a9,food insecurity hotspots - frequency - minimal
+2a10,food insecurity hotspots - frequency - stressed
+2a11,food insecurity hotspots - standarddeviation
+2a12,food insecurity hotspots - average
+6c1,domestic water use - cons
+6c2,domestic water use - withd
+6c3,electricity water use - cons
+6c4,electricity water use - withd
+6c5,irrigation water use - cons - model h08
+6c6,irrigation water use - cons - model jpjml
+6c7,irrigation water use - cons - model pcr
+6c8,irrigation water use - cons - model watergap
+6c9,irrigation water use - withd - model h08
+6c10,irrigation water use - withd - model jpjml
+6c11,irrigation water use - withd - model pcr
+6c12,irrigation water use - withd - model watergap
+6c13,livestock water use - cons
+6c14,livestock water use - withd
+6c15,manufacturing water use - cons
+6c16,manufacturing water use - withd
+6c17,mining water use - cons
+6c18,mining water use - withd
+7a1,predicted low-voltage infrastructure in kilometres
+7d1,Biofuels
+7d2,Coal
+7d3,Conv Gas
+7d4,Conv Oil
+7d5,Crop Expansion
+7d6,CSP
+7d7,Hydro
+7d8,Metallic Mining
+7d9,Non-metallic Mining
+7d10,PV
+7d11,Unconv Gas
+7d12,Unconv Oil
+7d13,Wind
