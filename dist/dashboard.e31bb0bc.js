@@ -42060,8 +42060,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 var pass = document.getElementById('fname');
 pass.addEventListener('input', function (e) {
-  console.log(pass.value);
-
+  //console.log(pass.value)
   if (pass.value === 'island') {
     document.getElementById('password').remove();
   }
@@ -42076,8 +42075,9 @@ _mapboxGl.default.accessToken = "pk.eyJ1Ijoic2ViYXN0aWFuLWNoIiwiYSI6ImNpejkxdzZ5
 var map = new _mapboxGl.default.Map({
   container: "map",
   // container ID
-  //style: 'mapbox://styles/mapbox/light-v10', //?optimize=true
-  style: 'mapbox://styles/mapbox/satellite-v9',
+  style: 'mapbox://styles/mapbox/light-v10',
+  //?optimize=true
+  //style: 'mapbox://styles/mapbox/satellite-v9', 
   center: [-71.4, 19.1],
   // starting position [lng, lat]
   zoom: 7 //pitch: 55
@@ -42106,11 +42106,11 @@ map.on("load", function () {
   });
   map.addControl(nav, 'top-left');
   var styles = [{
-    title: "Satellite Imagery",
-    uri: "mapbox://styles/mapbox/satellite-v9"
-  }, {
     title: "Light",
     uri: "mapbox://styles/mapbox/light-v10?optimize=true"
+  }, {
+    title: "Satellite Imagery",
+    uri: "mapbox://styles/mapbox/satellite-v9"
   }, {
     title: "Satellite With Labels",
     uri: "mapbox://styles/mapbox/satellite-streets-v11"
@@ -42144,8 +42144,8 @@ map.on("load", function () {
   }();
 
   legendControl = new MyCustomControl();
-  addHexSource();
-  addSidsSource();
+  map.addControl(new _mapboxGl.default.ScaleControl());
+  addHexSource(); //addSidsSource()
 }); //function taken from mapbox that extracts unique features, see comment below
 
 function getUniqueFeatures(array, comparatorProperty) {
@@ -42165,17 +42165,6 @@ function getUniqueFeatures(array, comparatorProperty) {
 }
 
 map.on('style.load', function () {
-  var layers = map.getStyle().layers; // Find the index of the first symbol layer in the map style
-
-  var firstSymbolId;
-
-  for (var i = 0; i < layers.length; i++) {
-    if (layers[i].type === 'symbol') {
-      firstSymbolId = layers[i].id;
-      break;
-    }
-  }
-
   if (sourceData.hexSource.data != null) {
     map.addSource('hex', {
       type: "geojson",
@@ -42327,12 +42316,12 @@ dataWrapper.addEventListener('click', function (event) {
 
     if (features) {
       var uniFeatures = getUniqueFeatures(features, 'hexid'); //console.log(uniFeatures[0].properties._mean);
-      //console.log(uniFeatures);
 
+      console.log(uniFeatures);
       var selecteData = uniFeatures.map(function (x) {
         return x.properties[event.target.id];
-      }); //console.log(selecteData);
-
+      });
+      console.log(selecteData);
       var max = Math.max.apply(Math, _toConsumableArray(selecteData));
       var min = Math.min.apply(Math, _toConsumableArray(selecteData)); //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
 
@@ -42341,8 +42330,8 @@ dataWrapper.addEventListener('click', function (event) {
 
       var colorRamp3 = _chromaJs.default.scale(['#fafa6e', '#2A4858']).mode('lch').colors(5);
 
-      var colorRamp1 = ['#edf8fb', '#b2e2e2', '#66c2a4', '#2ca25f', '#006d2c'];
-      var colorRamp2 = ['#f2f0f7', '#cbc9e2', '#9e9ac8', '#756bb1', '#54278f']; //console.log(colorz.classes)
+      var colorRamp1 = ['#edf8fb', '#b2e2e2', '#66c2a4', '#2ca25f', '#006d2c'].reverse();
+      var colorRamp2 = ['#f2f0f7', '#cbc9e2', '#9e9ac8', '#756bb1', '#54278f'].reverse(); //console.log(colorz.classes)
 
       var ramps = [colorRamp1, colorRamp2, colorRamp3];
       var colorRamp = ramps[Math.floor(Math.random() * 3)];
@@ -42386,8 +42375,22 @@ dataWrapper.addEventListener('click', function (event) {
       }
 
       map.setPaintProperty('hex', 'fill-color', ['interpolate', ['linear'], ['get', event.target.id], breaks[0], colorRamp[0], breaks[1], colorRamp[1], breaks[2], colorRamp[2], breaks[3], colorRamp[3], breaks[4], colorRamp[4]]);
+      /*map.setPaintProperty('hex', 'fill-outline-color',
+      [
+        'interpolate',
+        ['linear'],
+        ['get', event.target.id],
+        breaks[0], colorRamp[0],
+        breaks[1], colorRamp[1],
+        breaks[2], colorRamp[2],
+        breaks[3], colorRamp[3],
+        breaks[4], colorRamp[4],
+        ]
+      
+      ) */
+
       map.setPaintProperty('hex', 'fill-opacity', 0.5);
-      map.setFilter('hex', ['has', event.target.id]);
+      map.setFilter('hex', ['>=', event.target.id, 0]);
       addLegend(colorRamp, breaks, event.target.id);
     }
   } //each time the map moves, repaint
@@ -42443,7 +42446,7 @@ function addLegend(colors, breaks, current) {
   legend.innerHTML = '<h3>' + legData.units + '</h3>';
 
   for (var x in colors) {
-    legend.innerHTML += '<span style="background:' + colors[x] + '"></span>' + '<label>' + Number.parseFloat(breaks[x]).toFixed(3) + '</label>';
+    legend.innerHTML += '<span style="background:' + colors[x] + '"></span>' + '<label>' + Number.parseFloat(breaks[x]).toFixed(3).toLocaleString() + '</label>';
   }
 } //3d function
 
@@ -42505,6 +42508,17 @@ function addSidsSource() {
 
 function addHexSource() {
   var hexTest = "https://sebastian-ch.github.io/sidsDataTest/data/hex5u.pbf";
+  var layers = map.getStyle().layers; // Find the index of the first symbol layer in the map style
+
+  var firstSymbolId;
+
+  for (var i = 0; i < layers.length; i++) {
+    if (layers[i].type === 'symbol') {
+      firstSymbolId = layers[i].id;
+      break;
+    }
+  }
+
   d3.buffer(hexTest).then(function (data) {
     map.addSource('hex', {
       type: "geojson",
@@ -42522,7 +42536,7 @@ function addHexSource() {
         'fill-color': 'blue',
         'fill-opacity': 0
       }
-    });
+    }, firstSymbolId);
   });
 }
 
@@ -42580,7 +42594,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50272" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51397" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

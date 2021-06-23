@@ -43,8 +43,8 @@ mapboxgl.accessToken =
 
   const map = new mapboxgl.Map({
     container: "map", // container ID
-    //style: 'mapbox://styles/mapbox/light-v10', //?optimize=true
-    style: 'mapbox://styles/mapbox/satellite-v9', 
+    style: 'mapbox://styles/mapbox/light-v10', //?optimize=true
+    //style: 'mapbox://styles/mapbox/satellite-v9', 
     center: [-71.4, 19.1], // starting position [lng, lat]
     zoom: 7,
     //pitch: 55
@@ -79,8 +79,8 @@ mapboxgl.accessToken =
     map.addControl(nav, 'top-left');
 
     const styles = [
-      {title: "Satellite Imagery", uri: "mapbox://styles/mapbox/satellite-v9",},
       {title: "Light",uri: "mapbox://styles/mapbox/light-v10?optimize=true",},
+      {title: "Satellite Imagery", uri: "mapbox://styles/mapbox/satellite-v9",},
       {title: "Satellite With Labels",uri: "mapbox://styles/mapbox/satellite-streets-v11",},
     ];
     
@@ -102,9 +102,10 @@ mapboxgl.accessToken =
     } 
     
     legendControl = new MyCustomControl(); 
+    map.addControl(new mapboxgl.ScaleControl());
     
     addHexSource()
-    addSidsSource()
+    //addSidsSource()
 
     
   });
@@ -129,15 +130,7 @@ mapboxgl.accessToken =
     }
 
   map.on('style.load', function(){
-    var layers = map.getStyle().layers;
-    // Find the index of the first symbol layer in the map style
-    var firstSymbolId;
-    for (var i = 0; i < layers.length; i++) {
-    if (layers[i].type === 'symbol') {
-    firstSymbolId = layers[i].id;
-    break;
-    }
-    }
+    
       if(sourceData.hexSource.data != null) {
 
         map.addSource('hex', {
@@ -317,9 +310,9 @@ mapboxgl.accessToken =
 
         var uniFeatures = getUniqueFeatures(features, 'hexid');
         //console.log(uniFeatures[0].properties._mean);
-        //console.log(uniFeatures);
+        console.log(uniFeatures);
         var selecteData = uniFeatures.map(x => x.properties[event.target.id])
-        //console.log(selecteData);
+        console.log(selecteData);
         var max = Math.max(...selecteData)
         var min = Math.min(...selecteData)
         
@@ -328,8 +321,8 @@ mapboxgl.accessToken =
         var breaks = chroma.limits(selecteData, 'q', 4)
         //console.log(breaks)
         var colorRamp3 = chroma.scale(['#fafa6e','#2A4858']).mode('lch').colors(5)
-        var colorRamp1 = ['#edf8fb', '#b2e2e2','#66c2a4','#2ca25f', '#006d2c' ]
-        var colorRamp2 = ['#f2f0f7','#cbc9e2' ,'#9e9ac8' , '#756bb1' , '#54278f' ]
+        var colorRamp1 = ['#edf8fb', '#b2e2e2','#66c2a4','#2ca25f', '#006d2c' ].reverse()
+        var colorRamp2 = ['#f2f0f7','#cbc9e2' ,'#9e9ac8' , '#756bb1' , '#54278f' ].reverse()
         
         
         //console.log(colorz.classes)
@@ -366,6 +359,7 @@ mapboxgl.accessToken =
             layout: {
               visibility: "visible",
             },
+            
             paint: {
               "fill-extrusion-color": [
                 'interpolate',
@@ -409,8 +403,21 @@ mapboxgl.accessToken =
           ]
         
         )
+        /*map.setPaintProperty('hex', 'fill-outline-color',
+        [
+          'interpolate',
+          ['linear'],
+          ['get', event.target.id],
+          breaks[0], colorRamp[0],
+          breaks[1], colorRamp[1],
+          breaks[2], colorRamp[2],
+          breaks[3], colorRamp[3],
+          breaks[4], colorRamp[4],
+          ]
+        
+        ) */
         map.setPaintProperty('hex','fill-opacity', 0.5)
-        map.setFilter('hex',['has',event.target.id])
+        map.setFilter('hex',['>=',event.target.id, 0])
         addLegend(colorRamp, breaks, event.target.id)
         
       } 
@@ -496,7 +503,7 @@ var infoBox = document.getElementById('infoBox')
   legend.innerHTML = '<h3>' + legData.units + '</h3>';
   for (var x in colors) {
     legend.innerHTML+= '<span style="background:'+ colors[x] + '"></span>' +
-    '<label>'+ Number.parseFloat(breaks[x]).toFixed(3)+'</label>'
+    '<label>'+ Number.parseFloat(breaks[x]).toFixed(3).toLocaleString() +'</label>'
 
   }
     
@@ -590,12 +597,23 @@ function addSidsSource() {
   function addHexSource() {
     const hexTest = "https://sebastian-ch.github.io/sidsDataTest/data/hex5u.pbf";
 
+    var layers = map.getStyle().layers;
+    // Find the index of the first symbol layer in the map style
+    var firstSymbolId;
+    for (var i = 0; i < layers.length; i++) {
+    if (layers[i].type === 'symbol') {
+    firstSymbolId = layers[i].id;
+    break;
+    }
+    }
+
     d3.buffer(hexTest).then(function (data) {
       map.addSource('hex', {
         type: "geojson",
         data: geobuf.decode(new Pbf(data)),
       });
       sourceData.hexSource.data = data;
+
 
       map.addLayer({
         'id': 'hex',
@@ -609,8 +627,9 @@ function addSidsSource() {
             'fill-color': 'blue',
             'fill-opacity': 0,
             
+            
             }
-        });
+        }, firstSymbolId);
     });
   }
 
