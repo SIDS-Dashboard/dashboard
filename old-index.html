@@ -1,30 +1,26 @@
 <html>
   <head>
-    
-    
   </head>
 <body>
-  <div id='buttonWrap'>
-    <div class="dropdown data" id='dropdown'>
-      <div class="dropbtn">Select Data</div>
-      <div class="dropdown-content">
-        <button id='EEZ'>EEZ</button>
-        <button id='pop'>Population Density</button>
-        <button id='pop3d'>Population Density 3d</button>
-        <button id='hex'>Hex Example</button>
-        <button id='hex1'>Other Hex Example</button>
-        
-        
+  
+  <div id='password' class='password'>
+    <input type="text" id="fname" name="fname"><br><br>
+  </div>
+
+    <div id='infoBox'></div>
+    <div class="dropdown">
+      <div class="dropbtn">Select Country</div>
+        <div id="myDropdown" class="dropdown-content"> 
       </div>
     </div>
-    
-    <div id='dropdown' class="dropdown country">
-      <div class="dropbtn">Select SIDS</div>
-      <div id='countryDrop' class="dropdown-content"></div>
-    </div> 
-  </div>
-   
-    <div id='loader' class="loader"></div>
+
+    <button class='dropbtn' id='admin'>Add Admin Regions</button>
+
+    <div class="dropdown-data">
+      <div class="dropbtn">Select Data</div>
+      <div id="dataDrop" class="dropdown-contentData"> 
+      </div>
+    </div>
     <div id='map'></div>
 
   <script src="./index.js"></script>

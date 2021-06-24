@@ -14,7 +14,8 @@ import uniq from 'lodash.uniq'
 import chroma from "chroma-js";
 
 import addButtons from './setButtons'
-import './style.css'
+import './ui-styles.css'
+//import './style.css'
 
 
 var pass = document.getElementById('fname')
@@ -102,7 +103,7 @@ mapboxgl.accessToken =
     } 
     
     legendControl = new MyCustomControl(); 
-    map.addControl(new mapboxgl.ScaleControl());
+    map.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
     
     addHexSource()
     //addSidsSource()
@@ -173,7 +174,7 @@ mapboxgl.accessToken =
 
 
   /*****ADMIN BUTTON WRAPPER****/
-  const adminWrap = document.getElementById('admin');
+  /*const adminWrap = document.getElementById('admin');
   adminWrap.addEventListener('click', (event) => {
 
 
@@ -189,7 +190,7 @@ mapboxgl.accessToken =
         },
         paint: {
           "line-color": "red",
-          /*'line-opacity': 0.3, */
+         
           "line-width": 2,
         },
       });
@@ -197,17 +198,18 @@ mapboxgl.accessToken =
     
 
 
-  })
+  }) */
 
   
-  const wrapper = document.getElementById('myDropdown');
+  const wrapper = document.getElementById('country-select');
   wrapper.addEventListener('click', (event) => {
-    const isButton = event.target.nodeName === 'BUTTON';
-    if (!isButton) {
+
+    const isOption = event.target.nodeName === "OPTION";
+    if (!isOption) {
       return;
     }
 
-    console.dir(event.target.id);
+    console.log(event.target.id);
 
     if(!event.target.id.includes('data')) {
 
@@ -286,19 +288,80 @@ mapboxgl.accessToken =
     } */
   })
 
-
-  const dataWrapper = document.getElementById('dataDrop');
-  dataWrapper.addEventListener('click', (event) => {
-    const isButton = event.target.nodeName === 'BUTTON';
-    if (!isButton) {
-      return;
-    }
+  function changeDataOnMap(selection) {
 
     if(map.getLayoutProperty('hex', 'visibility', 'none')) {
       map.setLayoutProperty('hex','visibility','visible')
     }
+    if(map.getLayoutProperty('hex', 'visibility','visible')) {
+
+      var features = map.queryRenderedFeatures({
+        layers: ['hex']
+      })
+  
+      if(features) {
+
+        var uniFeatures = getUniqueFeatures(features, 'hexid');
+        //console.log(uniFeatures[0].properties._mean);
+        console.log(uniFeatures);
+        var selecteData = uniFeatures.map(x => x.properties[selection])
+        console.log(selecteData);
+        var max = Math.max(...selecteData)
+        var min = Math.min(...selecteData)
+        
+        
+        //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
+        var breaks = chroma.limits(selecteData, 'q', 4)
+        //console.log(breaks)
+        var colorRamp3 = chroma.scale(['#fafa6e','#2A4858']).mode('lch').colors(5)
+        var colorRamp1 = ['#edf8fb', '#b2e2e2','#66c2a4','#2ca25f', '#006d2c' ].reverse()
+        var colorRamp2 = ['#f2f0f7','#cbc9e2' ,'#9e9ac8' , '#756bb1' , '#54278f' ].reverse()
+        
+        
+        //console.log(colorz.classes)
+        var ramps = [colorRamp1, colorRamp2, colorRamp3]
+
+        var colorRamp = ramps[Math.floor(Math.random() * 3)];
+
+        currentGeojsonLayers.breaks = breaks;
+        currentGeojsonLayers.color = colorRamp;
+
+        map.setPaintProperty('hex', 'fill-color',
+        [
+          'interpolate',
+          ['linear'],
+          ['get', selection],
+          breaks[0], colorRamp[0],
+          breaks[1], colorRamp[1],
+          breaks[2], colorRamp[2],
+          breaks[3], colorRamp[3],
+          breaks[4], colorRamp[4],
+          ]
+        
+        )
+        
+        map.setPaintProperty('hex','fill-opacity', 0.5)
+        map.setFilter('hex',['>=',selection, 0])
+        //addLegend(colorRamp, breaks, selection)
+
+  }
+}
+  }
+
+
+  const dataWrapper = document.getElementById('dataDrop');
+  dataWrapper.addEventListener('click', (event) => {
+    console.log(event)
+    const isOption1 = event.target.nodeName === 'OPTION';
+    if (!isOption1) {
+      return;
+    }
+    console.log(event.target.id)
+    if(map.getLayoutProperty('hex', 'visibility', 'none')) {
+      map.setLayoutProperty('hex','visibility','visible')
+    }
     currentGeojsonLayers.dataLayer = event.target.id
-    console.dir(event.target.id);
+    //console.dir(event.target.id);
 
     if(map.getLayoutProperty('hex', 'visibility','visible')) {
 
@@ -418,7 +481,7 @@ mapboxgl.accessToken =
         ) */
         map.setPaintProperty('hex','fill-opacity', 0.5)
         map.setFilter('hex',['>=',event.target.id, 0])
-        addLegend(colorRamp, breaks, event.target.id)
+        //addLegend(colorRamp, breaks, event.target.id)
         
       } 
   
@@ -667,3 +730,475 @@ function addSidsOutline(name) {
 }
 
 
+/////ui js
+var selection_scroller_options = {
+	0: {
+		'label': 'SIDS offer Pillars',
+		'value': 'SIDS offer Pillars'
+	},
+
+	1: {
+		'label': 'SDGs',
+		'value': 'SDGs'
+	},
+
+	2: {
+		'label': 'SAMOA Pathway',
+		'value': 'SAMOA Pathway'
+	}
+};
+
+// Predefined data for side tooltip 
+var sdg = [
+	{
+		title: "No Poverty",
+		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Zero Hunger",
+		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Good Health and Well-being",
+		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Quality Education",
+		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Clean Water and Sanitation",
+		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Affortable and Clean Energy",
+		content: "<strong> Reference: CIESIN</strong>, it is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)"
+	},
+	{
+		title: "Decent Work and Economic Growth",
+		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Industry Innovation and Infrastructure",
+		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Reduced Inquality",
+		content: "t is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Blue Economy 2",
+		content: "<strong> Reference: CIESIN</strong>, it is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)"
+	},
+	{
+		title: "Blue Economy 3",
+		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Blue Economy 4",
+		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Blue Economy 1 ",
+		content: "t is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Blue Economy 2",
+		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Blue Economy 3",
+		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Blue Economy 4",
+		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Blue Economy 5",
+		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Blue Economy 6",
+		content: "lastIt is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+];
+
+var arrsamoa = [
+	{
+		title: "1",
+		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "2",
+		content: "<strong> Reference: CIESIN</strong>, it is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)"
+	},
+	{
+		title: "3",
+		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Quality Education",
+		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Clean Water and Sanitation",
+		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Affortable and Clean Energy",
+		content: "<strong> Reference: CIESIN</strong>, it is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)"
+	},
+	{
+		title: "Decent Work and Economic Growth",
+		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Industry Innovation and Infrastructure",
+		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Reduced Inquality",
+		content: "t is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Blue Economy 2",
+		content: "<strong> Reference: CIESIN</strong>, it is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)"
+	},
+	{
+		title: "Blue Economy 3",
+		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Blue Economy 4",
+		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Blue Economy 1 ",
+		content: "t is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Blue Economy 2",
+		content: "<strong> Reference: CIESIN</strong>, it is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)"
+	},
+	{
+		title: "Blue Economy 3",
+		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Blue Economy 4",
+		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Blue Economy 5",
+		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+	{
+		title: "Blue Economy 6",
+		content: "lastIt is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+	},
+];
+
+$(document).ready(function () {
+	/** Collapse/Expand for Box  */
+	$('.collapse-btn').on('click', function () {
+		$('.app-body').toggleClass('collapsed');
+		$(this).toggleClass('collapsed');
+	}); 
+
+	// /** Select2 for drop downs */
+	$('.form-select').select2();
+
+	/**
+	 * Tooltip for sdgs
+	*/
+	$(".sdgimg .carousel-item, .sdgs .icon-grid-item , .sdg-tool").mouseover(function () {
+		$("#gridsdgs").removeClass("d-none");
+		$("#samimg").removeClass("d-none");
+		var index = $(this).data('imgid');
+		$('.title-text').text(sdg[index].title);
+		$('.img-tooltip-content').html(sdg[index].content);
+	});
+
+	$(".sdgimg .carousel-item, .grid-container,.sdg-tool ").mouseout(function () {
+		$("#gridsdgs").addClass("d-none");
+		$("#samimg").addClass("d-none");
+	});
+
+	// samoa hover events
+	$(".samoa .carousel-item, .samoa-grid .icon-grid-item").mouseover(function () {
+		$("#gridsamoa").removeClass("d-none");
+		$("#samimg").removeClass("d-none");
+		var index = $(this).data('imgid');
+		$('.title-text').text(arrsamoa[index].title);
+		$('.img-tooltip-content').html(arrsamoa[index].content);
+
+	});
+
+	$(".samoa .carousel-item,.grid-container, .samoa-grid ").mouseout(function () {
+		$("#gridsamoa").addClass("d-none");
+		$("#samimg").addClass("d-none");
+	});
+
+	/**sdg grid hover */
+	$(".sdgs .icon-grid-item").click(function () {
+		$("#sdg_slider .carousel-item").removeClass("active");
+		var index = $(this).data('imgid');
+		$("#sdg_slider div[data-imgid='" + index + "']").addClass("active");
+	});
+
+
+	/**samoa grid hover */
+	$(".samoa-grid .icon-grid-item").click(function () {
+		$("#SAMOA_slider .carousel-item").removeClass("active");
+		var index = $(this).data('imgid');
+		$("#SAMOA_slider div[data-imgid='" + index + "']").addClass("active");
+		console.log('add');
+		console.log('remov');
+	});
+
+	// hover for economy
+	$(".BE, #tooleconnomy").mouseover(function () {
+		$("#tooleconomy").removeClass("d-none");
+	});
+	$(".BE, #tooleconomy").mouseout(function () {
+		$("#tooleconomy").addClass("d-none");
+	});
+
+	// hover action for climate action 
+	$(".CA, #toolclimate").mouseover(function () {
+		$("#tooleclimate").removeClass("d-none");
+	});
+	$(".CA, #tooleclimate").mouseout(function () {
+		$("#tooleclimate").addClass("d-none");
+	});
+
+	// hover action for Digital	Transformation
+	$(".DT, #tooldigi").mouseover(function () {
+		$("#tooldigi").removeClass("d-none");
+	});
+	$(".DT, #tooldigi").mouseout(function () {
+		$("#tooldigi").addClass("d-none");
+	});
+
+
+	// Button click and select
+	$('.button-option-select-1').on('click', function (e) {
+		var btnValue = $(this).data('value');
+
+		$('.button-option-select-1.active').removeClass('active');
+
+		$(this).addClass('active');
+		// Button value 
+		console.log('Button Value: ' + btnValue);
+
+		e.preventDefault();
+	});
+
+	// 
+	$('select[name="dataset-selection"]').on('change', function () {
+		//console.log('Dataset: ' + $(this).val());
+    //console.log(this.selectedOptions[0].id)
+    changeDataOnMap(this.selectedOptions[0].id);
+	});
+
+	$('select[name="layer-selection"]').on('change', function () {
+		console.log('Layer: ' + $(this).val());
+	});
+	/**
+	 * Dynamic year list creation 
+	 */
+	var yearList = [1990, 1995, 2010, 2015];
+	if (yearList.length == 1) {
+		$('.year-timeline').html(`<p class='m-0'> Data only available for ${yearList}</p>`)
+		$('.year-timeline-wrapper').addClass('single-year-only');
+		return;
+	}
+
+
+	last_percentage = 0;
+
+	for (var i = 0; i < yearList.length; i++) {
+		var class_for_year = "";
+		if (i == 0) {
+			class_for_year = "alpha";
+		}
+		else if (i == yearList.length - 1) {
+			class_for_year = "omega";
+		}
+
+
+		// 
+		var totalContainerWidth = $('.year-timeline').outerWidth();
+
+		// Calculating the pecetange of this block
+		var different_first_last = yearList[yearList.length - 1] - yearList[0];
+
+
+		// Now calculate the distance between the current item and the next one
+		var distance_to_next = yearList[i] - yearList[0];
+
+		if (i == yearList.length - 1) {
+			console.log('is omega');
+		}
+
+		var size_in_percentage = (distance_to_next / different_first_last) * 100;
+		size_in_percentage = size_in_percentage.toFixed(2);
+
+		var widthStyle = `width: ${size_in_percentage}%;`;
+
+		var fromLeftPosition = 0;
+		var fromLeftStyle = ``;
+
+		if (i > 0 && i < (yearList.length - 1)) {
+			fromLeftPosition = parseInt(size_in_percentage);
+			// convert from left position to pixels
+			fromLeftPixels = (fromLeftPosition / 100) * totalContainerWidth;
+			fromLeftStyle = `left: ${fromLeftPixels}px;`;
+		} else {
+			last_percentage = parseInt(size_in_percentage);
+		}
+
+		last_percentage = fromLeftPosition;
+
+
+		var year_html = `<div _style=' ${widthStyle}' data-width='${size_in_percentage}' class="year-timeline-block ${class_for_year}" data-year-idx="${i + 1}">
+				 <input type="radio" name="year-selected" value="${yearList[i]}" id="year-${yearList[i]}" ${(i == 0) ? 'checked' : ''}>
+				 <label for="year-${yearList[i]}">
+				 <span style='${fromLeftStyle}' class="label-value">${yearList[i]}</span>
+				 <span style='${fromLeftStyle}' class="circle-radio"></span>
+				 </label>
+			  </div>`;
+		$('.year-timeline').append(year_html);
+
+	}
+	// }
+
+	// Year selection 
+	var isReachedToEnd = false;
+	$('body').on('change click', 'input[name="year-selected"]', function () {
+		isReachedToEnd = false;
+		var yearValue = $('[name="year-selected"]:checked').val();
+		console.log(yearValue);
+	});
+
+	// play / pause
+	var playPauseInterval;
+
+	$('#year-play-pause').on('click', function (e) {
+		var isPaused = $(this).hasClass('play');
+
+
+		if (!isPaused) {
+			clearInterval(playPauseInterval);
+			$(this).removeClass('pause').addClass('play');
+		} else {
+			playPauseInterval = window.setInterval(function () {
+				var $checkedBox = $('input[name="year-selected"]:checked');
+				if ($checkedBox.parent('.year-timeline-block').hasClass('omega') && isReachedToEnd) {
+					$('.year-timeline-block.alpha input[type="radio"').prop('checked', true);
+					isReachedToEnd = false; // Reset, once replayed 
+				}
+				// Reached to end 
+				else if ($checkedBox.parent('.year-timeline-block').hasClass('omega')) {
+					clearInterval(playPauseInterval);
+					$('#year-play-pause').removeClass('pause').addClass('play');
+					isReachedToEnd = true; // Flag that indicates to replay the year selection 
+					return;
+				}
+				// Find the idx of checked item
+				var currentIdx = $checkedBox.parent('.year-timeline-block').data('year-idx');
+
+				var nextCheckedBoxIdx = currentIdx + 1;
+				$('.year-selected[value=1990]').prop('checked', true)
+				$('.year-timeline-block[data-year-idx="' + nextCheckedBoxIdx + '"]').find('input[name="year-selected"]').prop('checked', true);
+
+				console.log($('input[name="year-selected"]:checked').val());
+
+
+			}, 1000);
+
+			$(this).addClass('pause').removeClass('play');
+		}
+
+
+		e.preventDefault();
+
+	});
+
+
+	/* Tabs */
+	$('.tab-nav').on('click', function () {
+
+		$('.tab-nav').removeClass('active');
+		$(this).addClass('active');
+
+		var target = $(this).data('target');
+
+		$('.tab').removeClass('active');
+		$(target).addClass('active');
+
+	});
+
+	/**
+	 *  Top Toolip 
+	*/
+	$('.tab-nav').on('mouseover', function () {
+		var $target = $(this).data('tooltip-target');
+		$($target).show();
+	});
+
+	$('.tab-nav').on('mouseout', function () {
+		var $target = $(this).data('tooltip-target');
+		$($target).hide();
+	});
+	/* END TOP TOOLTIP */
+	$('.selection-dropdown-arrow').on('click', function () {
+		// Get <select> tag  
+		var $select = $(this).parent().find('select');
+		// Count options 
+		var totalOpts = $select.find('option').length;
+		// Get current selection s
+		var currentIndex = $select.prop('selectedIndex');
+
+
+		if ($(this).hasClass('up')) {
+			if (currentIndex === 0) {
+				currentIndex = totalOpts - 1;
+				$select.prop('selectedIndex', currentIndex);
+			}
+			else {
+				$select.prop('selectedIndex', currentIndex - 1);
+			}
+		}
+		else if ($(this).hasClass('down')) {
+			if (currentIndex === totalOpts - 1) {
+				currentIndex = 0;
+				$select.prop('selectedIndex', currentIndex);
+			}
+			else {
+				$select.prop('selectedIndex', currentIndex + 1);
+			}
+		}
+	}); 
+
+	/**
+	 * Function to check all the values
+	 */
+	function check_all_values() {
+		var top_left_nav = $('.tab-nav.active span').text();
+		var btnValue = $('.button-option-select-1.active').data('value');
+		var datasetSelect = $('select[name="dataset-selection"]').val();
+		var layerSelect = $('select[name="layer-selection"]').val();
+		var year = $('input[name="year-selected"]:checked').val();
+
+		console.log('Top left nav = ' + top_left_nav);
+		console.log('Top right Button = ' + btnValue);
+		console.log('DATASET selection = ' + datasetSelect);
+		console.log('Layer selection = ' + layerSelect);
+		console.log('Year selection = ' + year);
+	}
+
+	check_all_values()
+
+});

@@ -1,0 +1,870 @@
+body {
+    /*background-image: url('./assets/background-img.svg'); */
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.password {
+   /* display: flex; */
+   top: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 400;
+    background-color: black;
+    align-items: center;
+    text-align: center;
+  }
+
+#map {
+    position: absolute;
+    top: 0;
+    z-index: -1;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+.row-flex {
+    display: flex;
+    flex-direction: row;
+}
+
+.col-flex {
+    display: flex;
+    flex-direction: column;
+}
+
+.space-evenly {
+    justify-content: space-evenly;
+}
+
+.logos {
+    position: fixed;
+    top: 30px;
+    left: 30px;
+}
+
+.UNDP-logo {
+    width: 25px;
+    height: 65px;
+    background: url('./assets/UNDP-logo.svg');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    margin-right: 13px;
+}
+
+.rising-up-for-sids {
+    width: 131px;
+    height: 60px;
+    background: url('./assets/risingUpForSids.png');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-color: rgba(196, 196, 196, 0.7);
+}
+
+.top-right {
+    position: fixed;
+    top: 25px;
+    right: 30px;
+}
+
+.country-select-menu {
+    position: relative;
+}
+
+.country-select-menu select {
+    padding: 8px 35px 8px 20px;
+    border-radius: 16px;
+    outline: none;
+    height: 34px;
+    background: #DDDDDD;
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 19px;
+    border: 0px;
+    appearance: none;
+    cursor: pointer;
+}
+
+.downarrow {
+    width: 8.54px;
+    height: 7.68px;
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    background: url('./assets/down-arrow.svg');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    cursor: pointer;
+}
+
+.icon1 {
+    width: 34px;
+    height: 34px;
+    margin-left: 16px;
+    background: url('./assets/icon1.png');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+.add-overlay-menu {
+    position: relative;
+}
+
+.add-overlay-menu select {
+    padding: 8px 35px 8px 20px;
+    border-radius: 10px;
+    outline: none;
+    height: 34px;
+    background: #DDDDDD;
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 19px;
+    border: 0px;
+    appearance: none;
+    cursor: pointer;
+}
+
+.downarrow {
+    width: 8.54px;
+    height: 7.68px;
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    background: url('./assets/down-arrow.svg');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+.icon2 {
+    width: 34px;
+    height: 34px;
+    margin-left: 16px;
+    background: url('./assets/icon2.png');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+.plot-select-menu {
+    position: relative;
+}
+
+.plot-select-menu select {
+    padding: 8px 34px 8px 34px;
+    border-radius: 10px;
+    outline: none;
+    height: 34px;
+    background: #DDDDDD;
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 19px;
+    border: 0px;
+    appearance: none;
+    text-align: center;
+    cursor: pointer;
+}
+
+.left-arrow {
+    width: 7.68px;
+    height: 8.54px;
+    position: absolute;
+    top: 12px;
+    left: 14px;
+    background: url('./assets/left-arrow.svg');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    cursor: pointer;
+}
+
+.right-arrow {
+    width: 7.68px;
+    height: 8.54px;
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: url('./assets/right-arrow.svg');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    cursor: pointer;
+}
+
+.icon3 {
+    width: 34px;
+    height: 34px;
+    margin-left: 16px;
+    background: url('./assets/icon3.png');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+.plus-sign {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    margin-left: 4px;
+    background: url('./assets/plus-sign.png');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+.bottom-left-col {
+    position: fixed;
+    bottom: 12px;
+    left: 16px;
+}
+
+/*  */
+
+.main-wrapper {
+    margin-left: 14px;
+    margin-top: 40vh;
+    position: relative;
+}
+
+.app-body {
+    max-width: 360px;
+    margin: 10px 0;
+    background-color: rgba(196, 196, 196, 0.7);
+    padding: 10px 21px;
+    border-radius: 26px;
+    transition: 1s ease-in-out all;
+    opacity: 1;
+}
+
+.app-body.collapsed {
+    opacity: 0;
+    z-index: -999;
+    pointer-events: none;
+}
+
+/* Custom Selection Boxes */
+
+.custom-selection-dropdown {
+    padding-top: 4px;
+    position: relative;
+}
+
+.custom-selection-dropdown>label {
+    display: block;
+    margin: 0px 30px;
+    font-size: 13px;
+}
+
+.custom-selection-dropdown .form-select {
+    font-size: 12px;
+    border-radius: 30px;
+    padding: 4px 20px;
+    background-image: none;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 18px;
+}
+
+/* Selection scroller */
+
+#selection-scroller-option {
+    /* padding: 15px; */
+    border-right: 2px solid #333;
+    background-image: linear-gradient( 90deg, transparent, #ccc);
+}
+
+.selection-scroller .scroller-option {
+    font-size: 13px;
+    padding: 1px 0;
+    /* min-height: 32px; */
+}
+
+.tab-nav span {
+    cursor: pointer;
+}
+
+.tab-nav.active span {
+    font-size: 14px;
+    font-weight: 600;
+    position: relative;
+    display: block;
+    padding-right: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.scroller-option-selected {
+    font-size: 20px;
+    font-weight: 600;
+    position: relative;
+    display: block;
+    padding-right: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.scroller-option-selected .scroller-buttons {
+    position: absolute;
+    left: 162px;
+    top: 24%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.scroller-buttons>a {
+    color: #333;
+    text-decoration: none;
+    display: block;
+    margin: 0;
+    line-height: 1;
+    width: 12px;
+    height: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.scroller-buttons>a:hover {
+    color: #20649a;
+}
+
+.scroller-buttons>a .fa {
+    line-height: 1;
+}
+
+.scroller-buttons>a.disabled {
+    opacity: 0.5;
+}
+
+/* Button selection */
+
+.button-selection .btn {
+    display: block;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    color: #0cb5ff;
+    border-radius: 30px;
+    padding: 1px 6px;
+}
+
+.button-selection .btn:hover {
+    background-color: rgba(255, 255, 255, .1);
+}
+
+.button-selection .btn.active {
+    background-color: rgba(255, 255, 255, .25);
+}
+
+.button-selection .btn.btn-1 {
+    color: #2b71d2;
+}
+
+.button-selection .btn.btn-2 {
+    color: #37ef31;
+}
+
+.button-selection .btn.btn-3 {
+    color: #ffd312;
+}
+
+.button-selection img.button-icon {
+    max-width: 22px;
+}
+
+/* year timeline  */
+
+.year-timeline-wrapper {
+    position: relative;
+    padding-left: 0px;
+}
+
+.year-timeline-controls {
+    position: absolute;
+    bottom: -10px;
+    left: -8px;
+    z-index: 2;
+}
+
+#year-play-pause {
+    color: #b30d8a;
+    text-decoration: none;
+    display: block;
+    width: 32px;
+    height: 32px;
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 4;
+}
+
+#year-play-pause>span {
+    font-size: 0;
+    display: none;
+}
+
+#year-play-pause::after {
+    font-family: FontAwesome;
+    content: '\f04b';
+}
+
+#year-play-pause.pause::after {
+    font-family: FontAwesome;
+    content: '\f04c';
+}
+
+.year-timeline {
+    display: flex;
+    position: relative;
+    padding: 0;
+    margin-top: 6px;
+}
+
+.year-timeline .year-timeline-block {
+    display: block;
+    width: 25%;
+    /*width: auto;*/
+    text-align: center;
+    position: relative;
+}
+
+.year-timeline .year-timeline-block::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    width: 100%;
+    display: block;
+    background-color: #111;
+    margin-top: -4px;
+}
+
+.year-timeline .year-timeline-block.alpha::after {
+    width: 50%;
+    margin-left: auto;
+}
+
+.year-timeline .year-timeline-block.omega::after {
+    width: 50%;
+    margin-right: auto;
+}
+
+.year-timeline-block>input[type='radio'] {
+    visibility: hidden;
+    width: 0;
+    height: 0;
+    display: none;
+}
+
+.year-timeline-block label {
+    display: block;
+    cursor: pointer;
+}
+
+/***-------------- Show labels for selected/first and last (Uncomment out this to show only selected/first and last years)  --------------
+.year-timeline-block .label-value{ 
+    opacity: 0;
+}
+.year-timeline-block.alpha .label-value, 
+.year-timeline-block.omega .label-value, 
+input[type='radio']:checked~label .label-value {
+    opacity: 1;
+}
+/***-------------- END  --------------***/
+
+.year-timeline-block .label-value {
+    display: inline-block;
+    padding: 5px 0px;
+    position: relative;
+    text-align: center;
+    padding-bottom: 10px;
+    font-size: 12px;
+}
+
+.year-timeline-block .circle-radio {
+    width: 8px;
+    height: 8px;
+    display: block;
+    background-color: #333;
+    border-radius: 50%;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+    transition: 0.2s all ease-in-out;
+}
+
+input[type='radio']:checked~label .circle-radio {
+    background-color: #797979;
+    box-shadow: 0 0 0 1px #000000, 0 0 0 3px #3e3e3e;
+}
+
+.year-timeline-block.alpha .label-value {
+    margin-left: auto;
+}
+
+.year-timeline-block.omega .label-value {
+    margin-right: auto;
+}
+
+.year-timeline-wrapper {
+    padding-left: 35px;
+}
+
+.year-timeline .year-timeline-block {
+    position: static;
+    height: 40px;
+}
+
+.year-timeline .year-timeline-block.omega::after {
+    width: auto;
+    margin-left: initial;
+    margin-right: initial;
+}
+
+.year-timeline .year-timeline-block.alpha::after {
+    width: auto;
+    margin-left: initial;
+    margin-right: initial;
+}
+
+.year-timeline-block .label-value {
+    position: absolute;
+    transform: translateX(-50%);
+}
+
+.year-timeline-block.omega .label-value {
+    transform: translateX(50%);
+}
+
+.year-timeline-block.alpha .label-value {
+    position: absolute;
+    left: 0;
+    right: initial;
+}
+
+.year-timeline-block.omega .label-value {
+    position: absolute;
+    right: 0;
+    left: initial;
+}
+
+.year-timeline-block .circle-radio {
+    position: absolute;
+    bottom: 6px;
+    left: 0;
+}
+
+.year-timeline-block.alpha .circle-radio {
+    left: 0;
+    right: initial;
+}
+
+.year-timeline-block.omega .circle-radio {
+    right: 0;
+    left: initial;
+}
+
+.year-timeline .year-timeline-block::after {
+    bottom: 10px;
+}
+
+/* Tabs */
+
+.tab {
+    display: none;
+}
+
+.tab.active {
+    display: block;
+}
+
+.carousel-img {
+    max-height: 66px;
+}
+
+.grid-container {
+    max-width: 340px;
+    position: absolute;
+    z-index: 99;
+    left: -180px;
+    top: 66px;
+}
+
+.icon-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+}
+
+.grid-container .icon-grid img {
+    max-width: 60px;
+}
+
+.grid-container .icon-grid img:hover {
+    transform: scale(1.3);
+}
+
+.tab-2 {
+    position: relative;
+}
+
+.hide-economy {
+    display: none;
+}
+
+.econo {
+    background-color: #ffffff5e;
+    max-width: 436px;
+    position: absolute;
+    z-index: -99;
+    left: 384px;
+    top: 0px;
+}
+
+.econo .text-section {
+    padding-left: 32px;
+}
+
+.econo-content {
+    max-width: 316px;
+    margin: 27px 20px 28px 124px;
+}
+
+.sdg-content {
+    max-width: 308px;
+    margin: 27px 20px 28px 94px;
+}
+
+.blue-eco-tooltip-icon {
+    max-width: 60px;
+}
+
+.tooltip-blue-eco {
+    max-width: 360px;
+    padding: 10px;
+    border-radius: 20px;
+    background-color: #ebebeb9e;
+}
+
+.tooltip-blue-eco h3 {
+    color: #2b71d2;
+    font-size: 14px;
+}
+
+.tooltip-blue-eco p, .tooltip-blue-eco strong {
+    font-size: 12px;
+    margin: 0;
+}
+
+.tooltip-blue-eco .title-text {
+    color: #a21942;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.tooltip-cli h3 {
+    color: #37ef31;
+}
+
+.tooltip-digi h3 {
+    color: #ffd312;
+}
+
+.samoa-grid {
+    left: 12px;
+    top: 76px;
+}
+
+.custom-selection-dropdown .select2-container--default .select2-selection--single {
+    display: block;
+    width: 100%;
+    padding: 0;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right .75rem center;
+    background-size: 16px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 32px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    height: auto;
+}
+
+.custom-selection-dropdown .select2-selection__arrow {
+    display: none;
+}
+
+.collapse-btn {
+    width: 30px;
+    height: 50px;
+    line-height: 50px;
+    position: absolute;
+    left: -18px;
+    top: 36px;
+    background-color: rgba(37, 42, 48, 0.5);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: .5s ease-in-out;
+    display: flex;
+    justify-content: center;
+}
+
+.collapse-btn svg {
+    max-width: 26px;
+}
+
+.collapse-btn.collapsed {
+    transform: rotate(180deg);
+}
+
+/* Top tooltip */
+
+.tooltip-top {
+    display: none;
+    max-width: 360px;
+    padding: 10px 0;
+    background-color: white;
+    margin-left: 2px;
+    border-radius: 26px;
+    position: absolute;
+    top: -162px;
+}
+
+.tooltip-top .head-img {
+    display: flex;
+    justify-content: center;
+}
+
+.tooltip-top img {
+    max-width: 160px;
+}
+
+.tooltip-top p, .tooltip-top strong {
+    padding: 4px 10px;
+    font-size: 12px;
+    margin: 0;
+}
+
+.main-wrapper .select2-container {
+    width: 100% !important;
+}
+
+/* Scrollbar */
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    display: none;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #9E9E9E;
+    border-radius: 40px;
+}
+
+.population-density-box {
+    width: 350px;
+    height: 100px;
+    margin-top: 12px;
+    border-radius: 20px;
+    background-color: #EBEBEB;
+    margin-left: 30px;
+}
+
+.population-per-km {
+    max-width: 350px;
+    margin-top: 12px;
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 10px;
+    margin-left: 30px;
+}
+
+.population-per-km-text {
+    font-size: 11px;
+    line-height: 14px;
+    margin-top: 5px;
+}
+
+.population-per-km-img {
+    width: 25px;
+    height: 21px;
+    background: url('./assets/polygon.png');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    margin-top: 2px;
+}
+
+/* Misc */
+
+.text-add-chart {
+    font-size: 12px;
+    color: #fff;
+}
+
+.add-chart-button-wrap {
+    justify-content: flex-end;
+    margin-top: 15px;
+}
+
+.add-chart-button {
+    width: 93px;
+    height: 34px;
+    border-radius: 10px;
+    background-color: #525252;
+    cursor: pointer;
+    padding: 2px 5px
+}
+
+.dataset-select-uparrow {
+    width: 7.54px;
+    height: 6.68px;
+    position: absolute;
+    top: 28.76px;
+    right: 18px;
+    background: url('./assets/up-arrow.svg');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    cursor: pointer;
+}
+
+.dataset-select-downarrow {
+    width: 7.54px;
+    height: 6.68px;
+    position: absolute;
+    top: 38px;
+    right: 18px;
+    background: url('./assets/down-arrow.svg');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    cursor: pointer;
+}
+
+.year-timeline-wrapper.single-year-only {
+    padding: 0;
+}
+
+.single-year-only .year-timeline-controls {
+    display: none;
+}
+
+.single-year-only .year-timeline {
+    justify-content: center;
+}
+
+.select2~.selection-dropdown-arrow {
+    display: none;
+}

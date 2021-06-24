@@ -4,9 +4,9 @@ import allLayers from './index'
 
 export default function addButton(names, allTheLayers) {
 
-    var sidsHolder = document.getElementById('myDropdown');
+    var sidsHolder = document.getElementById('country-select');
     names.map(function(x) {
-        var btn = document.createElement("BUTTON"); 
+        var btn = document.createElement("option"); 
         btn.innerHTML = x.NAME_0;
         btn.classList.add('sidsb')
         btn.setAttribute('id', x.GID_0)
@@ -30,7 +30,7 @@ export default function addButton(names, allTheLayers) {
       
           var dataHolder = document.getElementById('dataDrop')
       
-          var btn1 = document.createElement("BUTTON"); 
+          var btn1 = document.createElement("option"); 
           btn1.innerHTML = x.Name;
           btn1.classList.add('data')
           btn1.setAttribute('id', x.Field_Name)
