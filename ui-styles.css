@@ -1,7 +1,6 @@
 body {
-    /*background-image: url('./assets/background-img.svg'); */
-    background-repeat: no-repeat;
-    background-size: cover;
+    
+   
 }
 
 .password {
@@ -19,10 +18,10 @@ body {
 #map {
     position: absolute;
     top: 0;
-    z-index: -1;
+    z-index: 0;
     height: 100vh;
     width: 100vw;
-    overflow: hidden;
+    /*overflow: hidden; */
 }
 
 .row-flex {
@@ -43,6 +42,7 @@ body {
     position: fixed;
     top: 30px;
     left: 30px;
+    z-index: 1;
 }
 
 .UNDP-logo {
@@ -52,6 +52,7 @@ body {
     background-repeat: no-repeat;
     background-size: 100% 100%;
     margin-right: 13px;
+
 }
 
 .rising-up-for-sids {
@@ -61,12 +62,14 @@ body {
     background-repeat: no-repeat;
     background-size: 100% 100%;
     background-color: rgba(196, 196, 196, 0.7);
+   
 }
 
 .top-right {
     position: fixed;
     top: 25px;
-    right: 30px;
+    right: 40px;
+    z-index: 1;
 }
 
 .country-select-menu {
@@ -218,18 +221,23 @@ body {
 
 .main-wrapper {
     margin-left: 14px;
-    margin-top: 40vh;
+    margin-top: 35vh;
     position: relative;
+    /*Sebastian added this */
+    width: 26%;
+    z-index: 1;
+     
 }
 
 .app-body {
     max-width: 360px;
     margin: 10px 0;
-    background-color: rgba(196, 196, 196, 0.7);
+    background-color: rgba(221, 221, 221, 0.7);
     padding: 10px 21px;
     border-radius: 26px;
     transition: 1s ease-in-out all;
     opacity: 1;
+    
 }
 
 .app-body.collapsed {
@@ -387,6 +395,10 @@ body {
     bottom: -10px;
     left: -8px;
     z-index: 2;
+}
+
+#icon3d:hover {
+    cursor: pointer;
 }
 
 #year-play-pause {
@@ -780,8 +792,11 @@ input[type='radio']:checked~label .circle-radio {
     height: 100px;
     margin-top: 12px;
     border-radius: 20px;
-    background-color: #EBEBEB;
+    background-color: #DDDDDD;
     margin-left: 30px;
+    /*sebastian added */
+    position: relative;
+    z-index: 1;
 }
 
 .population-per-km {
@@ -791,12 +806,16 @@ input[type='radio']:checked~label .circle-radio {
     border-radius: 20px;
     padding: 10px;
     margin-left: 30px;
+    /*sebastian added */
+    position: relative;
+    z-index: 1;
 }
 
 .population-per-km-text {
     font-size: 11px;
     line-height: 14px;
     margin-top: 5px;
+    
 }
 
 .population-per-km-img {

@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="/dashboard.e31bb0bc.css"></head>
 
 <body>
-
+	
 	<div id="password" class="password">
 		<input type="text" id="fname" name="fname"><br><br>
 	  </div>
@@ -40,29 +40,29 @@
 				</select>
 				<span class="downarrow"></span>
 			</div>
-			<div class="icon1"></div>
+			<!--<div class="icon1"></div>-->
 		</div>
 
 		<div class="row-flex" style="justify-content:flex-end;margin-top:15px;">
 			<div class="add-overlay-menu">
-				<select id="add-overlay">
+				<select name="overlay-select" id="add-overlay">
 					<option value="Select Country or Region">Add overlays</option>
-					<option value="overlay1">overlay1</option>
-					<option value="overlay2">overlay2</option>
-					<option value="overlay3">overlay3</option>
+					<option value="admin1">Admin Regions 1</option>
+					<option value="admin2">Admin Regions 2</option>
+					
 				</select>
 				<span class="downarrow"></span>
 			</div>
-			<div class="icon2"></div>
+			<div id="icon3d" class="icon2"></div>
 		</div>
 
 		<div class="row-flex" style="justify-content:flex-end;margin-top:15px;">
 			<div class="plot-select-menu">
-				<select id="plot-select">
-					<option value="5km hexbins">5km hexbins</option>
-					<option value="10km hexbin">10km hexbin</option>
-					<option value="20km hexbin">20km hexbin</option>
-					<option value="30km hexbin">30km hexbin</option>
+				<select name="hexbin-change" id="plot-select">
+					<option selected="" value="hex5">5km hexbins</option>
+					<option value="hex10">10km hexbin</option>
+					<option value="admin1">Admin 1 Regions</option>
+					<option value="admin2">Admin 2 Regions</option>
 				</select>
 				<span class="selection-dropdown-arrow up left-arrow"></span>
 				<span class="selection-dropdown-arrow down right-arrow"></span>
@@ -474,10 +474,10 @@
 					<div class="custom-selection-dropdown selection-dropdown-1">
 						<label>Dataset</label>
 						<select class="form-select data-set-selection" id="dataDrop" aria-label="Dataset" name="dataset-selection">
-							<option value="Population Density (CIESIN)" selected="">Population Density (CIESIN)</option>
+							<!--<option value="Population Density (CIESIN)" selected>Population Density (CIESIN)</option>
 							<option value="Example 2">Example 2</option>
 							<option value="Example Dataset 3">Example Dataset 3</option>
-							<option value="Example Dataset 4">Example Dataset 4</option>
+							<option value="Example Dataset 4">Example Dataset 4</option> -->
 						</select>
 						<span class="selection-dropdown-arrow up dataset-select-uparrow"></span>
 						<span class="selection-dropdown-arrow down dataset-select-downarrow"></span>
@@ -569,21 +569,16 @@
 	</div>
 	<div class="population-density-box col-flex">
 		<div class="col-flex" style="overflow-y:auto; padding:0px 6px 0px 0px;margin:12px 4px 12px 16px;">
-			<div style="font-size:16px;font-weight:700;">Population Density 2020</div>
-			<div style="font-size:12px;font-weight:500;margin-top:10px;">The Gridded Population of the World, Version 4
-				(GPWv4) consists of estimates of human population (number of persons per pixel) consistent with national
-				censuses and population registers with respect to relative spatial distribution.</div>
-			<div style="font-size:12px;font-weight:500;margin-top:10px;"><strong>Reference:</strong> CIESIN, Columbia
-				University (2018) -
-				https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-count-adjusted-to-2015-unwpp-country-totals-rev11
-			</div>
+			<div id="infoBoxTitle" style="font-size:16px;font-weight:700;">Select a Dataset</div>
+			<div id="infoBoxText" style="font-size:12px;font-weight:500;margin-top:10px;"></div>
+			<div id="infoBoxLink" style="font-size:12px;font-weight:500;margin-top:10px;"></div>
 		</div>
 	</div>
 	<div class="population-per-km col-flex">
-		<div class="row-flex space-evenly" style="margin-top:4px;font-size: 14px;">Population per km</div>
+		<div class="row-flex space-evenly" style="margin-top:4px;font-size: 14px;" id="legendTitle">Legend</div>
 
-		<div class="row-flex space-evenly">
-			<div class="col-flex align-items-center">
+		<div class="row-flex space-evenly" id="updateLegend">
+			<!--<div class="col-flex align-items-center">
 				<div class="population-per-km-text">0.05</div>
 				<div class="population-per-km-img" style="background-color:#B3F1FF;"></div>
 			</div>
@@ -602,11 +597,13 @@
 			<div class="col-flex align-items-center">
 				<div class="population-per-km-text">2236.52</div>
 				<div class="population-per-km-img" style="background-color:#006379;"></div>
-			</div>
+			</div> -->
 		</div>
+		
 	</div>
 	<!-- </div> -->
 	<div id="map"></div>
+	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js" integrity="sha512-jGR1T3dQerLCSm/IGEGbndPwzszJBlKQ5Br9vuB0Pw2iyxOy+7AK+lJcCC8eaXyz/9du+bkCy4HXxByhxkHf+w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>

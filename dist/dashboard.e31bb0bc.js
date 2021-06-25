@@ -33611,8 +33611,8 @@ module.exports = [{
   "bb": [[137.48592, 1.02621], [163.03544, 10.09033]],
   "GID_0": ""
 }];
-},{}],"data/csv_data.csv":[function(require,module,exports) {
-module.exports = "/csv_data.5248d871.csv";
+},{}],"data/csv_data_new.csv":[function(require,module,exports) {
+module.exports = "/csv_data_new.d9746989.csv";
 },{}],"node_modules/d3-fetch/src/blob.js":[function(require,module,exports) {
 "use strict";
 
@@ -41967,6 +41967,8 @@ var d3 = _interopRequireWildcard(require("d3-fetch"));
 
 var _index = _interopRequireDefault(require("./index"));
 
+var _lodash = _interopRequireDefault(require("lodash.uniq"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
@@ -41989,6 +41991,8 @@ function addButton(names, allTheLayers) {
       _index.default.push({
         'field_name': x.Field_Name,
         'title': x.Name,
+        'band': x.Band,
+        'time': x.Temporal,
         'desc': x.Description,
         'units': x.Unit,
         'desc_long': x.Desc_long,
@@ -41996,21 +42000,55 @@ function addButton(names, allTheLayers) {
         'link': x.Source_Link
       });
 
+      var uniqueNames = _index.default.map(function (x) {
+        return x.title;
+      }); //console.log(uniq(uniqueNames))
+
+
       var dataHolder = document.getElementById('dataDrop');
       var btn1 = document.createElement("option");
-      btn1.innerHTML = x.Name;
+      btn1.innerHTML = x.Name + ' ' + x.Temporal;
       btn1.classList.add('data');
       btn1.setAttribute('id', x.Field_Name);
       dataHolder.appendChild(btn1);
     });
+    /*  var dataHolder = document.getElementById('dataDrop')
+      var uniqueNames = allLayers.map(x => x.title)
+      //console.log(uniq(uniqueNames))
+      var actualu = uniq(uniqueNames);
+        for (var x in actualu) {
+        //console.log(actualu[x]);
+        var btn1 = document.createElement("option"); 
+        btn1.innerHTML = actualu[x];
+        btn1.classList.add('data')
+        btn1.setAttribute('id', allLayers[x].field_name)
+        dataHolder.appendChild(btn1) 
+          } */
   });
 }
-},{"d3-fetch":"node_modules/d3-fetch/src/index.js","./index":"index.js"}],"ui-styles.css":[function(require,module,exports) {
+},{"d3-fetch":"node_modules/d3-fetch/src/index.js","./index":"index.js","lodash.uniq":"node_modules/lodash.uniq/index.js"}],"ui-styles.css":[function(require,module,exports) {
 var reloadCSS = require('_css_loader');
 
 module.hot.dispose(reloadCSS);
 module.hot.accept(reloadCSS);
-},{"./assets\\UNDP-logo.svg":[["UNDP-logo.c3ef9c5c.svg","assets/UNDP-logo.svg"],"assets/UNDP-logo.svg"],"./assets\\risingUpForSids.png":[["risingUpForSids.6ca41891.png","assets/risingUpForSids.png"],"assets/risingUpForSids.png"],"./assets\\down-arrow.svg":[["down-arrow.39fba8f1.svg","assets/down-arrow.svg"],"assets/down-arrow.svg"],"./assets\\icon1.png":[["icon1.443e685f.png","assets/icon1.png"],"assets/icon1.png"],"./assets\\icon2.png":[["icon2.8eadbe99.png","assets/icon2.png"],"assets/icon2.png"],"./assets\\left-arrow.svg":[["left-arrow.63fa8854.svg","assets/left-arrow.svg"],"assets/left-arrow.svg"],"./assets\\right-arrow.svg":[["right-arrow.a6d2cab3.svg","assets/right-arrow.svg"],"assets/right-arrow.svg"],"./assets\\icon3.png":[["icon3.6f66cbfb.png","assets/icon3.png"],"assets/icon3.png"],"./assets\\plus-sign.png":[["plus-sign.5bb9b08d.png","assets/plus-sign.png"],"assets/plus-sign.png"],"./assets\\polygon.png":[["polygon.c2df5e4a.png","assets/polygon.png"],"assets/polygon.png"],"./assets\\up-arrow.svg":[["up-arrow.6046179d.svg","assets/up-arrow.svg"],"assets/up-arrow.svg"],"_css_loader":"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/css-loader.js"}],"index.js":[function(require,module,exports) {
+},{"./assets\\UNDP-logo.svg":[["UNDP-logo.c3ef9c5c.svg","assets/UNDP-logo.svg"],"assets/UNDP-logo.svg"],"./assets\\risingUpForSids.png":[["risingUpForSids.6ca41891.png","assets/risingUpForSids.png"],"assets/risingUpForSids.png"],"./assets\\down-arrow.svg":[["down-arrow.39fba8f1.svg","assets/down-arrow.svg"],"assets/down-arrow.svg"],"./assets\\icon1.png":[["icon1.443e685f.png","assets/icon1.png"],"assets/icon1.png"],"./assets\\icon2.png":[["icon2.8eadbe99.png","assets/icon2.png"],"assets/icon2.png"],"./assets\\left-arrow.svg":[["left-arrow.63fa8854.svg","assets/left-arrow.svg"],"assets/left-arrow.svg"],"./assets\\right-arrow.svg":[["right-arrow.a6d2cab3.svg","assets/right-arrow.svg"],"assets/right-arrow.svg"],"./assets\\icon3.png":[["icon3.6f66cbfb.png","assets/icon3.png"],"assets/icon3.png"],"./assets\\plus-sign.png":[["plus-sign.5bb9b08d.png","assets/plus-sign.png"],"assets/plus-sign.png"],"./assets\\polygon.png":[["polygon.c2df5e4a.png","assets/polygon.png"],"assets/polygon.png"],"./assets\\up-arrow.svg":[["up-arrow.6046179d.svg","assets/up-arrow.svg"],"assets/up-arrow.svg"],"_css_loader":"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/css-loader.js"}],"password.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = addPass;
+
+function addPass() {
+  var pass = document.getElementById('fname');
+  pass.addEventListener('input', function (e) {
+    //console.log(pass.value)
+    if (pass.value === 'island') {
+      document.getElementById('password').remove();
+    }
+  });
+}
+},{}],"index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -42028,7 +42066,7 @@ require("mapbox-gl-style-switcher/styles.css");
 
 var _sidsNames = _interopRequireDefault(require("./data/sidsNames.json"));
 
-var _csv_data = _interopRequireDefault(require("./data/csv_data.csv"));
+var _csv_data_new = _interopRequireDefault(require("./data/csv_data_new.csv"));
 
 var d3 = _interopRequireWildcard(require("d3-fetch"));
 
@@ -42045,6 +42083,8 @@ var _chromaJs = _interopRequireDefault(require("chroma-js"));
 var _setButtons = _interopRequireDefault(require("./setButtons"));
 
 require("./ui-styles.css");
+
+var _password = _interopRequireDefault(require("./password"));
 
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
 
@@ -42071,17 +42111,11 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 //import './style.css'
-var pass = document.getElementById('fname');
-pass.addEventListener('input', function (e) {
-  //console.log(pass.value)
-  if (pass.value === 'island') {
-    document.getElementById('password').remove();
-  }
-});
+(0, _password.default)();
 var allLayers = [];
 var _default = allLayers;
 exports.default = _default;
-(0, _setButtons.default)(_sidsNames.default, _csv_data.default);
+(0, _setButtons.default)(_sidsNames.default, _csv_data_new.default);
 /*Initialize Map */
 
 _mapboxGl.default.accessToken = "pk.eyJ1Ijoic2ViYXN0aWFuLWNoIiwiYSI6ImNpejkxdzZ5YzAxa2gyd21udGpmaGU0dTgifQ.IrEd_tvrl6MuypVNUGU5SQ";
@@ -42098,7 +42132,7 @@ var map = new _mapboxGl.default.Map({
 });
 var sourceData = {
   hexSource: {
-    name: 'hex-source',
+    name: 'hex5',
     data: null
   },
   allSidsSource: {
@@ -42110,14 +42144,11 @@ var sourceData = {
 var currentGeojsonLayers = {
   color: null,
   breaks: null,
-  dataLayer: null
+  dataLayer: null,
+  hexSize: 'hex5'
 };
 var legendControl;
 map.on("load", function () {
-  var nav = new _mapboxGl.default.NavigationControl({
-    visualizePitch: true
-  });
-  map.addControl(nav, 'top-left');
   var styles = [{
     title: "Light",
     uri: "mapbox://styles/mapbox/light-v10?optimize=true"
@@ -42178,15 +42209,26 @@ function getUniqueFeatures(array, comparatorProperty) {
 }
 
 map.on('style.load', function () {
+  var layers = map.getStyle().layers; // Find the index of the first symbol layer in the map style
+
+  var firstSymbolId;
+
+  for (var i = 0; i < layers.length; i++) {
+    if (layers[i].type === 'symbol') {
+      firstSymbolId = layers[i].id;
+      break;
+    }
+  }
+
   if (sourceData.hexSource.data != null) {
-    map.addSource('hex', {
+    map.addSource(currentGeojsonLayers.hexSize, {
       type: "geojson",
       data: _geobuf.default.decode(new _pbf.default(sourceData.hexSource.data))
     });
     map.addLayer({
-      'id': 'hex',
+      'id': currentGeojsonLayers.hexSize,
       'type': 'fill',
-      'source': 'hex',
+      'source': currentGeojsonLayers.hexSize,
       'layout': {
         'visibility': 'visible'
       },
@@ -42196,38 +42238,40 @@ map.on('style.load', function () {
         'fill-opacity': 0.7
       }
     }, firstSymbolId);
-    /* map.addSource("allSids-source", {
-       type: "geojson",
-       data: geobuf.decode(new Pbf(sourceData.allSidsSource.data)),
-     }); */
+    map.setFilter(currentGeojsonLayers.hexSize, ['>=', currentGeojsonLayers.dataLayer, 0]);
   }
 });
-/*****ADMIN BUTTON WRAPPER****/
+var button3dWrapper = document.getElementById('icon3d');
+button3dWrapper.addEventListener('click', function (event) {
+  var id3d = currentGeojsonLayers.hexSize + '-3d';
 
-/*const adminWrap = document.getElementById('admin');
-adminWrap.addEventListener('click', (event) => {
-
-  if(map.getLayer('admin')) {
-    map.removeLayer('admin')
+  if (map.getLayer(id3d)) {
+    map.removeLayer(id3d);
+    map.easeTo({
+      center: map.getCenter(),
+      pitch: 0
+    });
   } else {
     map.addLayer({
-      id: "admin",
-      type: "line",
-      source: "allSids-source",
-      layout: {
-        visibility: "visible",
+      'id': id3d,
+      'type': 'fill-extrusion',
+      'source': currentGeojsonLayers.hexSize,
+      'layout': {
+        'visibility': 'visible'
       },
-      paint: {
-        "line-color": "red",
-       
-        "line-width": 2,
-      },
+      'paint': {
+        'fill-extrusion-color': ['interpolate', ['linear'], ['get', currentGeojsonLayers.dataLayer], currentGeojsonLayers.breaks[0], currentGeojsonLayers.color[0], currentGeojsonLayers.breaks[1], currentGeojsonLayers.color[1], currentGeojsonLayers.breaks[2], currentGeojsonLayers.color[2], currentGeojsonLayers.breaks[3], currentGeojsonLayers.color[3], currentGeojsonLayers.breaks[4], currentGeojsonLayers.color[4]],
+        'fill-extrusion-height': ['get', currentGeojsonLayers.dataLayer] //'fill-opacity': 0.7,
+
+      }
+    });
+    map.setFilter(id3d, ['>=', currentGeojsonLayers.dataLayer, 0]);
+    map.easeTo({
+      center: map.getCenter(),
+      pitch: 55
     });
   }
-  
-
-}) */
-
+});
 var wrapper = document.getElementById('country-select');
 wrapper.addEventListener('click', function (event) {
   var isOption = event.target.nodeName === "OPTION";
@@ -42311,20 +42355,72 @@ wrapper.addEventListener('click', function (event) {
 
 });
 
-function changeDataOnMap(selection) {
-  if (map.getLayoutProperty('hex', 'visibility', 'none')) {
-    map.setLayoutProperty('hex', 'visibility', 'visible');
+function changeHexagonSize(sel) {
+  currentGeojsonLayers.hexSize = sel;
+  var layers = map.getStyle().layers; // Find the index of the first symbol layer in the map style
+
+  var firstSymbolId;
+
+  for (var i = 0; i < layers.length; i++) {
+    if (layers[i].type === 'symbol') {
+      firstSymbolId = layers[i].id;
+      break;
+    }
   }
 
-  if (map.getLayoutProperty('hex', 'visibility', 'visible')) {
+  var userLayers = ['hex5', 'hex10', 'admin1', 'admin2'];
+
+  for (var x in userLayers) {
+    if (map.getLayer(userLayers[x])) {
+      map.removeLayer(userLayers[x]);
+    }
+  } //console.log(currentGeojsonLayers.breaks)
+
+
+  map.addLayer({
+    'id': sel,
+    'type': 'fill',
+    'source': sel,
+    'layout': {
+      'visibility': 'visible'
+    },
+    'paint': {
+      'fill-color': 'blue',
+      'fill-opacity': 0
+    }
+  }, firstSymbolId);
+
+  if (currentGeojsonLayers.breaks != null) {
+    map.setPaintProperty(sel, 'fill-color', ['interpolate', ['linear'], ['get', currentGeojsonLayers.dataLayer], currentGeojsonLayers.breaks[0], currentGeojsonLayers.color[0], currentGeojsonLayers.breaks[1], currentGeojsonLayers.color[1], currentGeojsonLayers.breaks[2], currentGeojsonLayers.color[2], currentGeojsonLayers.breaks[3], currentGeojsonLayers.color[3], currentGeojsonLayers.breaks[4], currentGeojsonLayers.color[4]]);
+    map.setPaintProperty(sel, 'fill-opacity', 0.7);
+    map.setFilter(sel, ['>=', currentGeojsonLayers.dataLayer, 0]);
+  }
+}
+
+function changeDataOnMap(selection) {
+  console.log(selection);
+  currentGeojsonLayers.dataLayer = selection;
+
+  if (map.getLayoutProperty(currentGeojsonLayers.hexSize, 'visibility', 'none')) {
+    map.setLayoutProperty(currentGeojsonLayers.hexSize, 'visibility', 'visible');
+  }
+
+  if (map.getLayoutProperty(currentGeojsonLayers.hexSize, 'visibility', 'visible')) {
     var features = map.queryRenderedFeatures({
-      layers: ['hex']
+      layers: [currentGeojsonLayers.hexSize]
     });
 
     if (features) {
-      var uniFeatures = getUniqueFeatures(features, 'hexid'); //console.log(uniFeatures[0].properties._mean);
+      var uniFeatures;
 
-      console.log(uniFeatures);
+      if (currentGeojsonLayers.hexSize === 'admin1') {
+        uniFeatures = getUniqueFeatures(features, 'GID_1');
+      } else {
+        uniFeatures = getUniqueFeatures(features, 'hexid');
+      } //console.log(uniFeatures[0].properties._mean);
+      //console.log(uniFeatures);
+
+
       var selecteData = uniFeatures.map(function (x) {
         return x.properties[selection];
       });
@@ -42337,235 +42433,132 @@ function changeDataOnMap(selection) {
 
       var colorRamp3 = _chromaJs.default.scale(['#fafa6e', '#2A4858']).mode('lch').colors(5);
 
-      var colorRamp1 = ['#edf8fb', '#b2e2e2', '#66c2a4', '#2ca25f', '#006d2c'].reverse();
-      var colorRamp2 = ['#f2f0f7', '#cbc9e2', '#9e9ac8', '#756bb1', '#54278f'].reverse(); //console.log(colorz.classes)
+      var colorRamp1 = ['#edf8fb', '#b2e2e2', '#66c2a4', '#2ca25f', '#006d2c'];
+      var colorRamp2 = ['#f2f0f7', '#cbc9e2', '#9e9ac8', '#756bb1', '#54278f'];
+      var colorRamp4 = ['#ffffd4', '#fed98e', '#fe9929', '#d95f0e', '#993404']; //console.log(colorz.classes)
 
-      var ramps = [colorRamp1, colorRamp2, colorRamp3];
-      var colorRamp = ramps[Math.floor(Math.random() * 3)];
+      var ramps = [colorRamp1, colorRamp2, colorRamp3, colorRamp4];
+      var colorRamp = ramps[Math.floor(Math.random() * 4)];
       currentGeojsonLayers.breaks = breaks;
-      currentGeojsonLayers.color = colorRamp;
-      map.setPaintProperty('hex', 'fill-color', ['interpolate', ['linear'], ['get', selection], breaks[0], colorRamp[0], breaks[1], colorRamp[1], breaks[2], colorRamp[2], breaks[3], colorRamp[3], breaks[4], colorRamp[4]]);
-      map.setPaintProperty('hex', 'fill-opacity', 0.5);
-      map.setFilter('hex', ['>=', selection, 0]); //addLegend(colorRamp, breaks, selection)
+      currentGeojsonLayers.color = colorRamp; //console.log(currentGeojsonLayers)
+
+      map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-color', ['interpolate', ['linear'], ['get', selection], breaks[0], colorRamp[0], breaks[1], colorRamp[1], breaks[2], colorRamp[2], breaks[3], colorRamp[3], breaks[4], colorRamp[4]]);
+      map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.7);
+      map.setFilter(currentGeojsonLayers.hexSize, ['>=', selection, 0]);
+      addLegend(colorRamp, breaks, selection);
     }
   }
-}
+} //each time the map moves, repaint
 
-var dataWrapper = document.getElementById('dataDrop');
-dataWrapper.addEventListener('click', function (event) {
-  console.log(event);
-  var isOption1 = event.target.nodeName === 'OPTION';
 
-  if (!isOption1) {
-    return;
-  }
-
-  console.log(event.target.id);
-
-  if (map.getLayoutProperty('hex', 'visibility', 'none')) {
-    map.setLayoutProperty('hex', 'visibility', 'visible');
-  }
-
-  currentGeojsonLayers.dataLayer = event.target.id; //console.dir(event.target.id);
-
-  if (map.getLayoutProperty('hex', 'visibility', 'visible')) {
+map.on('moveend', function () {
+  if (map.getLayer(currentGeojsonLayers.hexSize)) {
     var features = map.queryRenderedFeatures({
-      layers: ['hex']
+      layers: [currentGeojsonLayers.hexSize]
     });
 
     if (features) {
-      var uniFeatures = getUniqueFeatures(features, 'hexid'); //console.log(uniFeatures[0].properties._mean);
+      var uniFeatures;
 
-      console.log(uniFeatures);
+      if (currentGeojsonLayers.hexSize === 'admin1') {
+        uniFeatures = getUniqueFeatures(features, 'GID_1');
+      } else {
+        uniFeatures = getUniqueFeatures(features, 'hexid');
+      } //console.log(uniFeatures[0].properties._mean);
+      //console.log(uniFeatures);
+
+
       var selecteData = uniFeatures.map(function (x) {
-        return x.properties[event.target.id];
+        return x.properties[currentGeojsonLayers.dataLayer];
       });
       console.log(selecteData);
       var max = Math.max.apply(Math, _toConsumableArray(selecteData));
-      var min = Math.min.apply(Math, _toConsumableArray(selecteData)); //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
+      var min = Math.min.apply(Math, _toConsumableArray(selecteData));
 
-      var breaks = _chromaJs.default.limits(selecteData, 'q', 4); //console.log(breaks)
+      var breaks = _chromaJs.default.limits(selecteData, 'q', 4);
 
-
-      var colorRamp3 = _chromaJs.default.scale(['#fafa6e', '#2A4858']).mode('lch').colors(5);
-
-      var colorRamp1 = ['#edf8fb', '#b2e2e2', '#66c2a4', '#2ca25f', '#006d2c'].reverse();
-      var colorRamp2 = ['#f2f0f7', '#cbc9e2', '#9e9ac8', '#756bb1', '#54278f'].reverse(); //console.log(colorz.classes)
-
-      var ramps = [colorRamp1, colorRamp2, colorRamp3];
-      var colorRamp = ramps[Math.floor(Math.random() * 3)];
+      console.log(breaks);
       currentGeojsonLayers.breaks = breaks;
-      currentGeojsonLayers.color = colorRamp;
-
-      if (event.target.id == '1c5') {
-        /*function rotateCamera(timestamp) {
-          // clamp the rotation between 0 -360 degrees
-          // Divide timestamp by 100 to slow rotation to ~10 degrees / sec
-          map.rotateTo((timestamp / 100) % 360, { duration: 0 });
-          // Request the next frame of the animation.
-          requestAnimationFrame(rotateCamera);
-          }
-          rotateCamera(0) */
-        map.easeTo({
-          center: map.getCenter(),
-          pitch: 55 //bearing: 180,
-          //duration: 4000
-
-        });
-        map.addLayer({
-          id: 'pop3d',
-          type: "fill-extrusion",
-          source: 'hex',
-          layout: {
-            visibility: "visible"
-          },
-          paint: {
-            "fill-extrusion-color": ['interpolate', ['linear'], ['get', event.target.id], breaks[0], colorRamp[0], breaks[1], colorRamp[1], breaks[2], colorRamp[2], breaks[3], colorRamp[3], breaks[4], colorRamp[4]],
-            "fill-extrusion-height": ["get", event.target.id],
-            "fill-extrusion-opacity": 0.75
-          }
-        });
-      } else if (map.getLayer('pop3d')) {
-        map.removeLayer('pop3d');
-        map.easeTo({
-          center: map.getCenter(),
-          pitch: 0
-        });
-      }
-
-      map.setPaintProperty('hex', 'fill-color', ['interpolate', ['linear'], ['get', event.target.id], breaks[0], colorRamp[0], breaks[1], colorRamp[1], breaks[2], colorRamp[2], breaks[3], colorRamp[3], breaks[4], colorRamp[4]]);
-      /*map.setPaintProperty('hex', 'fill-outline-color',
-      [
-        'interpolate',
-        ['linear'],
-        ['get', event.target.id],
-        breaks[0], colorRamp[0],
-        breaks[1], colorRamp[1],
-        breaks[2], colorRamp[2],
-        breaks[3], colorRamp[3],
-        breaks[4], colorRamp[4],
-        ]
-      
-      ) */
-
-      map.setPaintProperty('hex', 'fill-opacity', 0.5);
-      map.setFilter('hex', ['>=', event.target.id, 0]); //addLegend(colorRamp, breaks, event.target.id)
+      map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-color', ['interpolate', ['linear'], ['get', currentGeojsonLayers.dataLayer], breaks[0], currentGeojsonLayers.color[0], breaks[1], currentGeojsonLayers.color[1], breaks[2], currentGeojsonLayers.color[2], breaks[3], currentGeojsonLayers.color[3], breaks[4], currentGeojsonLayers.color[4]]);
     }
-  } //each time the map moves, repaint
+  }
 
+  addLegend(currentGeojsonLayers.color, breaks, currentGeojsonLayers.dataLayer);
+});
 
-  map.on('moveend', function () {
-    if (map.getLayer('hex')) {
-      var features = map.queryRenderedFeatures({
-        layers: ['hex']
-      });
+function addOverlay(sel) {
+  var layerName = sel + '-overlay';
 
-      if (features) {
-        var uniFeatures = getUniqueFeatures(features, 'hexid'); //console.log(uniFeatures[0].properties._mean);
-        //console.log(uniFeatures);
+  if (map.getLayer(layerName)) {
+    map.removeLayer(layerName);
+  } else {
+    var layers = map.getStyle().layers; // Find the index of the first symbol layer in the map style
 
-        var selecteData = uniFeatures.map(function (x) {
-          return x.properties[currentGeojsonLayers.dataLayer];
-        }); //console.log(selecteData);
+    var firstSymbolId;
 
-        var max = Math.max.apply(Math, _toConsumableArray(selecteData));
-        var min = Math.min.apply(Math, _toConsumableArray(selecteData)); //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
-
-        var breaks = _chromaJs.default.limits(selecteData, 'q', 4); //console.log(breaks)
-        //console.log(colorz.classes)
-
-
-        currentGeojsonLayers.breaks = breaks;
-        map.setPaintProperty('hex', 'fill-color', ['interpolate', ['linear'], ['get', currentGeojsonLayers.dataLayer], breaks[0], currentGeojsonLayers.color[0], breaks[1], currentGeojsonLayers.color[1], breaks[2], currentGeojsonLayers.color[2], breaks[3], currentGeojsonLayers.color[3], breaks[4], currentGeojsonLayers.color[4]]);
-        map.setPaintProperty('hex', 'fill-opacity', 0.5); //map.setFilter('hex',['has',currentGeojsonLayers.dataLayer])
-
-        addLegend(currentGeojsonLayers.color, breaks, currentGeojsonLayers.dataLayer);
+    for (var i = 0; i < layers.length; i++) {
+      if (layers[i].type === 'symbol') {
+        firstSymbolId = layers[i].id;
+        break;
       }
     }
-  });
-}); //addLegend()
+
+    map.addLayer({
+      'id': layerName,
+      'type': 'line',
+      'source': sel,
+      'layout': {
+        'visibility': 'visible'
+      },
+      'paint': {
+        'line-color': 'red'
+      }
+    }, firstSymbolId);
+  }
+} //addLegend()
 //add the legend
+
 
 function addLegend(colors, breaks, current) {
   //console.log(allLayers)
-  var legData = (0, _lodash.default)(allLayers, ['field_name', current]); //console.log(legData)
-
-  if (!map.hasControl(legendControl)) {
-    map.addControl(legendControl, 'bottom-right');
-  }
-
-  var infoBox = document.getElementById('infoBox');
-  infoBox.style.display = "block";
-  infoBox.innerHTML = '<h2>' + legData.title + '</h2><p>' + legData.desc_long + '</p>' + '<b>Reference: </b>' + legData.source_name + ' - ' + legData.link.link(); //console.log('hi')
-  //map.addControl(legendControl, 'bottom-left')
-
-  var legend = document.getElementById('legend');
+  var legData = (0, _lodash.default)(allLayers, ['field_name', current]);
+  var infoBoxTitle = document.getElementById("infoBoxTitle");
+  var infoBoxText = document.getElementById("infoBoxText");
+  var infoBoxLink = document.getElementById("infoBoxLink");
+  infoBoxTitle.innerHTML = '';
+  infoBoxText.innerHTML = '';
+  infoBoxLink.innerHTML = '';
+  infoBoxTitle.innerHTML = legData.title;
+  infoBoxText.innerHTML = legData.desc_long;
+  infoBoxLink.innerHTML = '<strong>Reference: </strong>' + legData.source_name + ' - ' + legData.link.link();
+  var legendTitle = document.getElementById('legendTitle');
+  var legend = document.getElementById('updateLegend');
   legend.innerHTML = '';
-  legend.innerHTML = '<h3>' + legData.units + '</h3>';
+  legendTitle.innerHTML = '';
+  legendTitle.innerHTML = legData.units;
 
   for (var x in colors) {
-    legend.innerHTML += '<span style="background:' + colors[x] + '"></span>' + '<label>' + Number.parseFloat(breaks[x]).toFixed(3).toLocaleString() + '</label>';
+    var containerDiv = document.createElement('div');
+    containerDiv.classList.add('col-flex');
+    containerDiv.classList.add('align-items-center');
+    var words = document.createElement('div');
+    words.classList.add('population-per-km-text');
+    words.innerHTML = Number.parseFloat(breaks[x]).toFixed(3);
+    var hexI = document.createElement('div');
+    hexI.classList.add('population-per-km-img');
+    hexI.style.backgroundColor = colors[x];
+    containerDiv.appendChild(words);
+    containerDiv.appendChild(hexI);
+    legend.appendChild(containerDiv);
   }
-} //3d function
-
-
-function add3dHex() {
-  currentGeojsonLayers = (0, _lodash2.default)(currentGeojsonLayers);
-
-  if (map.getLayer('pop3d')) {
-    var thisIndex = currentGeojsonLayers.indexOf('pop3d');
-
-    if (thisIndex > -1) {
-      currentGeojsonLayers.splice(thisIndex, 1);
-    }
-
-    map.removeLayer('pop3d');
-  } else {
-    currentGeojsonLayers.push('pop3d');
-    map.addLayer({
-      id: 'pop3d',
-      type: "fill-extrusion",
-      source: 'hex',
-      layout: {
-        visibility: "visible"
-      },
-      paint: {
-        "fill-extrusion-color": ['interpolate', ['linear'], ['get', '_mean'], 0, '#ffffcc', 345, '#c7e9b4', 2408, '#7fcdbb', 7190, '#41b6c4', 19764, '#2c7fb8', 58223, '#253494'],
-        "fill-extrusion-height": ["get", "_mean"],
-        "fill-extrusion-opacity": 0.75
-      }
-    });
-  }
-
-  var v2 = new _mapboxGl.default.LngLatBounds([[103.60905, 1.16639], [104.0858, 1.47139]]);
-  /*map.fitBounds(v2, {
-    linear: true,
-    padding: { top: 10, bottom: 25, left: 15, right: 5 },
-    pitch: 55,
-    }); */
-  //console.log(map.getCenter())
-
-  map.easeTo({
-    center: map.getCenter(),
-    pitch: 55
-  }); //map.setPitch(55);
-}
-
-function addSidsSource() {
-  var allSids = "https://sebastian-ch.github.io/sidsDataTest/data/gadm1.pbf";
-  d3.buffer(allSids).then(function (data) {
-    //console.log(data)
-    map.addSource("allSids-source", {
-      type: "geojson",
-      data: _geobuf.default.decode(new _pbf.default(data))
-    });
-    sourceData.allSidsSource.data = data;
-  });
 } //add sources
 
 
 function addHexSource() {
-  var hexTest = "https://sebastian-ch.github.io/sidsDataTest/data/hex5u.pbf";
+  var hex10 = "https://sebastian-ch.github.io/sidsDataTest/data/10km.pbf";
+  var hex5 = "https://sebastian-ch.github.io/sidsDataTest/data/hex5u.pbf";
+  var admin1 = "https://sebastian-ch.github.io/sidsDataTest/data/admin1.pbf";
+  var admin2 = "https://sebastian-ch.github.io/sidsDataTest/data/admin2.pbf";
   var layers = map.getStyle().layers; // Find the index of the first symbol layer in the map style
 
   var firstSymbolId;
@@ -42577,16 +42570,33 @@ function addHexSource() {
     }
   }
 
-  d3.buffer(hexTest).then(function (data) {
-    map.addSource('hex', {
+  var files = [hex10, hex5, admin1];
+  var promises = [];
+  files.forEach(function (url) {
+    promises.push(d3.buffer(url));
+  });
+  Promise.all(promises).then(function (allData) {
+    //add 10km source
+    map.addSource('hex10', {
       type: "geojson",
-      data: _geobuf.default.decode(new _pbf.default(data))
+      data: _geobuf.default.decode(new _pbf.default(allData[0]))
+    }); //add 5km
+
+    map.addSource('hex5', {
+      type: "geojson",
+      data: _geobuf.default.decode(new _pbf.default(allData[1]))
+    }); //add admin1
+
+    map.addSource('admin1', {
+      type: "geojson",
+      data: _geobuf.default.decode(new _pbf.default(allData[2]))
     });
-    sourceData.hexSource.data = data;
+    sourceData.hexSource.data = allData[1]; //add first layer (5km)
+
     map.addLayer({
-      'id': 'hex',
+      'id': 'hex5',
       'type': 'fill',
-      'source': 'hex',
+      'source': 'hex5',
       'layout': {
         'visibility': 'visible'
       },
@@ -42596,33 +42606,6 @@ function addHexSource() {
       }
     }, firstSymbolId);
   });
-}
-
-function addSidsOutline(name) {
-  console.log(name);
-  currentGeojsonLayers = (0, _lodash2.default)(currentGeojsonLayers);
-
-  if (map.getLayer("outline")) {
-    map.setFilter("outline", ["==", "NAME_0", name]);
-  } else {
-    currentGeojsonLayers.push('outline');
-    console.log(currentGeojsonLayers);
-    map.addLayer({
-      id: "outline",
-      type: "line",
-      source: "allSids-source",
-      layout: {
-        visibility: "visible"
-      },
-      filter: ["==", "NAME_0", name],
-      paint: {
-        "line-color": "red",
-
-        /*'line-opacity': 0.3, */
-        "line-width": 2
-      }
-    });
-  }
 } /////ui js
 
 
@@ -42836,7 +42819,20 @@ $(document).ready(function () {
   $('select[name="dataset-selection"]').on('change', function () {
     //console.log('Dataset: ' + $(this).val());
     //console.log(this.selectedOptions[0].id)
-    changeDataOnMap(this.selectedOptions[0].id);
+
+    /*if(this.selectedOptions[0].innerHTML === 'GDP per capita' || this.selectedOptions[0].innerHTML === 'Population Density') {
+      console.log(this.selectedOptions[0])
+    } else { */
+    changeDataOnMap(this.selectedOptions[0].id); //}
+    //changeDataOnMap(this.selectedOptions[0].id);
+  });
+  $('select[name="hexbin-change"]').on('change', function () {
+    console.log(this.selectedOptions[0].value);
+    changeHexagonSize(this.selectedOptions[0].value);
+  });
+  $('select[name="overlay-select"]').on('change', function () {
+    console.log(this.selectedOptions[0].value);
+    addOverlay(this.selectedOptions[0].value);
   });
   $('select[name="layer-selection"]').on('change', function () {
     console.log('Layer: ' + $(this).val());
@@ -42853,7 +42849,7 @@ $(document).ready(function () {
     return;
   }
 
-  last_percentage = 0;
+  var last_percentage = 0;
 
   for (var i = 0; i < yearList.length; i++) {
     var class_for_year = "";
@@ -42879,6 +42875,7 @@ $(document).ready(function () {
     size_in_percentage = size_in_percentage.toFixed(2);
     var widthStyle = "width: ".concat(size_in_percentage, "%;");
     var fromLeftPosition = 0;
+    var fromLeftPixels = 0;
     var fromLeftStyle = "";
 
     if (i > 0 && i < yearList.length - 1) {
@@ -43005,7 +43002,7 @@ $(document).ready(function () {
 
   check_all_values();
 });
-},{"mapbox-gl":"node_modules/mapbox-gl/dist/mapbox-gl.js","mapbox-gl/dist/mapbox-gl.css":"node_modules/mapbox-gl/dist/mapbox-gl.css","mapbox-gl-style-switcher":"node_modules/mapbox-gl-style-switcher/dist/index.js","mapbox-gl-style-switcher/styles.css":"node_modules/mapbox-gl-style-switcher/styles.css","./data/sidsNames.json":"data/sidsNames.json","./data/csv_data.csv":"data/csv_data.csv","d3-fetch":"node_modules/d3-fetch/src/index.js","pbf":"node_modules/pbf/index.js","geobuf":"node_modules/geobuf/index.js","lodash.find":"node_modules/lodash.find/index.js","lodash.uniq":"node_modules/lodash.uniq/index.js","chroma-js":"node_modules/chroma-js/chroma.js","./setButtons":"setButtons.js","./ui-styles.css":"ui-styles.css"}],"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"mapbox-gl":"node_modules/mapbox-gl/dist/mapbox-gl.js","mapbox-gl/dist/mapbox-gl.css":"node_modules/mapbox-gl/dist/mapbox-gl.css","mapbox-gl-style-switcher":"node_modules/mapbox-gl-style-switcher/dist/index.js","mapbox-gl-style-switcher/styles.css":"node_modules/mapbox-gl-style-switcher/styles.css","./data/sidsNames.json":"data/sidsNames.json","./data/csv_data_new.csv":"data/csv_data_new.csv","d3-fetch":"node_modules/d3-fetch/src/index.js","pbf":"node_modules/pbf/index.js","geobuf":"node_modules/geobuf/index.js","lodash.find":"node_modules/lodash.find/index.js","lodash.uniq":"node_modules/lodash.uniq/index.js","chroma-js":"node_modules/chroma-js/chroma.js","./setButtons":"setButtons.js","./ui-styles.css":"ui-styles.css","./password":"password.js"}],"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -43033,7 +43030,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56034" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61346" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
