@@ -42111,7 +42111,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 //import './style.css'
-(0, _password.default)();
+//addPass()
 var allLayers = [];
 var _default = allLayers;
 exports.default = _default;
@@ -43043,7 +43043,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61787" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62549" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
