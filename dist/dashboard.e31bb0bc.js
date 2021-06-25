@@ -42149,6 +42149,7 @@ var currentGeojsonLayers = {
 };
 var legendControl;
 map.on("load", function () {
+  map.removeLayer('admin-1-boundary');
   var styles = [{
     title: "Light",
     uri: "mapbox://styles/mapbox/light-v10?optimize=true"
@@ -42159,7 +42160,7 @@ map.on("load", function () {
     title: "Satellite With Labels",
     uri: "mapbox://styles/mapbox/satellite-streets-v11"
   }];
-  map.addControl(new _mapboxGlStyleSwitcher.MapboxStyleSwitcherControl(styles), 'top-right');
+  map.addControl(new _mapboxGlStyleSwitcher.MapboxStyleSwitcherControl(styles), 'bottom-right');
 
   var MyCustomControl = /*#__PURE__*/function () {
     function MyCustomControl() {
@@ -42443,9 +42444,9 @@ function changeDataOnMap(selection) {
       currentGeojsonLayers.color = colorRamp; //console.log(currentGeojsonLayers)
 
       map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-color', ['interpolate', ['linear'], ['get', selection], breaks[0], colorRamp[0], breaks[1], colorRamp[1], breaks[2], colorRamp[2], breaks[3], colorRamp[3], breaks[4], colorRamp[4]]);
-      map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.7);
       map.setFilter(currentGeojsonLayers.hexSize, ['>=', selection, 0]);
       addLegend(colorRamp, breaks, selection);
+      map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.7);
     }
   }
 } //each time the map moves, repaint
@@ -42487,6 +42488,14 @@ map.on('moveend', function () {
 });
 
 function addOverlay(sel) {
+  var colorz;
+
+  if (sel === 'admin2') {
+    colorz = 'blue';
+  } else {
+    colorz = 'red';
+  }
+
   var layerName = sel + '-overlay';
 
   if (map.getLayer(layerName)) {
@@ -42511,7 +42520,7 @@ function addOverlay(sel) {
         'visibility': 'visible'
       },
       'paint': {
-        'line-color': 'red'
+        'line-color': colorz
       }
     }, firstSymbolId);
   }
@@ -42570,7 +42579,7 @@ function addHexSource() {
     }
   }
 
-  var files = [hex10, hex5, admin1];
+  var files = [hex10, hex5, admin1, admin2];
   var promises = [];
   files.forEach(function (url) {
     promises.push(d3.buffer(url));
@@ -42590,6 +42599,10 @@ function addHexSource() {
     map.addSource('admin1', {
       type: "geojson",
       data: _geobuf.default.decode(new _pbf.default(allData[2]))
+    });
+    map.addSource('admin2', {
+      type: "geojson",
+      data: _geobuf.default.decode(new _pbf.default(allData[3]))
     });
     sourceData.hexSource.data = allData[1]; //add first layer (5km)
 
@@ -43030,7 +43043,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61346" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61787" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

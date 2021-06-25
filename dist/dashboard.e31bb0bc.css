@@ -108,7 +108,7 @@ body {
 
 .top-right {
     position: fixed;
-    top: 25px;
+    top: 30px;
     right: 40px;
     z-index: 1;
 }

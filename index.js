@@ -43,6 +43,7 @@ mapboxgl.accessToken =
   });
 
 
+
   var sourceData = {
       hexSource: {
         name: 'hex5',
@@ -66,6 +67,8 @@ mapboxgl.accessToken =
   var legendControl;
 
   map.on("load", function () {
+    map.removeLayer('admin-1-boundary')
+
 
     const styles = [
       {title: "Light",uri: "mapbox://styles/mapbox/light-v10?optimize=true",},
@@ -73,7 +76,7 @@ mapboxgl.accessToken =
       {title: "Satellite With Labels",uri: "mapbox://styles/mapbox/satellite-streets-v11",},
     ];
     
-    map.addControl(new MapboxStyleSwitcherControl(styles), 'top-right');
+    map.addControl(new MapboxStyleSwitcherControl(styles), 'bottom-right');
 
     class MyCustomControl {
       onAdd(map){
@@ -434,9 +437,10 @@ mapboxgl.accessToken =
         
         )
         
-        map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.7)
+        
         map.setFilter(currentGeojsonLayers.hexSize,['>=',selection, 0])
         addLegend(colorRamp, breaks, selection)
+        map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.7)
 
   }
 }
@@ -491,6 +495,14 @@ mapboxgl.accessToken =
 
 
 function addOverlay(sel) {
+
+  var colorz;
+
+  if(sel === 'admin2') {
+    colorz = 'blue'
+  } else {
+    colorz = 'red'
+  }
   
   var layerName = sel + '-overlay'
 
@@ -517,7 +529,7 @@ function addOverlay(sel) {
         },
       
       'paint': {
-          'line-color': 'red',
+          'line-color': colorz,
           
           }
       }, firstSymbolId);
@@ -590,7 +602,7 @@ function addLegend(colors, breaks, current) {
     }
     }
 
-    var files = [hex10, hex5, admin1]
+    var files = [hex10, hex5, admin1, admin2]
     var promises = [];
 
     files.forEach(function(url){
@@ -617,6 +629,14 @@ function addLegend(colors, breaks, current) {
         type: "geojson",
         data: geobuf.decode(new Pbf(allData[2])),
       });
+
+
+      map.addSource('admin2', {
+        type: "geojson",
+        data: geobuf.decode(new Pbf(allData[3])),
+      });
+
+
       sourceData.hexSource.data = allData[1];
 
 
