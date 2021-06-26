@@ -2,6 +2,7 @@
 import * as d3 from 'd3-fetch';
 import allLayers from './index'
 import uniq from 'lodash.uniq';
+import find from 'lodash.find'
 
 
 export default function addButton(names, allTheLayers) {
@@ -32,7 +33,7 @@ export default function addButton(names, allTheLayers) {
             'link': x.Source_Link
           })
 
-          var uniqueNames = allLayers.map(x => x.title)
+        /*  var uniqueNames = allLayers.map(x => x.title)
           //console.log(uniq(uniqueNames))
 
           var dataHolder = document.getElementById('dataDrop')
@@ -41,12 +42,12 @@ export default function addButton(names, allTheLayers) {
           btn1.innerHTML = x.Name + ' ' + x.Temporal;
           btn1.classList.add('data')
           btn1.setAttribute('id', x.Field_Name)
-          dataHolder.appendChild(btn1)
+          dataHolder.appendChild(btn1) */
       
         })
-      /*  var dataHolder = document.getElementById('dataDrop')
+        var dataHolder = document.getElementById('dataDrop')
         var uniqueNames = allLayers.map(x => x.title)
-        //console.log(uniq(uniqueNames))
+       
         var actualu = uniq(uniqueNames);
 
         for (var x in actualu) {
@@ -54,15 +55,13 @@ export default function addButton(names, allTheLayers) {
           var btn1 = document.createElement("option"); 
           btn1.innerHTML = actualu[x];
           btn1.classList.add('data')
-          btn1.setAttribute('id', allLayers[x].field_name)
+          var correctFI = find(allLayers, function(o) {return o.title === actualu[x]})
+          //console.log(correctFI);
+          btn1.setAttribute('id', correctFI.field_name)
           dataHolder.appendChild(btn1) 
 
 
-        } */
-
-        
-
-        
+        }
 
       })
       

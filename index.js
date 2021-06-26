@@ -16,12 +16,12 @@ import chroma from "chroma-js";
 import addButtons from './setButtons'
 import './ui-styles.css'
 import addPass from "./password";
-//import './style.css'
 
 
 
 
-//addPass()
+
+addPass()
 
 
 var allLayers = []
@@ -372,6 +372,27 @@ mapboxgl.accessToken =
 
 
       }
+
+  }
+
+  function addToLayersDrop(layers) {
+
+    console.log(layers);
+    var layersHolder = document.getElementById('layer-drop');
+    var length = layersHolder.options.length;
+    
+
+      for (var i = length-1; i >= 0; i--) {
+        layersHolder.options[i] = null;
+      }
+
+    for (var x in layers) {
+      var btn = document.createElement('option')
+      btn.innerHTML = layers[x].title + ' ' + layers[x].time;
+      btn.setAttribute('id', layers[x].field_name)
+      btn.setAttribute('value', 'hi')
+      layersHolder.appendChild(btn);
+    }
 
   }
 
@@ -932,11 +953,27 @@ $(document).ready(function () {
 	$('select[name="dataset-selection"]').on('change', function () {
 		//console.log('Dataset: ' + $(this).val());
     //console.log(this.selectedOptions[0].id)
-    /*if(this.selectedOptions[0].innerHTML === 'GDP per capita' || this.selectedOptions[0].innerHTML === 'Population Density') {
-      console.log(this.selectedOptions[0])
-    } else { */
+    if(this.selectedOptions[0].innerHTML === 'GDP per capita' || this.selectedOptions[0].innerHTML === 'Population Density') {
+      var layers = [];
+      //console.log(this.selectedOptions[0])
+      for (var x in allLayers) {
+        if (allLayers[x].title === this.selectedOptions[0].innerHTML) {
+          //console.log(allLayers[x]);
+          layers.push(allLayers[x]);
+        }
+      }
+
+      addToLayersDrop(layers);
+
+    } else {
+      var layersHolder = document.getElementById('layer-drop');
+      var length = layersHolder.options.length;
+    
+      for (var i = length-1; i >= 0; i--) {
+        layersHolder.options[i] = null;
+      }
       changeDataOnMap(this.selectedOptions[0].id);
-    //}
+    }
     
     //changeDataOnMap(this.selectedOptions[0].id);
 	});

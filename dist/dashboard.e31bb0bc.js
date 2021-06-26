@@ -41969,6 +41969,8 @@ var _index = _interopRequireDefault(require("./index"));
 
 var _lodash = _interopRequireDefault(require("lodash.uniq"));
 
+var _lodash2 = _interopRequireDefault(require("lodash.find"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
@@ -41999,34 +42001,40 @@ function addButton(names, allTheLayers) {
         'source_name': x.Source_Name,
         'link': x.Source_Link
       });
-
-      var uniqueNames = _index.default.map(function (x) {
-        return x.title;
-      }); //console.log(uniq(uniqueNames))
-
-
-      var dataHolder = document.getElementById('dataDrop');
-      var btn1 = document.createElement("option");
-      btn1.innerHTML = x.Name + ' ' + x.Temporal;
-      btn1.classList.add('data');
-      btn1.setAttribute('id', x.Field_Name);
-      dataHolder.appendChild(btn1);
-    });
-    /*  var dataHolder = document.getElementById('dataDrop')
-      var uniqueNames = allLayers.map(x => x.title)
-      //console.log(uniq(uniqueNames))
-      var actualu = uniq(uniqueNames);
-        for (var x in actualu) {
-        //console.log(actualu[x]);
+      /*  var uniqueNames = allLayers.map(x => x.title)
+        //console.log(uniq(uniqueNames))
+          var dataHolder = document.getElementById('dataDrop')
+        
         var btn1 = document.createElement("option"); 
-        btn1.innerHTML = actualu[x];
+        btn1.innerHTML = x.Name + ' ' + x.Temporal;
         btn1.classList.add('data')
-        btn1.setAttribute('id', allLayers[x].field_name)
-        dataHolder.appendChild(btn1) 
-          } */
+        btn1.setAttribute('id', x.Field_Name)
+        dataHolder.appendChild(btn1) */
+
+    });
+    var dataHolder = document.getElementById('dataDrop');
+
+    var uniqueNames = _index.default.map(function (x) {
+      return x.title;
+    });
+
+    var actualu = (0, _lodash.default)(uniqueNames);
+
+    for (var x in actualu) {
+      //console.log(actualu[x]);
+      var btn1 = document.createElement("option");
+      btn1.innerHTML = actualu[x];
+      btn1.classList.add('data');
+      var correctFI = (0, _lodash2.default)(_index.default, function (o) {
+        return o.title === actualu[x];
+      }); //console.log(correctFI);
+
+      btn1.setAttribute('id', correctFI.field_name);
+      dataHolder.appendChild(btn1);
+    }
   });
 }
-},{"d3-fetch":"node_modules/d3-fetch/src/index.js","./index":"index.js","lodash.uniq":"node_modules/lodash.uniq/index.js"}],"ui-styles.css":[function(require,module,exports) {
+},{"d3-fetch":"node_modules/d3-fetch/src/index.js","./index":"index.js","lodash.uniq":"node_modules/lodash.uniq/index.js","lodash.find":"node_modules/lodash.find/index.js"}],"ui-styles.css":[function(require,module,exports) {
 var reloadCSS = require('_css_loader');
 
 module.hot.dispose(reloadCSS);
@@ -42110,8 +42118,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-//import './style.css'
-//addPass()
+(0, _password.default)();
 var allLayers = [];
 var _default = allLayers;
 exports.default = _default;
@@ -42395,6 +42402,24 @@ function changeHexagonSize(sel) {
     map.setPaintProperty(sel, 'fill-color', ['interpolate', ['linear'], ['get', currentGeojsonLayers.dataLayer], currentGeojsonLayers.breaks[0], currentGeojsonLayers.color[0], currentGeojsonLayers.breaks[1], currentGeojsonLayers.color[1], currentGeojsonLayers.breaks[2], currentGeojsonLayers.color[2], currentGeojsonLayers.breaks[3], currentGeojsonLayers.color[3], currentGeojsonLayers.breaks[4], currentGeojsonLayers.color[4]]);
     map.setPaintProperty(sel, 'fill-opacity', 0.7);
     map.setFilter(sel, ['>=', currentGeojsonLayers.dataLayer, 0]);
+  }
+}
+
+function addToLayersDrop(layers) {
+  console.log(layers);
+  var layersHolder = document.getElementById('layer-drop');
+  var length = layersHolder.options.length;
+
+  for (var i = length - 1; i >= 0; i--) {
+    layersHolder.options[i] = null;
+  }
+
+  for (var x in layers) {
+    var btn = document.createElement('option');
+    btn.innerHTML = layers[x].title + ' ' + layers[x].time;
+    btn.setAttribute('id', layers[x].field_name);
+    btn.setAttribute('value', 'hi');
+    layersHolder.appendChild(btn);
   }
 }
 
@@ -42832,12 +42857,28 @@ $(document).ready(function () {
   $('select[name="dataset-selection"]').on('change', function () {
     //console.log('Dataset: ' + $(this).val());
     //console.log(this.selectedOptions[0].id)
+    if (this.selectedOptions[0].innerHTML === 'GDP per capita' || this.selectedOptions[0].innerHTML === 'Population Density') {
+      var layers = []; //console.log(this.selectedOptions[0])
 
-    /*if(this.selectedOptions[0].innerHTML === 'GDP per capita' || this.selectedOptions[0].innerHTML === 'Population Density') {
-      console.log(this.selectedOptions[0])
-    } else { */
-    changeDataOnMap(this.selectedOptions[0].id); //}
-    //changeDataOnMap(this.selectedOptions[0].id);
+      for (var x in allLayers) {
+        if (allLayers[x].title === this.selectedOptions[0].innerHTML) {
+          //console.log(allLayers[x]);
+          layers.push(allLayers[x]);
+        }
+      }
+
+      addToLayersDrop(layers);
+    } else {
+      var layersHolder = document.getElementById('layer-drop');
+      var length = layersHolder.options.length;
+
+      for (var i = length - 1; i >= 0; i--) {
+        layersHolder.options[i] = null;
+      }
+
+      changeDataOnMap(this.selectedOptions[0].id);
+    } //changeDataOnMap(this.selectedOptions[0].id);
+
   });
   $('select[name="hexbin-change"]').on('change', function () {
     console.log(this.selectedOptions[0].value);
@@ -43043,7 +43084,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62817" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64779" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
