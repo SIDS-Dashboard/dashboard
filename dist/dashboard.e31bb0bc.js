@@ -42137,6 +42137,8 @@ var map = new _mapboxGl.default.Map({
   zoom: 7 //pitch: 55
 
 });
+var yearList = [];
+var currentTimeLayer;
 var sourceData = {
   hexSource: {
     name: 'hex5',
@@ -42215,40 +42217,51 @@ function getUniqueFeatures(array, comparatorProperty) {
   });
   return uniqueFeatures;
 }
-
-map.on('style.load', function () {
-  var layers = map.getStyle().layers; // Find the index of the first symbol layer in the map style
-
+/*map.on('style.load', function(){
+    var layers = map.getStyle().layers;
+  // Find the index of the first symbol layer in the map style
   var firstSymbolId;
-
   for (var i = 0; i < layers.length; i++) {
-    if (layers[i].type === 'symbol') {
-      firstSymbolId = layers[i].id;
-      break;
-    }
+  if (layers[i].type === 'symbol') {
+  firstSymbolId = layers[i].id;
+  break;
   }
+  }
+  
+    if(sourceData.hexSource.data != null) {
+        map.addSource(currentGeojsonLayers.hexSize, {
+        type: "geojson",
+      data: geobuf.decode(new Pbf(sourceData.hexSource.data)),
+      })
+        map.addLayer({
+        'id': currentGeojsonLayers.hexSize,
+        'type': 'fill', 
+        'source': currentGeojsonLayers.hexSize,
+        'layout': {
+          'visibility': 'visible'
+          },
+        //'filter': ['!=', "null"],
+        'paint': {
+            'fill-color': [
+              'interpolate',
+              ['linear'],
+              ['get', currentGeojsonLayers.dataLayer],
+              currentGeojsonLayers.breaks[0], currentGeojsonLayers.color[0],
+              currentGeojsonLayers.breaks[1], currentGeojsonLayers.color[1],
+              currentGeojsonLayers.breaks[2], currentGeojsonLayers.color[2],
+              currentGeojsonLayers.breaks[3], currentGeojsonLayers.color[3],
+              currentGeojsonLayers.breaks[4], currentGeojsonLayers.color[4],
+              ],
+            'fill-opacity': 0.7,
+            
+            }
+        }, firstSymbolId);
 
-  if (sourceData.hexSource.data != null) {
-    map.addSource(currentGeojsonLayers.hexSize, {
-      type: "geojson",
-      data: _geobuf.default.decode(new _pbf.default(sourceData.hexSource.data))
-    });
-    map.addLayer({
-      'id': currentGeojsonLayers.hexSize,
-      'type': 'fill',
-      'source': currentGeojsonLayers.hexSize,
-      'layout': {
-        'visibility': 'visible'
-      },
-      //'filter': ['!=', "null"],
-      'paint': {
-        'fill-color': ['interpolate', ['linear'], ['get', currentGeojsonLayers.dataLayer], currentGeojsonLayers.breaks[0], currentGeojsonLayers.color[0], currentGeojsonLayers.breaks[1], currentGeojsonLayers.color[1], currentGeojsonLayers.breaks[2], currentGeojsonLayers.color[2], currentGeojsonLayers.breaks[3], currentGeojsonLayers.color[3], currentGeojsonLayers.breaks[4], currentGeojsonLayers.color[4]],
-        'fill-opacity': 0.7
+        map.setFilter(currentGeojsonLayers.hexSize,['>=',currentGeojsonLayers.dataLayer, 0])
       }
-    }, firstSymbolId);
-    map.setFilter(currentGeojsonLayers.hexSize, ['>=', currentGeojsonLayers.dataLayer, 0]);
-  }
-});
+  }) */
+
+
 var button3dWrapper = document.getElementById('icon3d');
 button3dWrapper.addEventListener('click', function (event) {
   var id3d = currentGeojsonLayers.hexSize + '-3d';
@@ -42304,63 +42317,14 @@ wrapper.addEventListener('click', function (event) {
       },
       pitch: 0
     });
-    /* map.on('moveend', function(){
-         if(map.getLayer('hex')) {
-       var features = map.queryRenderedFeatures({
-         layers: ['hex']
-       })
-    
-       if(features) {
-    
-         var uniFeatures = getUniqueFeatures(features, 'hexid');
-         //console.log(uniFeatures[0].properties._mean);
-         console.log(uniFeatures);
-         var selecteData = uniFeatures.map(x => x.properties[currentGeojsonLayers.dataLayer])
-         //console.log(selecteData);
-         var max = Math.max(...selecteData)
-         var min = Math.min(...selecteData)
-    
-    
-         //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
-         var breaks = chroma.limits(selecteData, 'q', 4)
-         //console.log(breaks)
-        
-         
-         //console.log(colorz.classes)
-       
-         currentGeojsonLayers.breaks = breaks;
-    
-           map.setPaintProperty('hex', 'fill-color',
-           [
-             'interpolate',
-             ['linear'],
-             ['get', currentGeojsonLayers.dataLayer],
-             breaks[0], currentGeojsonLayers.color[0],
-             breaks[1], currentGeojsonLayers.color[1],
-             breaks[2], currentGeojsonLayers.color[2],
-             breaks[3], currentGeojsonLayers.color[3],
-             breaks[4], currentGeojsonLayers.color[4],
-             ]
-           
-           )
-           map.setPaintProperty('hex','fill-opacity', 0.5)
-           map.setFilter('hex',['has',currentGeojsonLayers.dataLayer])
-           addLegend(colorRamp, breaks, currentGeojsonLayers.dataLayer)
-    
-           }
-         }
-     })  */
-    //addSidsOutline(currbb.NAME_0);
+    map.on('moveend', function () {
+      console.log('hi');
+      map.on('render', function () {
+        //colorTheMap();
+        console.log('styled');
+      });
+    });
   }
-  /*  else if(event.target.id.includes('pop3d')) {
-         add3dHex(event.target.id)
-       addLegend(event.target.id)
-     } else if(event.target.id.includes('hex')) {
-         addHex(event.target.id);
-   } else if (event.target.id.includes('popd')) {
-       addPopDen()
-     } */
-
 });
 
 function changeHexagonSize(sel) {
@@ -42406,7 +42370,10 @@ function changeHexagonSize(sel) {
 }
 
 function addToLayersDrop(layers) {
-  console.log(layers);
+  $('#layer-id').show();
+  $('.year-timeline-wrapper').show(); //console.log(layers);
+  //console.log(yearList)
+
   var layersHolder = document.getElementById('layer-drop');
   var length = layersHolder.options.length;
 
@@ -42420,11 +42387,19 @@ function addToLayersDrop(layers) {
     btn.setAttribute('id', layers[x].field_name);
     btn.setAttribute('value', 'hi');
     layersHolder.appendChild(btn);
-  }
+  } //console.log(layers.map(x => x.time));
+
+
+  yearList = layers.map(function (x) {
+    return x.time;
+  }); //console.log(layers);
+
+  updateTime(layers);
 }
 
 function changeDataOnMap(selection) {
-  console.log(selection);
+  //console.log(map.getStyle().layers)
+  //console.log(selection);
   currentGeojsonLayers.dataLayer = selection;
 
   if (map.getLayoutProperty(currentGeojsonLayers.hexSize, 'visibility', 'none')) {
@@ -42449,35 +42424,36 @@ function changeDataOnMap(selection) {
 
       var selecteData = uniFeatures.map(function (x) {
         return x.properties[selection];
-      });
-      console.log(selecteData);
+      }); //console.log(selecteData);
+
       var max = Math.max.apply(Math, _toConsumableArray(selecteData));
       var min = Math.min.apply(Math, _toConsumableArray(selecteData)); //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
 
       var breaks = _chromaJs.default.limits(selecteData, 'q', 4); //console.log(breaks)
 
 
-      var colorRamp3 = _chromaJs.default.scale(['#fafa6e', '#2A4858']).mode('lch').colors(5);
+      var colorRamp = _chromaJs.default.scale(['#fafa6e', '#2A4858']).mode('lch').colors(5);
 
       var colorRamp1 = ['#edf8fb', '#b2e2e2', '#66c2a4', '#2ca25f', '#006d2c'];
       var colorRamp2 = ['#f2f0f7', '#cbc9e2', '#9e9ac8', '#756bb1', '#54278f'];
       var colorRamp4 = ['#ffffd4', '#fed98e', '#fe9929', '#d95f0e', '#993404']; //console.log(colorz.classes)
+      //var ramps = [colorRamp1, colorRamp2, colorRamp3, colorRamp4]
+      //var colorRamp = ramps[Math.floor(Math.random() * 4)];
 
-      var ramps = [colorRamp1, colorRamp2, colorRamp3, colorRamp4];
-      var colorRamp = ramps[Math.floor(Math.random() * 4)];
       currentGeojsonLayers.breaks = breaks;
       currentGeojsonLayers.color = colorRamp; //console.log(currentGeojsonLayers)
 
       map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-color', ['interpolate', ['linear'], ['get', selection], breaks[0], colorRamp[0], breaks[1], colorRamp[1], breaks[2], colorRamp[2], breaks[3], colorRamp[3], breaks[4], colorRamp[4]]);
       map.setFilter(currentGeojsonLayers.hexSize, ['>=', selection, 0]);
       addLegend(colorRamp, breaks, selection);
-      map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.7);
+      setTimeout(function () {
+        map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.7);
+      }, 500); //map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.7)
     }
   }
-} //each time the map moves, repaint
+}
 
-
-map.on('moveend', function () {
+function colorTheMap() {
   if (map.getLayer(currentGeojsonLayers.hexSize)) {
     var features = map.queryRenderedFeatures({
       layers: [currentGeojsonLayers.hexSize]
@@ -42501,16 +42477,57 @@ map.on('moveend', function () {
       var max = Math.max.apply(Math, _toConsumableArray(selecteData));
       var min = Math.min.apply(Math, _toConsumableArray(selecteData));
 
-      var breaks = _chromaJs.default.limits(selecteData, 'q', 4);
+      var breaks = _chromaJs.default.limits(selecteData, 'q', 4); //console.log(breaks);
 
-      console.log(breaks);
+
       currentGeojsonLayers.breaks = breaks;
       map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-color', ['interpolate', ['linear'], ['get', currentGeojsonLayers.dataLayer], breaks[0], currentGeojsonLayers.color[0], breaks[1], currentGeojsonLayers.color[1], breaks[2], currentGeojsonLayers.color[2], breaks[3], currentGeojsonLayers.color[3], breaks[4], currentGeojsonLayers.color[4]]);
     }
   }
 
   addLegend(currentGeojsonLayers.color, breaks, currentGeojsonLayers.dataLayer);
-});
+} //each time the map moves, repaint
+
+/* map.on('moveend', function(){
+  
+  if(map.getLayer(currentGeojsonLayers.hexSize)) {
+  var features = map.queryRenderedFeatures({
+    layers: [currentGeojsonLayers.hexSize]
+  })
+    if(features) {
+      var uniFeatures;
+      if(currentGeojsonLayers.hexSize === 'admin1') {
+        uniFeatures = getUniqueFeatures(features, 'GID_1');
+      } else {
+        uniFeatures = getUniqueFeatures(features, 'hexid');
+      }
+    //console.log(uniFeatures[0].properties._mean);
+    //console.log(uniFeatures);
+    var selecteData = uniFeatures.map(x => x.properties[currentGeojsonLayers.dataLayer])
+    console.log(selecteData);
+    var max = Math.max(...selecteData)
+    var min = Math.min(...selecteData)
+      var breaks = chroma.limits(selecteData, 'q', 4)
+    //console.log(breaks);
+    currentGeojsonLayers.breaks = breaks;
+      map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-color',
+      [
+        'interpolate',
+        ['linear'],
+        ['get', currentGeojsonLayers.dataLayer],
+        breaks[0], currentGeojsonLayers.color[0],
+        breaks[1], currentGeojsonLayers.color[1],
+        breaks[2], currentGeojsonLayers.color[2],
+        breaks[3], currentGeojsonLayers.color[3],
+        breaks[4], currentGeojsonLayers.color[4],
+        ]
+      )
+  }
+}
+    addLegend(currentGeojsonLayers.color, breaks, currentGeojsonLayers.dataLayer)
+  
+}) */
+
 
 function addOverlay(sel) {
   var colorz;
@@ -42604,7 +42621,8 @@ function addHexSource() {
     }
   }
 
-  var files = [hex10, hex5, admin1, admin2];
+  var files = [hex10, hex5, admin1, admin2]; //var files = [hex5]
+
   var promises = [];
   files.forEach(function (url) {
     promises.push(d3.buffer(url));
@@ -42629,7 +42647,7 @@ function addHexSource() {
       type: "geojson",
       data: _geobuf.default.decode(new _pbf.default(allData[3]))
     });
-    sourceData.hexSource.data = allData[1]; //add first layer (5km)
+    sourceData.hexSource.data = allData[0]; //add first layer (5km)
 
     map.addLayer({
       'id': 'hex5',
@@ -42772,130 +42790,149 @@ var arrsamoa = [{
   title: "Blue Economy 6",
   content: "lastIt is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
 }];
-$(document).ready(function () {
-  /** Collapse/Expand for Box  */
-  $('.collapse-btn').on('click', function () {
-    $('.app-body').toggleClass('collapsed');
-    $(this).toggleClass('collapsed');
-  }); // /** Select2 for drop downs */
+$('#layer-id').hide();
+$('.year-timeline-wrapper').hide(); //$(document).ready(function () {
 
-  $('.form-select').select2();
-  /**
-   * Tooltip for sdgs
-  */
+/** Collapse/Expand for Box  */
 
-  $(".sdgimg .carousel-item, .sdgs .icon-grid-item , .sdg-tool").mouseover(function () {
-    $("#gridsdgs").removeClass("d-none");
-    $("#samimg").removeClass("d-none");
-    var index = $(this).data('imgid');
-    $('.title-text').text(sdg[index].title);
-    $('.img-tooltip-content').html(sdg[index].content);
-  });
-  $(".sdgimg .carousel-item, .grid-container,.sdg-tool ").mouseout(function () {
-    $("#gridsdgs").addClass("d-none");
-    $("#samimg").addClass("d-none");
-  }); // samoa hover events
+$('.collapse-btn').on('click', function () {
+  $('.app-body').toggleClass('collapsed');
+  $(this).toggleClass('collapsed');
+}); // /** Select2 for drop downs */
 
-  $(".samoa .carousel-item, .samoa-grid .icon-grid-item").mouseover(function () {
-    $("#gridsamoa").removeClass("d-none");
-    $("#samimg").removeClass("d-none");
-    var index = $(this).data('imgid');
-    $('.title-text').text(arrsamoa[index].title);
-    $('.img-tooltip-content').html(arrsamoa[index].content);
-  });
-  $(".samoa .carousel-item,.grid-container, .samoa-grid ").mouseout(function () {
-    $("#gridsamoa").addClass("d-none");
-    $("#samimg").addClass("d-none");
-  });
-  /**sdg grid hover */
+$('.form-select').select2();
+/**
+ * Tooltip for sdgs
+*/
 
-  $(".sdgs .icon-grid-item").click(function () {
-    $("#sdg_slider .carousel-item").removeClass("active");
-    var index = $(this).data('imgid');
-    $("#sdg_slider div[data-imgid='" + index + "']").addClass("active");
-  });
-  /**samoa grid hover */
+$(".sdgimg .carousel-item, .sdgs .icon-grid-item , .sdg-tool").mouseover(function () {
+  $("#gridsdgs").removeClass("d-none");
+  $("#samimg").removeClass("d-none");
+  var index = $(this).data('imgid');
+  $('.title-text').text(sdg[index].title);
+  $('.img-tooltip-content').html(sdg[index].content);
+});
+$(".sdgimg .carousel-item, .grid-container,.sdg-tool ").mouseout(function () {
+  $("#gridsdgs").addClass("d-none");
+  $("#samimg").addClass("d-none");
+}); // samoa hover events
 
-  $(".samoa-grid .icon-grid-item").click(function () {
-    $("#SAMOA_slider .carousel-item").removeClass("active");
-    var index = $(this).data('imgid');
-    $("#SAMOA_slider div[data-imgid='" + index + "']").addClass("active");
-    console.log('add');
-    console.log('remov');
-  }); // hover for economy
+$(".samoa .carousel-item, .samoa-grid .icon-grid-item").mouseover(function () {
+  $("#gridsamoa").removeClass("d-none");
+  $("#samimg").removeClass("d-none");
+  var index = $(this).data('imgid');
+  $('.title-text').text(arrsamoa[index].title);
+  $('.img-tooltip-content').html(arrsamoa[index].content);
+});
+$(".samoa .carousel-item,.grid-container, .samoa-grid ").mouseout(function () {
+  $("#gridsamoa").addClass("d-none");
+  $("#samimg").addClass("d-none");
+});
+/**sdg grid hover */
 
-  $(".BE, #tooleconnomy").mouseover(function () {
-    $("#tooleconomy").removeClass("d-none");
-  });
-  $(".BE, #tooleconomy").mouseout(function () {
-    $("#tooleconomy").addClass("d-none");
-  }); // hover action for climate action 
+$(".sdgs .icon-grid-item").click(function () {
+  $("#sdg_slider .carousel-item").removeClass("active");
+  var index = $(this).data('imgid');
+  $("#sdg_slider div[data-imgid='" + index + "']").addClass("active");
+});
+/**samoa grid hover */
 
-  $(".CA, #toolclimate").mouseover(function () {
-    $("#tooleclimate").removeClass("d-none");
-  });
-  $(".CA, #tooleclimate").mouseout(function () {
-    $("#tooleclimate").addClass("d-none");
-  }); // hover action for Digital	Transformation
+$(".samoa-grid .icon-grid-item").click(function () {
+  $("#SAMOA_slider .carousel-item").removeClass("active");
+  var index = $(this).data('imgid');
+  $("#SAMOA_slider div[data-imgid='" + index + "']").addClass("active");
+  console.log('add');
+  console.log('remov');
+}); // hover for economy
 
-  $(".DT, #tooldigi").mouseover(function () {
-    $("#tooldigi").removeClass("d-none");
-  });
-  $(".DT, #tooldigi").mouseout(function () {
-    $("#tooldigi").addClass("d-none");
-  }); // Button click and select
+$(".BE, #tooleconnomy").mouseover(function () {
+  $("#tooleconomy").removeClass("d-none");
+});
+$(".BE, #tooleconomy").mouseout(function () {
+  $("#tooleconomy").addClass("d-none");
+}); // hover action for climate action 
 
-  $('.button-option-select-1').on('click', function (e) {
-    var btnValue = $(this).data('value');
-    $('.button-option-select-1.active').removeClass('active');
-    $(this).addClass('active'); // Button value 
+$(".CA, #toolclimate").mouseover(function () {
+  $("#tooleclimate").removeClass("d-none");
+});
+$(".CA, #tooleclimate").mouseout(function () {
+  $("#tooleclimate").addClass("d-none");
+}); // hover action for Digital	Transformation
 
-    console.log('Button Value: ' + btnValue);
-    e.preventDefault();
-  }); // 
+$(".DT, #tooldigi").mouseover(function () {
+  $("#tooldigi").removeClass("d-none");
+});
+$(".DT, #tooldigi").mouseout(function () {
+  $("#tooldigi").addClass("d-none");
+}); // Button click and select
 
-  $('select[name="dataset-selection"]').on('change', function () {
-    //console.log('Dataset: ' + $(this).val());
-    //console.log(this.selectedOptions[0].id)
-    if (this.selectedOptions[0].innerHTML === 'GDP per capita' || this.selectedOptions[0].innerHTML === 'Population Density') {
-      var layers = []; //console.log(this.selectedOptions[0])
+$('.button-option-select-1').on('click', function (e) {
+  var btnValue = $(this).data('value');
+  $('.button-option-select-1.active').removeClass('active');
+  $(this).addClass('active'); // Button value 
 
-      for (var x in allLayers) {
-        if (allLayers[x].title === this.selectedOptions[0].innerHTML) {
-          //console.log(allLayers[x]);
-          layers.push(allLayers[x]);
-        }
+  console.log('Button Value: ' + btnValue);
+  e.preventDefault();
+}); // 
+
+$('select[name="dataset-selection"]').on('change', function () {
+  //console.log('Dataset: ' + $(this).val());
+  //console.log(this.selectedOptions[0].id)
+  if (this.selectedOptions[0].innerHTML === 'GDP per capita' || this.selectedOptions[0].innerHTML === 'Population Density') {
+    var layers = []; //console.log(this.selectedOptions[0])
+
+    for (var x in allLayers) {
+      if (allLayers[x].title === this.selectedOptions[0].innerHTML) {
+        //console.log(allLayers[x]);
+        layers.push(allLayers[x]);
       }
+    }
 
-      addToLayersDrop(layers);
-    } else {
-      var layersHolder = document.getElementById('layer-drop');
-      var length = layersHolder.options.length;
+    addToLayersDrop(layers);
+  } else {
+    var layersHolder = document.getElementById('layer-drop');
+    var length = layersHolder.options.length;
 
-      for (var i = length - 1; i >= 0; i--) {
-        layersHolder.options[i] = null;
-      }
+    for (var i = length - 1; i >= 0; i--) {
+      layersHolder.options[i] = null;
+    }
 
-      changeDataOnMap(this.selectedOptions[0].id);
-    } //changeDataOnMap(this.selectedOptions[0].id);
+    $('#layer-id').hide();
+    $('.year-timeline-wrapper').hide();
+    $('.year-timeline').empty();
+    changeDataOnMap(this.selectedOptions[0].id);
+  } //changeDataOnMap(this.selectedOptions[0].id);
 
+});
+$('select[name="hexbin-change"]').on('change', function () {
+  console.log(this.selectedOptions[0].value);
+  changeHexagonSize(this.selectedOptions[0].value);
+});
+$('select[name="overlay-select"]').on('change', function () {
+  console.log(this.selectedOptions[0].value);
+  addOverlay(this.selectedOptions[0].value);
+});
+$('select[name="layer-selection"]').on('change', function () {
+  console.log('Layer: ' + $(this).val()); //console.log('hi');
+
+  changeDataOnMap(this.selectedOptions[0].id);
+});
+/**
+ * Dynamic year list creation 
+ */
+
+function updateTime(layers) {
+  //console.log(yearList)
+  //console.log(layers);
+  //var currentLayer = {}
+  currentTimeLayer = layers; //console.log(currentLayer)
+
+  var yearList = currentTimeLayer.map(function (x) {
+    return x.time;
   });
-  $('select[name="hexbin-change"]').on('change', function () {
-    console.log(this.selectedOptions[0].value);
-    changeHexagonSize(this.selectedOptions[0].value);
-  });
-  $('select[name="overlay-select"]').on('change', function () {
-    console.log(this.selectedOptions[0].value);
-    addOverlay(this.selectedOptions[0].value);
-  });
-  $('select[name="layer-selection"]').on('change', function () {
-    console.log('Layer: ' + $(this).val());
-  });
-  /**
-   * Dynamic year list creation 
-   */
+  var year_html = ''; //$('.year-timeline').append(year_html);
 
-  var yearList = [1990, 1995, 2010, 2015];
+  $('.year-timeline').empty();
 
   if (yearList.length == 1) {
     $('.year-timeline').html("<p class='m-0'> Data only available for ".concat(yearList, "</p>"));
@@ -42942,120 +42979,136 @@ $(document).ready(function () {
     }
 
     last_percentage = fromLeftPosition;
-    var year_html = "<div _style=' ".concat(widthStyle, "' data-width='").concat(size_in_percentage, "' class=\"year-timeline-block ").concat(class_for_year, "\" data-year-idx=\"").concat(i + 1, "\">\n\t\t\t\t <input type=\"radio\" name=\"year-selected\" value=\"").concat(yearList[i], "\" id=\"year-").concat(yearList[i], "\" ").concat(i == 0 ? 'checked' : '', ">\n\t\t\t\t <label for=\"year-").concat(yearList[i], "\">\n\t\t\t\t <span style='").concat(fromLeftStyle, "' class=\"label-value\">").concat(yearList[i], "</span>\n\t\t\t\t <span style='").concat(fromLeftStyle, "' class=\"circle-radio\"></span>\n\t\t\t\t </label>\n\t\t\t  </div>");
+    year_html = "<div _style=' ".concat(widthStyle, "' data-width='").concat(size_in_percentage, "' class=\"year-timeline-block ").concat(class_for_year, "\" data-year-idx=\"").concat(i + 1, "\">\n          <input type=\"radio\" name=\"year-selected\" value=\"").concat(yearList[i], "\" id=\"year-").concat(yearList[i], "\" ").concat(i == 0 ? 'checked' : '', ">\n          <label for=\"year-").concat(yearList[i], "\">\n          <span style='").concat(fromLeftStyle, "' class=\"label-value\">").concat(yearList[i], "</span>\n          <span style='").concat(fromLeftStyle, "' class=\"circle-radio\"></span>\n          </label>\n          </div>");
     $('.year-timeline').append(year_html);
-  } // }
-  // Year selection 
-
-
-  var isReachedToEnd = false;
-  $('body').on('change click', 'input[name="year-selected"]', function () {
-    isReachedToEnd = false;
-    var yearValue = $('[name="year-selected"]:checked').val();
-    console.log(yearValue);
-  }); // play / pause
-
-  var playPauseInterval;
-  $('#year-play-pause').on('click', function (e) {
-    var isPaused = $(this).hasClass('play');
-
-    if (!isPaused) {
-      clearInterval(playPauseInterval);
-      $(this).removeClass('pause').addClass('play');
-    } else {
-      playPauseInterval = window.setInterval(function () {
-        var $checkedBox = $('input[name="year-selected"]:checked');
-
-        if ($checkedBox.parent('.year-timeline-block').hasClass('omega') && isReachedToEnd) {
-          $('.year-timeline-block.alpha input[type="radio"').prop('checked', true);
-          isReachedToEnd = false; // Reset, once replayed 
-        } // Reached to end 
-        else if ($checkedBox.parent('.year-timeline-block').hasClass('omega')) {
-            clearInterval(playPauseInterval);
-            $('#year-play-pause').removeClass('pause').addClass('play');
-            isReachedToEnd = true; // Flag that indicates to replay the year selection 
-
-            return;
-          } // Find the idx of checked item
-
-
-        var currentIdx = $checkedBox.parent('.year-timeline-block').data('year-idx');
-        var nextCheckedBoxIdx = currentIdx + 1;
-        $('.year-selected[value=1990]').prop('checked', true);
-        $('.year-timeline-block[data-year-idx="' + nextCheckedBoxIdx + '"]').find('input[name="year-selected"]').prop('checked', true);
-        console.log($('input[name="year-selected"]:checked').val());
-      }, 1000);
-      $(this).addClass('pause').removeClass('play');
-    }
-
-    e.preventDefault();
-  });
-  /* Tabs */
-
-  $('.tab-nav').on('click', function () {
-    $('.tab-nav').removeClass('active');
-    $(this).addClass('active');
-    var target = $(this).data('target');
-    $('.tab').removeClass('active');
-    $(target).addClass('active');
-  });
-  /**
-   *  Top Toolip 
-  */
-
-  $('.tab-nav').on('mouseover', function () {
-    var $target = $(this).data('tooltip-target');
-    $($target).show();
-  });
-  $('.tab-nav').on('mouseout', function () {
-    var $target = $(this).data('tooltip-target');
-    $($target).hide();
-  });
-  /* END TOP TOOLTIP */
-
-  $('.selection-dropdown-arrow').on('click', function () {
-    // Get <select> tag  
-    var $select = $(this).parent().find('select'); // Count options 
-
-    var totalOpts = $select.find('option').length; // Get current selection s
-
-    var currentIndex = $select.prop('selectedIndex');
-
-    if ($(this).hasClass('up')) {
-      if (currentIndex === 0) {
-        currentIndex = totalOpts - 1;
-        $select.prop('selectedIndex', currentIndex);
-      } else {
-        $select.prop('selectedIndex', currentIndex - 1);
-      }
-    } else if ($(this).hasClass('down')) {
-      if (currentIndex === totalOpts - 1) {
-        currentIndex = 0;
-        $select.prop('selectedIndex', currentIndex);
-      } else {
-        $select.prop('selectedIndex', currentIndex + 1);
-      }
-    }
-  });
-  /**
-   * Function to check all the values
-   */
-
-  function check_all_values() {
-    var top_left_nav = $('.tab-nav.active span').text();
-    var btnValue = $('.button-option-select-1.active').data('value');
-    var datasetSelect = $('select[name="dataset-selection"]').val();
-    var layerSelect = $('select[name="layer-selection"]').val();
-    var year = $('input[name="year-selected"]:checked').val();
-    console.log('Top left nav = ' + top_left_nav);
-    console.log('Top right Button = ' + btnValue);
-    console.log('DATASET selection = ' + datasetSelect);
-    console.log('Layer selection = ' + layerSelect);
-    console.log('Year selection = ' + year);
   }
 
-  check_all_values();
+  var isReachedToEnd = false;
+  $('body').on('change click', 'input[name="year-selected"]', function (e) {
+    e.preventDefault(); //so it doesn't run twice
+
+    isReachedToEnd = false;
+    var yearValue = $('[name="year-selected"]:checked').val();
+    console.log('-----');
+    console.log(yearValue);
+    console.log(currentTimeLayer);
+    var showLayer = (0, _lodash.default)(currentTimeLayer, function (o) {
+      return o.time === yearValue;
+    });
+    console.log(showLayer);
+    changeDataOnMap(showLayer.field_name); //console.log(yearValue);
+  });
+} // }
+// Year selection 
+
+/*	var isReachedToEnd = false;
+	$('body').on('change click', 'input[name="year-selected"]', function () {
+		isReachedToEnd = false;
+		var yearValue = $('[name="year-selected"]:checked').val();
+		console.log(yearValue);
+	}); */
+// play / pause
+
+
+var playPauseInterval;
+$('#year-play-pause').on('click', function (e) {
+  var isPaused = $(this).hasClass('play');
+
+  if (!isPaused) {
+    clearInterval(playPauseInterval);
+    $(this).removeClass('pause').addClass('play');
+  } else {
+    playPauseInterval = window.setInterval(function () {
+      var $checkedBox = $('input[name="year-selected"]:checked');
+
+      if ($checkedBox.parent('.year-timeline-block').hasClass('omega') && isReachedToEnd) {
+        $('.year-timeline-block.alpha input[type="radio"').prop('checked', true);
+        isReachedToEnd = false; // Reset, once replayed 
+      } // Reached to end 
+      else if ($checkedBox.parent('.year-timeline-block').hasClass('omega')) {
+          clearInterval(playPauseInterval);
+          $('#year-play-pause').removeClass('pause').addClass('play');
+          isReachedToEnd = true; // Flag that indicates to replay the year selection 
+
+          return;
+        } // Find the idx of checked item
+
+
+      var currentIdx = $checkedBox.parent('.year-timeline-block').data('year-idx');
+      var nextCheckedBoxIdx = currentIdx + 1;
+      $('.year-selected[value=1990]').prop('checked', true);
+      $('.year-timeline-block[data-year-idx="' + nextCheckedBoxIdx + '"]').find('input[name="year-selected"]').prop('checked', true);
+      console.log($('input[name="year-selected"]:checked').val());
+    }, 1000);
+    $(this).addClass('pause').removeClass('play');
+  }
+
+  e.preventDefault();
 });
+/* Tabs */
+
+$('.tab-nav').on('click', function () {
+  $('.tab-nav').removeClass('active');
+  $(this).addClass('active');
+  var target = $(this).data('target');
+  $('.tab').removeClass('active');
+  $(target).addClass('active');
+});
+/**
+ *  Top Toolip 
+*/
+
+$('.tab-nav').on('mouseover', function () {
+  var $target = $(this).data('tooltip-target');
+  $($target).show();
+});
+$('.tab-nav').on('mouseout', function () {
+  var $target = $(this).data('tooltip-target');
+  $($target).hide();
+});
+/* END TOP TOOLTIP */
+
+$('.selection-dropdown-arrow').on('click', function () {
+  // Get <select> tag  
+  var $select = $(this).parent().find('select'); // Count options 
+
+  var totalOpts = $select.find('option').length; // Get current selection s
+
+  var currentIndex = $select.prop('selectedIndex');
+
+  if ($(this).hasClass('up')) {
+    if (currentIndex === 0) {
+      currentIndex = totalOpts - 1;
+      $select.prop('selectedIndex', currentIndex);
+    } else {
+      $select.prop('selectedIndex', currentIndex - 1);
+    }
+  } else if ($(this).hasClass('down')) {
+    if (currentIndex === totalOpts - 1) {
+      currentIndex = 0;
+      $select.prop('selectedIndex', currentIndex);
+    } else {
+      $select.prop('selectedIndex', currentIndex + 1);
+    }
+  }
+});
+/**
+ * Function to check all the values
+ */
+
+function check_all_values() {
+  var top_left_nav = $('.tab-nav.active span').text();
+  var btnValue = $('.button-option-select-1.active').data('value');
+  var datasetSelect = $('select[name="dataset-selection"]').val();
+  var layerSelect = $('select[name="layer-selection"]').val(); //var year = $('input[name="year-selected"]:checked').val();
+
+  console.log('Top left nav = ' + top_left_nav);
+  console.log('Top right Button = ' + btnValue);
+  console.log('DATASET selection = ' + datasetSelect);
+  console.log('Layer selection = ' + layerSelect); //console.log('Year selection = ' + year);
+}
+
+check_all_values(); //});
 },{"mapbox-gl":"node_modules/mapbox-gl/dist/mapbox-gl.js","mapbox-gl/dist/mapbox-gl.css":"node_modules/mapbox-gl/dist/mapbox-gl.css","mapbox-gl-style-switcher":"node_modules/mapbox-gl-style-switcher/dist/index.js","mapbox-gl-style-switcher/styles.css":"node_modules/mapbox-gl-style-switcher/styles.css","./data/sidsNames.json":"data/sidsNames.json","./data/csv_data_new.csv":"data/csv_data_new.csv","d3-fetch":"node_modules/d3-fetch/src/index.js","pbf":"node_modules/pbf/index.js","geobuf":"node_modules/geobuf/index.js","lodash.find":"node_modules/lodash.find/index.js","lodash.uniq":"node_modules/lodash.uniq/index.js","chroma-js":"node_modules/chroma-js/chroma.js","./setButtons":"setButtons.js","./ui-styles.css":"ui-styles.css","./password":"password.js"}],"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -43084,7 +43137,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64779" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52203" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

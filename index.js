@@ -42,7 +42,8 @@ mapboxgl.accessToken =
     //pitch: 55
   });
 
-
+  var yearList = [];
+  var currentTimeLayer;
 
   var sourceData = {
       hexSource: {
@@ -121,7 +122,7 @@ mapboxgl.accessToken =
     return uniqueFeatures;
     }
 
-  map.on('style.load', function(){
+  /*map.on('style.load', function(){
 
     var layers = map.getStyle().layers;
     // Find the index of the first symbol layer in the map style
@@ -169,7 +170,7 @@ mapboxgl.accessToken =
 
       }
 
-  })
+  }) */
 
   
   const button3dWrapper = document.getElementById('icon3d')
@@ -247,69 +248,19 @@ mapboxgl.accessToken =
           pitch: 0
         });
 
-       /* map.on('moveend', function(){
-
-          if(map.getLayer('hex')) {
-          var features = map.queryRenderedFeatures({
-            layers: ['hex']
+        map.on('moveend', function(){
+          console.log('hi');
+          map.on('render', function() {
+            //colorTheMap();
+            console.log('styled')
           })
-      
-          if(features) {
-      
-            var uniFeatures = getUniqueFeatures(features, 'hexid');
-            //console.log(uniFeatures[0].properties._mean);
-            console.log(uniFeatures);
-            var selecteData = uniFeatures.map(x => x.properties[currentGeojsonLayers.dataLayer])
-            //console.log(selecteData);
-            var max = Math.max(...selecteData)
-            var min = Math.min(...selecteData)
-      
-      
-            //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
-            var breaks = chroma.limits(selecteData, 'q', 4)
-            //console.log(breaks)
-           
-            
-            //console.log(colorz.classes)
           
-            currentGeojsonLayers.breaks = breaks;
-      
-              map.setPaintProperty('hex', 'fill-color',
-              [
-                'interpolate',
-                ['linear'],
-                ['get', currentGeojsonLayers.dataLayer],
-                breaks[0], currentGeojsonLayers.color[0],
-                breaks[1], currentGeojsonLayers.color[1],
-                breaks[2], currentGeojsonLayers.color[2],
-                breaks[3], currentGeojsonLayers.color[3],
-                breaks[4], currentGeojsonLayers.color[4],
-                ]
-              
-              )
-              map.setPaintProperty('hex','fill-opacity', 0.5)
-              map.setFilter('hex',['has',currentGeojsonLayers.dataLayer])
-              addLegend(colorRamp, breaks, currentGeojsonLayers.dataLayer)
-      
-              }
-            }
-        })  */
-        //addSidsOutline(currbb.NAME_0);
+        })
+
     } 
-   /*  else if(event.target.id.includes('pop3d')) {
-
-        add3dHex(event.target.id)
-        addLegend(event.target.id)
-
-    } else if(event.target.id.includes('hex')) {
-
-        addHex(event.target.id);
-    } else if (event.target.id.includes('popd')) {
-
-      addPopDen()
-
-    } */
+   
   })
+
   function changeHexagonSize(sel) {
 
     currentGeojsonLayers.hexSize = sel
@@ -377,7 +328,10 @@ mapboxgl.accessToken =
 
   function addToLayersDrop(layers) {
 
-    console.log(layers);
+    $('#layer-id').show()
+    $('.year-timeline-wrapper').show()
+    //console.log(layers);
+    //console.log(yearList)
     var layersHolder = document.getElementById('layer-drop');
     var length = layersHolder.options.length;
     
@@ -393,11 +347,18 @@ mapboxgl.accessToken =
       btn.setAttribute('value', 'hi')
       layersHolder.appendChild(btn);
     }
+    //console.log(layers.map(x => x.time));
+    yearList = layers.map(x => x.time)
+    //console.log(layers);
+    updateTime(layers)
+    
 
   }
 
   function changeDataOnMap(selection) {
-    console.log(selection);
+
+    //console.log(map.getStyle().layers)
+    //console.log(selection);
     currentGeojsonLayers.dataLayer = selection;
 
     if(map.getLayoutProperty(currentGeojsonLayers.hexSize, 'visibility', 'none')) {
@@ -421,7 +382,7 @@ mapboxgl.accessToken =
         //console.log(uniFeatures[0].properties._mean);
         //console.log(uniFeatures);
         var selecteData = uniFeatures.map(x => x.properties[selection])
-        console.log(selecteData);
+        //console.log(selecteData);
         var max = Math.max(...selecteData)
         var min = Math.min(...selecteData)
         
@@ -429,15 +390,15 @@ mapboxgl.accessToken =
         //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
         var breaks = chroma.limits(selecteData, 'q', 4)
         //console.log(breaks)
-        var colorRamp3 = chroma.scale(['#fafa6e','#2A4858']).mode('lch').colors(5)
+        var colorRamp = chroma.scale(['#fafa6e','#2A4858']).mode('lch').colors(5)
         var colorRamp1 = ['#edf8fb', '#b2e2e2','#66c2a4','#2ca25f', '#006d2c' ]
         var colorRamp2 = ['#f2f0f7','#cbc9e2' ,'#9e9ac8' , '#756bb1' , '#54278f' ]
         var colorRamp4 = ['#ffffd4','#fed98e','#fe9929','#d95f0e','#993404']
         
         //console.log(colorz.classes)
-        var ramps = [colorRamp1, colorRamp2, colorRamp3, colorRamp4]
+        //var ramps = [colorRamp1, colorRamp2, colorRamp3, colorRamp4]
 
-        var colorRamp = ramps[Math.floor(Math.random() * 4)];
+        //var colorRamp = ramps[Math.floor(Math.random() * 4)];
 
         currentGeojsonLayers.breaks = breaks;
         currentGeojsonLayers.color = colorRamp;
@@ -461,15 +422,61 @@ mapboxgl.accessToken =
         
         map.setFilter(currentGeojsonLayers.hexSize,['>=',selection, 0])
         addLegend(colorRamp, breaks, selection)
-        map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.7)
+        setTimeout(() => {  map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.7) }, 500);
+        //map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.7)
 
   }
 }
   }
+
+  function colorTheMap() {
+
+    if(map.getLayer(currentGeojsonLayers.hexSize)) {
+      var features = map.queryRenderedFeatures({
+        layers: [currentGeojsonLayers.hexSize]
+      })
+  
+      if(features) {
+  
+        var uniFeatures;
+          if(currentGeojsonLayers.hexSize === 'admin1') {
+            uniFeatures = getUniqueFeatures(features, 'GID_1');
+          } else {
+            uniFeatures = getUniqueFeatures(features, 'hexid');
+          }
+        //console.log(uniFeatures[0].properties._mean);
+        //console.log(uniFeatures);
+        var selecteData = uniFeatures.map(x => x.properties[currentGeojsonLayers.dataLayer])
+        console.log(selecteData);
+        var max = Math.max(...selecteData)
+        var min = Math.min(...selecteData)
+  
+        var breaks = chroma.limits(selecteData, 'q', 4)
+        //console.log(breaks);
+        currentGeojsonLayers.breaks = breaks;
+  
+        map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-color',
+          [
+            'interpolate',
+            ['linear'],
+            ['get', currentGeojsonLayers.dataLayer],
+            breaks[0], currentGeojsonLayers.color[0],
+            breaks[1], currentGeojsonLayers.color[1],
+            breaks[2], currentGeojsonLayers.color[2],
+            breaks[3], currentGeojsonLayers.color[3],
+            breaks[4], currentGeojsonLayers.color[4],
+            ]
+          )
+      }
+    }
+  
+      addLegend(currentGeojsonLayers.color, breaks, currentGeojsonLayers.dataLayer)
+
+  }
     
     //each time the map moves, repaint
-   map.on('moveend', function(){
-
+  /* map.on('moveend', function(){
+    
     if(map.getLayer(currentGeojsonLayers.hexSize)) {
     var features = map.queryRenderedFeatures({
       layers: [currentGeojsonLayers.hexSize]
@@ -491,7 +498,7 @@ mapboxgl.accessToken =
       var min = Math.min(...selecteData)
 
       var breaks = chroma.limits(selecteData, 'q', 4)
-      console.log(breaks);
+      //console.log(breaks);
       currentGeojsonLayers.breaks = breaks;
 
       map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-color',
@@ -509,9 +516,9 @@ mapboxgl.accessToken =
     }
   }
 
-  addLegend(currentGeojsonLayers.color, breaks, currentGeojsonLayers.dataLayer)
-
-  })
+    addLegend(currentGeojsonLayers.color, breaks, currentGeojsonLayers.dataLayer)
+    
+  }) */
 
 
 
@@ -624,6 +631,7 @@ function addLegend(colors, breaks, current) {
     }
 
     var files = [hex10, hex5, admin1, admin2]
+    //var files = [hex5]
     var promises = [];
 
     files.forEach(function(url){
@@ -658,7 +666,7 @@ function addLegend(colors, breaks, current) {
       });
 
 
-      sourceData.hexSource.data = allData[1];
+      sourceData.hexSource.data = allData[0];
 
 
       //add first layer (5km)
@@ -853,7 +861,10 @@ var arrsamoa = [
 	},
 ];
 
-$(document).ready(function () {
+$('#layer-id').hide()
+$('.year-timeline-wrapper').hide()
+
+//$(document).ready(function () {
 	/** Collapse/Expand for Box  */
 	$('.collapse-btn').on('click', function () {
 		$('.app-body').toggleClass('collapsed');
@@ -972,6 +983,9 @@ $(document).ready(function () {
       for (var i = length-1; i >= 0; i--) {
         layersHolder.options[i] = null;
       }
+      $('#layer-id').hide()
+      $('.year-timeline-wrapper').hide()
+      $('.year-timeline').empty();
       changeDataOnMap(this.selectedOptions[0].id);
     }
     
@@ -993,84 +1007,118 @@ $(document).ready(function () {
 
 	$('select[name="layer-selection"]').on('change', function () {
 		console.log('Layer: ' + $(this).val());
+    //console.log('hi');
+    changeDataOnMap(this.selectedOptions[0].id)
 	});
+
+
 	/**
 	 * Dynamic year list creation 
 	 */
-	var yearList = [1990, 1995, 2010, 2015];
-	if (yearList.length == 1) {
-		$('.year-timeline').html(`<p class='m-0'> Data only available for ${yearList}</p>`)
-		$('.year-timeline-wrapper').addClass('single-year-only');
-		return;
-	}
+
+  function updateTime(layers) {
+
+    //console.log(yearList)
+    //console.log(layers);
+    //var currentLayer = {}
+    currentTimeLayer = layers;
+    //console.log(currentLayer)
+    var yearList = currentTimeLayer.map(x => x.time)
+    var year_html = ''
+    //$('.year-timeline').append(year_html);
+    $('.year-timeline').empty();
+  
+	
+    if (yearList.length == 1) {
+      $('.year-timeline').html(`<p class='m-0'> Data only available for ${yearList}</p>`)
+      $('.year-timeline-wrapper').addClass('single-year-only');
+      return;
+    }
+
+    var last_percentage = 0;
+
+    for (var i = 0; i < yearList.length; i++) {
+      var class_for_year = "";
+      if (i == 0) {
+        class_for_year = "alpha";
+      }
+      else if (i == yearList.length - 1) {
+        class_for_year = "omega";
+      }
 
 
-	var last_percentage = 0;
+      // 
+      var totalContainerWidth = $('.year-timeline').outerWidth();
 
-	for (var i = 0; i < yearList.length; i++) {
-		var class_for_year = "";
-		if (i == 0) {
-			class_for_year = "alpha";
-		}
-		else if (i == yearList.length - 1) {
-			class_for_year = "omega";
-		}
+      // Calculating the pecetange of this block
+      var different_first_last = yearList[yearList.length - 1] - yearList[0];
 
 
-		// 
-		var totalContainerWidth = $('.year-timeline').outerWidth();
+      // Now calculate the distance between the current item and the next one
+      var distance_to_next = yearList[i] - yearList[0];
 
-		// Calculating the pecetange of this block
-		var different_first_last = yearList[yearList.length - 1] - yearList[0];
+      if (i == yearList.length - 1) {
+        console.log('is omega');
+      }
 
+      var size_in_percentage = (distance_to_next / different_first_last) * 100;
+      size_in_percentage = size_in_percentage.toFixed(2);
 
-		// Now calculate the distance between the current item and the next one
-		var distance_to_next = yearList[i] - yearList[0];
+      var widthStyle = `width: ${size_in_percentage}%;`;
 
-		if (i == yearList.length - 1) {
-			console.log('is omega');
-		}
+      var fromLeftPosition = 0;
+      var fromLeftPixels = 0;
+      var fromLeftStyle = ``;
 
-		var size_in_percentage = (distance_to_next / different_first_last) * 100;
-		size_in_percentage = size_in_percentage.toFixed(2);
+      if (i > 0 && i < (yearList.length - 1)) {
+        fromLeftPosition = parseInt(size_in_percentage);
+        // convert from left position to pixels
+        fromLeftPixels = (fromLeftPosition / 100) * totalContainerWidth;
+        fromLeftStyle = `left: ${fromLeftPixels}px;`;
+      } else {
+        last_percentage = parseInt(size_in_percentage);
+      }
 
-		var widthStyle = `width: ${size_in_percentage}%;`;
-
-		var fromLeftPosition = 0;
-    var fromLeftPixels = 0;
-		var fromLeftStyle = ``;
-
-		if (i > 0 && i < (yearList.length - 1)) {
-			fromLeftPosition = parseInt(size_in_percentage);
-			// convert from left position to pixels
-			fromLeftPixels = (fromLeftPosition / 100) * totalContainerWidth;
-			fromLeftStyle = `left: ${fromLeftPixels}px;`;
-		} else {
-			last_percentage = parseInt(size_in_percentage);
-		}
-
-		last_percentage = fromLeftPosition;
+      last_percentage = fromLeftPosition;
 
 
-		var year_html = `<div _style=' ${widthStyle}' data-width='${size_in_percentage}' class="year-timeline-block ${class_for_year}" data-year-idx="${i + 1}">
-				 <input type="radio" name="year-selected" value="${yearList[i]}" id="year-${yearList[i]}" ${(i == 0) ? 'checked' : ''}>
-				 <label for="year-${yearList[i]}">
-				 <span style='${fromLeftStyle}' class="label-value">${yearList[i]}</span>
-				 <span style='${fromLeftStyle}' class="circle-radio"></span>
-				 </label>
-			  </div>`;
-		$('.year-timeline').append(year_html);
+      year_html = `<div _style=' ${widthStyle}' data-width='${size_in_percentage}' class="year-timeline-block ${class_for_year}" data-year-idx="${i + 1}">
+          <input type="radio" name="year-selected" value="${yearList[i]}" id="year-${yearList[i]}" ${(i == 0) ? 'checked' : ''}>
+          <label for="year-${yearList[i]}">
+          <span style='${fromLeftStyle}' class="label-value">${yearList[i]}</span>
+          <span style='${fromLeftStyle}' class="circle-radio"></span>
+          </label>
+          </div>`;
+      $('.year-timeline').append(year_html);
+    
+    }
 
-	}
+    var isReachedToEnd = false;
+    $('body').on('change click', 'input[name="year-selected"]', function (e) {
+      e.preventDefault() //so it doesn't run twice
+      isReachedToEnd = false;
+      var yearValue = $('[name="year-selected"]:checked').val();
+      console.log('-----')
+      console.log(yearValue);
+      console.log(currentTimeLayer);
+      var showLayer = find(currentTimeLayer, function(o) {return o.time === yearValue})
+      console.log(showLayer)
+      changeDataOnMap(showLayer.field_name);
+      //console.log(yearValue);
+	  });
+
+
+}
 	// }
 
+  
 	// Year selection 
-	var isReachedToEnd = false;
+/*	var isReachedToEnd = false;
 	$('body').on('change click', 'input[name="year-selected"]', function () {
 		isReachedToEnd = false;
 		var yearValue = $('[name="year-selected"]:checked').val();
 		console.log(yearValue);
-	});
+	}); */
 
 	// play / pause
 	var playPauseInterval;
@@ -1180,15 +1228,15 @@ $(document).ready(function () {
 		var btnValue = $('.button-option-select-1.active').data('value');
 		var datasetSelect = $('select[name="dataset-selection"]').val();
 		var layerSelect = $('select[name="layer-selection"]').val();
-		var year = $('input[name="year-selected"]:checked').val();
+		//var year = $('input[name="year-selected"]:checked').val();
 
 		console.log('Top left nav = ' + top_left_nav);
 		console.log('Top right Button = ' + btnValue);
 		console.log('DATASET selection = ' + datasetSelect);
 		console.log('Layer selection = ' + layerSelect);
-		console.log('Year selection = ' + year);
+		//console.log('Year selection = ' + year);
 	}
 
 	check_all_values()
 
-});
+//});
