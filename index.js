@@ -21,7 +21,7 @@ import addPass from "./password";
 
 
 
-//addPass()
+addPass()
 
 
 var allLayers = []
