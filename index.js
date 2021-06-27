@@ -49,12 +49,6 @@ mapboxgl.accessToken =
       hexSource: {
         name: 'hex5',
         data: null
-      },
-
-      allSidsSource: {
-        name: 'allSids-source',
-        data: [],
-        lastName: null
       }
 
   }
