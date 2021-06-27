@@ -24,7 +24,7 @@
 	<div id='password' class='password'>
 		<input type="text" id="fname" name="fname"><br><br>
 	  </div>
-
+	
 	<!-- Logos Section Start -->
 	<div class="logos row-flex align-items-center">
 		<div class="UNDP-logo"></div>
@@ -49,6 +49,7 @@
 		</div>
 
 		<div class="row-flex" style="justify-content:flex-end;margin-top:15px;">
+			
 			<div class="add-overlay-menu">
 				<select name='overlay-select' id='add-overlay'>
 					<option value="Select Country or Region">Add overlays</option>
@@ -58,7 +59,7 @@
 				</select>
 				<span class="downarrow"></span>
 			</div>
-			<div id='icon3d' class="icon2"></div>
+			<div id='icon3d' style="display: none;" class="icon2"></div>
 		</div>
 
 		<div class="row-flex" style="justify-content:flex-end;margin-top:15px;">
@@ -75,12 +76,12 @@
 			<div class="icon3"></div>
 		</div>
 
-		<div class="row-flex add-chart-button-wrap">
+		<!--<div class="row-flex add-chart-button-wrap">
 			<div class="add-chart-button row-flex align-items-center">
 				<div class="plus-sign"></div>
 				<div class="text-add-chart">Add chart</div>
 			</div>
-		</div>
+		</div>-->
 
 	</div>
 	<!-- Top right Column End -->
@@ -681,6 +682,7 @@
 		
 	</div>
 	<!-- </div> -->
+	<div class="loader"></div> 
 	<div id='map'></div>
 	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"

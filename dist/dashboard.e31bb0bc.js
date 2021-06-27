@@ -42039,7 +42039,7 @@ var reloadCSS = require('_css_loader');
 
 module.hot.dispose(reloadCSS);
 module.hot.accept(reloadCSS);
-},{"./assets\\UNDP-logo.svg":[["UNDP-logo.c3ef9c5c.svg","assets/UNDP-logo.svg"],"assets/UNDP-logo.svg"],"./assets\\risingUpForSids.png":[["risingUpForSids.6ca41891.png","assets/risingUpForSids.png"],"assets/risingUpForSids.png"],"./assets\\down-arrow.svg":[["down-arrow.39fba8f1.svg","assets/down-arrow.svg"],"assets/down-arrow.svg"],"./assets\\icon1.png":[["icon1.443e685f.png","assets/icon1.png"],"assets/icon1.png"],"./assets\\icon2.png":[["icon2.8eadbe99.png","assets/icon2.png"],"assets/icon2.png"],"./assets\\left-arrow.svg":[["left-arrow.63fa8854.svg","assets/left-arrow.svg"],"assets/left-arrow.svg"],"./assets\\right-arrow.svg":[["right-arrow.a6d2cab3.svg","assets/right-arrow.svg"],"assets/right-arrow.svg"],"./assets\\icon3.png":[["icon3.6f66cbfb.png","assets/icon3.png"],"assets/icon3.png"],"./assets\\plus-sign.png":[["plus-sign.5bb9b08d.png","assets/plus-sign.png"],"assets/plus-sign.png"],"./assets\\polygon.png":[["polygon.c2df5e4a.png","assets/polygon.png"],"assets/polygon.png"],"./assets\\up-arrow.svg":[["up-arrow.6046179d.svg","assets/up-arrow.svg"],"assets/up-arrow.svg"],"_css_loader":"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/css-loader.js"}],"password.js":[function(require,module,exports) {
+},{"./assets\\UNDP-logo.svg":[["UNDP-logo.c3ef9c5c.svg","assets/UNDP-logo.svg"],"assets/UNDP-logo.svg"],"./assets\\risingUpForSids.png":[["risingUpForSids.6ca41891.png","assets/risingUpForSids.png"],"assets/risingUpForSids.png"],"./assets\\down-arrow.svg":[["down-arrow.39fba8f1.svg","assets/down-arrow.svg"],"assets/down-arrow.svg"],"./assets\\icon1.png":[["icon1.443e685f.png","assets/icon1.png"],"assets/icon1.png"],"./assets\\icon2.png":[["icon2.8eadbe99.png","assets/icon2.png"],"assets/icon2.png"],"./assets\\left-arrow.svg":[["left-arrow.63fa8854.svg","assets/left-arrow.svg"],"assets/left-arrow.svg"],"./assets\\right-arrow.svg":[["right-arrow.a6d2cab3.svg","assets/right-arrow.svg"],"assets/right-arrow.svg"],"./assets\\plus-sign.png":[["plus-sign.5bb9b08d.png","assets/plus-sign.png"],"assets/plus-sign.png"],"./assets\\polygon.png":[["polygon.c2df5e4a.png","assets/polygon.png"],"assets/polygon.png"],"./assets\\up-arrow.svg":[["up-arrow.6046179d.svg","assets/up-arrow.svg"],"assets/up-arrow.svg"],"_css_loader":"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/css-loader.js"}],"password.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -42118,7 +42118,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-(0, _password.default)();
+//addPass()
 var allLayers = [];
 var _default = allLayers;
 exports.default = _default;
@@ -42129,9 +42129,8 @@ _mapboxGl.default.accessToken = "pk.eyJ1Ijoic2ViYXN0aWFuLWNoIiwiYSI6ImNpejkxdzZ5
 var map = new _mapboxGl.default.Map({
   container: "map",
   // container ID
-  style: 'mapbox://styles/mapbox/light-v10',
-  //?optimize=true
-  //style: 'mapbox://styles/mapbox/satellite-v9', 
+  //style: 'mapbox://styles/mapbox/light-v10', //?optimize=true
+  style: 'mapbox://styles/mapbox/satellite-streets-v11',
   center: [-71.4, 19.1],
   // starting position [lng, lat]
   zoom: 7 //pitch: 55
@@ -42160,14 +42159,14 @@ var legendControl;
 map.on("load", function () {
   map.removeLayer('admin-1-boundary');
   var styles = [{
+    title: "Satellite With Labels",
+    uri: "mapbox://styles/mapbox/satellite-streets-v11"
+  }, {
     title: "Light",
     uri: "mapbox://styles/mapbox/light-v10?optimize=true"
   }, {
     title: "Satellite Imagery",
     uri: "mapbox://styles/mapbox/satellite-v9"
-  }, {
-    title: "Satellite With Labels",
-    uri: "mapbox://styles/mapbox/satellite-streets-v11"
   }];
   map.addControl(new _mapboxGlStyleSwitcher.MapboxStyleSwitcherControl(styles), 'bottom-right');
 
@@ -42199,7 +42198,10 @@ map.on("load", function () {
 
   legendControl = new MyCustomControl();
   map.addControl(new _mapboxGl.default.ScaleControl(), 'bottom-right');
-  addHexSource(); //addSidsSource()
+  addHexSource();
+});
+map.once('idle', function () {
+  $('.loader').remove();
 }); //function taken from mapbox that extracts unique features, see comment below
 
 function getUniqueFeatures(array, comparatorProperty) {
@@ -42264,6 +42266,17 @@ function getUniqueFeatures(array, comparatorProperty) {
 
 var button3dWrapper = document.getElementById('icon3d');
 button3dWrapper.addEventListener('click', function (event) {
+  var layers = map.getStyle().layers; // Find the index of the first symbol layer in the map style
+
+  var firstSymbolId;
+
+  for (var i = 0; i < layers.length; i++) {
+    if (layers[i].type === 'symbol') {
+      firstSymbolId = layers[i].id;
+      break;
+    }
+  }
+
   var id3d = currentGeojsonLayers.hexSize + '-3d';
 
   if (map.getLayer(id3d)) {
@@ -42285,7 +42298,7 @@ button3dWrapper.addEventListener('click', function (event) {
         'fill-extrusion-height': ['get', currentGeojsonLayers.dataLayer] //'fill-opacity': 0.7,
 
       }
-    });
+    }, firstSymbolId);
     map.setFilter(id3d, ['>=', currentGeojsonLayers.dataLayer, 0]);
     map.easeTo({
       center: map.getCenter(),
@@ -42317,17 +42330,19 @@ wrapper.addEventListener('click', function (event) {
       },
       pitch: 0
     });
-    map.on('moveend', function () {
+    /*map.on('moveend', function(){
       console.log('hi');
-      map.on('render', function () {
+      map.on('render', function() {
         //colorTheMap();
-        console.log('styled');
-      });
-    });
+        console.log('styled')
+      })
+      
+    }) */
   }
 });
 
 function changeHexagonSize(sel) {
+  remove3d();
   currentGeojsonLayers.hexSize = sel;
   var layers = map.getStyle().layers; // Find the index of the first symbol layer in the map style
 
@@ -42369,9 +42384,28 @@ function changeHexagonSize(sel) {
   }
 }
 
+function remove3d() {
+  var lay = map.getStyle().layers; //console.log(lay);
+
+  var threedee = (0, _lodash.default)(lay, function (o) {
+    return o.type === 'fill-extrusion';
+  });
+
+  if (threedee) {
+    map.removeLayer(threedee.id);
+    map.easeTo({
+      center: map.getCenter(),
+      pitch: 0
+    });
+  }
+}
+/*map.on('moveend', function(){
+  console.log(map.getZoom())
+})*/
+
+
 function addToLayersDrop(layers) {
-  $('#layer-id').show();
-  $('.year-timeline-wrapper').show(); //console.log(layers);
+  $('#layer-id').show(); //console.log(layers);
   //console.log(yearList)
 
   var layersHolder = document.getElementById('layer-drop');
@@ -42393,13 +42427,13 @@ function addToLayersDrop(layers) {
   yearList = layers.map(function (x) {
     return x.time;
   }); //console.log(layers);
-
-  updateTime(layers);
+  //updateTime(layers)
 }
 
 function changeDataOnMap(selection) {
-  //console.log(map.getStyle().layers)
+  remove3d(); //console.log(map.getStyle().layers)
   //console.log(selection);
+
   currentGeojsonLayers.dataLayer = selection;
 
   if (map.getLayoutProperty(currentGeojsonLayers.hexSize, 'visibility', 'none')) {
@@ -42416,21 +42450,23 @@ function changeDataOnMap(selection) {
 
       if (currentGeojsonLayers.hexSize === 'admin1') {
         uniFeatures = getUniqueFeatures(features, 'GID_1');
+      } else if (currentGeojsonLayers.hexSize === 'admin2') {
+        uniFeatures = getUniqueFeatures(features, 'GID_2');
       } else {
         uniFeatures = getUniqueFeatures(features, 'hexid');
-      } //console.log(uniFeatures[0].properties._mean);
-      //console.log(uniFeatures);
+      } //console.log(uniFeatures);
 
 
       var selecteData = uniFeatures.map(function (x) {
         return x.properties[selection];
-      }); //console.log(selecteData);
-
+      });
+      console.log(selecteData);
       var max = Math.max.apply(Math, _toConsumableArray(selecteData));
       var min = Math.min.apply(Math, _toConsumableArray(selecteData)); //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
 
-      var breaks = _chromaJs.default.limits(selecteData, 'q', 4); //console.log(breaks)
+      var breaks = _chromaJs.default.limits(selecteData, 'q', 4);
 
+      console.log(breaks);
 
       var colorRamp = _chromaJs.default.scale(['#fafa6e', '#2A4858']).mode('lch').colors(5);
 
@@ -42443,12 +42479,21 @@ function changeDataOnMap(selection) {
       currentGeojsonLayers.breaks = breaks;
       currentGeojsonLayers.color = colorRamp; //console.log(currentGeojsonLayers)
 
-      map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-color', ['interpolate', ['linear'], ['get', selection], breaks[0], colorRamp[0], breaks[1], colorRamp[1], breaks[2], colorRamp[2], breaks[3], colorRamp[3], breaks[4], colorRamp[4]]);
-      map.setFilter(currentGeojsonLayers.hexSize, ['>=', selection, 0]);
-      addLegend(colorRamp, breaks, selection);
-      setTimeout(function () {
-        map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.7);
-      }, 500); //map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.7)
+      map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-color', ['interpolate', ['linear'], ['get', selection], breaks[0], colorRamp[0], breaks[1], colorRamp[1], breaks[2], colorRamp[2], breaks[3], colorRamp[3], breaks[4], colorRamp[4]]); //map.setFilter(currentGeojsonLayers.hexSize,['>=',selection, 0])
+
+      if (isNaN(breaks[3])) {
+        map.setFilter(currentGeojsonLayers.hexSize, null);
+        map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.0);
+        addNoDataLegend();
+      } else {
+        map.setFilter(currentGeojsonLayers.hexSize, ['>=', selection, 0]);
+        addLegend(colorRamp, breaks, selection);
+        setTimeout(function () {
+          map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.7);
+        }, 700);
+      } //setTimeout(() => {  map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.7) }, 700);
+      //map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.7)
+
     }
   }
 }
@@ -42570,6 +42615,19 @@ function addOverlay(sel) {
 //add the legend
 
 
+function addNoDataLegend() {
+  var infoBoxTitle = document.getElementById("infoBoxTitle");
+  var infoBoxText = document.getElementById("infoBoxText");
+  var infoBoxLink = document.getElementById("infoBoxLink");
+  infoBoxTitle.innerHTML = 'No Data for this Region';
+  infoBoxText.innerHTML = '';
+  infoBoxLink.innerHTML = '';
+  var legendTitle = document.getElementById('legendTitle');
+  var legend = document.getElementById('updateLegend');
+  legend.innerHTML = '';
+  legendTitle.innerHTML = '';
+}
+
 function addLegend(colors, breaks, current) {
   //console.log(allLayers)
   var legData = (0, _lodash.default)(allLayers, ['field_name', current]);
@@ -42606,8 +42664,8 @@ function addLegend(colors, breaks, current) {
 
 
 function addHexSource() {
-  var hex10 = "https://sebastian-ch.github.io/sidsDataTest/data/10km.pbf";
-  var hex5 = "https://sebastian-ch.github.io/sidsDataTest/data/hex5u.pbf";
+  var hex10 = "https://sebastian-ch.github.io/sidsDataTest/data/hex10.pbf";
+  var hex5 = "https://sebastian-ch.github.io/sidsDataTest/data/hex5.pbf";
   var admin1 = "https://sebastian-ch.github.io/sidsDataTest/data/admin1.pbf";
   var admin2 = "https://sebastian-ch.github.io/sidsDataTest/data/admin2.pbf";
   var layers = map.getStyle().layers; // Find the index of the first symbol layer in the map style
@@ -42879,6 +42937,10 @@ $('select[name="dataset-selection"]').on('change', function () {
   //console.log('Dataset: ' + $(this).val());
   //console.log(this.selectedOptions[0].id)
   if (this.selectedOptions[0].innerHTML === 'GDP per capita' || this.selectedOptions[0].innerHTML === 'Population Density') {
+    if (this.selectedOptions[0].innerHTML === 'Population Density') {
+      $('#icon3d').show();
+    }
+
     var layers = []; //console.log(this.selectedOptions[0])
 
     for (var x in allLayers) {
@@ -42888,8 +42950,9 @@ $('select[name="dataset-selection"]').on('change', function () {
       }
     }
 
-    addToLayersDrop(layers);
+    updateTime(layers); //addToLayersDrop(layers);
   } else {
+    $('#icon3d').hide();
     var layersHolder = document.getElementById('layer-drop');
     var length = layersHolder.options.length;
 
@@ -42917,14 +42980,16 @@ $('select[name="layer-selection"]').on('change', function () {
 
   changeDataOnMap(this.selectedOptions[0].id);
 });
+var isReachedToEnd = false;
 /**
  * Dynamic year list creation 
  */
 
 function updateTime(layers) {
-  //console.log(yearList)
+  $('.year-timeline-wrapper').show(); //console.log(yearList)
   //console.log(layers);
   //var currentLayer = {}
+
   currentTimeLayer = layers; //console.log(currentLayer)
 
   var yearList = currentTimeLayer.map(function (x) {
@@ -42983,19 +43048,23 @@ function updateTime(layers) {
     $('.year-timeline').append(year_html);
   }
 
-  var isReachedToEnd = false;
   $('body').on('change click', 'input[name="year-selected"]', function (e) {
     e.preventDefault(); //so it doesn't run twice
 
     isReachedToEnd = false;
     var yearValue = $('[name="year-selected"]:checked').val();
-    console.log('-----');
+    $('.year-timeline-block.alpha input[type="radio"').prop('checked', true); //console.log('-----')
+
     console.log(yearValue);
-    console.log(currentTimeLayer);
+    console.log(this);
+    var check = $(this).attr('checked');
+    if (check) $(this).removeAttr('checked').prop('checked', false);else $(this).attr('checked', true).prop('checked', true);
+    console.log(this); //console.log(currentTimeLayer);
+
     var showLayer = (0, _lodash.default)(currentTimeLayer, function (o) {
       return o.time === yearValue;
-    });
-    console.log(showLayer);
+    }); //console.log(showLayer)
+
     changeDataOnMap(showLayer.field_name); //console.log(yearValue);
   });
 } // }
@@ -43137,7 +43206,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52203" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55108" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

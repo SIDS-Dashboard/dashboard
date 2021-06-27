@@ -35,8 +35,8 @@ mapboxgl.accessToken =
 
   const map = new mapboxgl.Map({
     container: "map", // container ID
-    style: 'mapbox://styles/mapbox/light-v10', //?optimize=true
-    //style: 'mapbox://styles/mapbox/satellite-v9', 
+    //style: 'mapbox://styles/mapbox/light-v10', //?optimize=true
+    style: 'mapbox://styles/mapbox/satellite-streets-v11', 
     center: [-71.4, 19.1], // starting position [lng, lat]
     zoom: 7,
     //pitch: 55
@@ -69,12 +69,14 @@ mapboxgl.accessToken =
 
   map.on("load", function () {
     map.removeLayer('admin-1-boundary')
+    
 
 
     const styles = [
+      {title: "Satellite With Labels",uri: "mapbox://styles/mapbox/satellite-streets-v11",},
       {title: "Light",uri: "mapbox://styles/mapbox/light-v10?optimize=true",},
       {title: "Satellite Imagery", uri: "mapbox://styles/mapbox/satellite-v9",},
-      {title: "Satellite With Labels",uri: "mapbox://styles/mapbox/satellite-streets-v11",},
+     
     ];
     
     map.addControl(new MapboxStyleSwitcherControl(styles), 'bottom-right');
@@ -98,12 +100,12 @@ mapboxgl.accessToken =
     map.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
     
     addHexSource()
-    //addSidsSource()
-
     
   });
 
-  
+  map.once('idle', function(){
+    $('.loader').remove()
+  })
   //function taken from mapbox that extracts unique features, see comment below
   function getUniqueFeatures(array, comparatorProperty) {
     var existingFeatureKeys = {};
@@ -176,6 +178,16 @@ mapboxgl.accessToken =
   const button3dWrapper = document.getElementById('icon3d')
   button3dWrapper.addEventListener('click', (event) => {
 
+    var layers = map.getStyle().layers;
+    // Find the index of the first symbol layer in the map style
+    var firstSymbolId;
+    for (var i = 0; i < layers.length; i++) {
+    if (layers[i].type === 'symbol') {
+    firstSymbolId = layers[i].id;
+    break;
+    }
+    }
+
     var id3d = currentGeojsonLayers.hexSize + '-3d'
 
     if(map.getLayer(id3d)) {
@@ -212,7 +224,7 @@ mapboxgl.accessToken =
           //'fill-opacity': 0.7,
         
           }
-      });
+      }, firstSymbolId);
 
       map.setFilter(id3d,['>=',currentGeojsonLayers.dataLayer, 0])
       map.easeTo({
@@ -248,21 +260,21 @@ mapboxgl.accessToken =
           pitch: 0
         });
 
-        map.on('moveend', function(){
+        /*map.on('moveend', function(){
           console.log('hi');
           map.on('render', function() {
             //colorTheMap();
             console.log('styled')
           })
           
-        })
+        }) */
 
     } 
    
   })
 
   function changeHexagonSize(sel) {
-
+    remove3d()
     currentGeojsonLayers.hexSize = sel
 
     var layers = map.getStyle().layers;
@@ -326,10 +338,31 @@ mapboxgl.accessToken =
 
   }
 
+  
+  function remove3d() {
+
+    var lay = map.getStyle().layers;
+    //console.log(lay);
+    var threedee = find(lay, function(o){return o.type === 'fill-extrusion'});
+    if (threedee) {
+      map.removeLayer(threedee.id);
+      map.easeTo({
+        center: map.getCenter(),
+        pitch: 0
+    
+      })
+    }
+
+  }
+
+  /*map.on('moveend', function(){
+    console.log(map.getZoom())
+  })*/
+
   function addToLayersDrop(layers) {
 
     $('#layer-id').show()
-    $('.year-timeline-wrapper').show()
+    
     //console.log(layers);
     //console.log(yearList)
     var layersHolder = document.getElementById('layer-drop');
@@ -350,13 +383,13 @@ mapboxgl.accessToken =
     //console.log(layers.map(x => x.time));
     yearList = layers.map(x => x.time)
     //console.log(layers);
-    updateTime(layers)
+    //updateTime(layers)
     
 
   }
 
   function changeDataOnMap(selection) {
-
+    remove3d()
     //console.log(map.getStyle().layers)
     //console.log(selection);
     currentGeojsonLayers.dataLayer = selection;
@@ -375,21 +408,24 @@ mapboxgl.accessToken =
         var uniFeatures;
         if(currentGeojsonLayers.hexSize === 'admin1') {
           uniFeatures = getUniqueFeatures(features, 'GID_1');
+        } else if (currentGeojsonLayers.hexSize === 'admin2') {
+          uniFeatures = getUniqueFeatures(features, 'GID_2');
         } else {
           uniFeatures = getUniqueFeatures(features, 'hexid');
         }
         
-        //console.log(uniFeatures[0].properties._mean);
+        
         //console.log(uniFeatures);
         var selecteData = uniFeatures.map(x => x.properties[selection])
-        //console.log(selecteData);
+        console.log(selecteData);
         var max = Math.max(...selecteData)
         var min = Math.min(...selecteData)
         
         
         //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
         var breaks = chroma.limits(selecteData, 'q', 4)
-        //console.log(breaks)
+        console.log(breaks)
+        
         var colorRamp = chroma.scale(['#fafa6e','#2A4858']).mode('lch').colors(5)
         var colorRamp1 = ['#edf8fb', '#b2e2e2','#66c2a4','#2ca25f', '#006d2c' ]
         var colorRamp2 = ['#f2f0f7','#cbc9e2' ,'#9e9ac8' , '#756bb1' , '#54278f' ]
@@ -420,10 +456,20 @@ mapboxgl.accessToken =
         )
         
         
-        map.setFilter(currentGeojsonLayers.hexSize,['>=',selection, 0])
-        addLegend(colorRamp, breaks, selection)
-        setTimeout(() => {  map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.7) }, 500);
+        //map.setFilter(currentGeojsonLayers.hexSize,['>=',selection, 0])
+        if (isNaN(breaks[3])) {
+          map.setFilter(currentGeojsonLayers.hexSize, null)
+          map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.0)
+          addNoDataLegend();
+        } else {
+          map.setFilter(currentGeojsonLayers.hexSize,['>=',selection, 0])
+          addLegend(colorRamp, breaks, selection)
+          setTimeout(() => {  map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.7) }, 700);
+        }
+        
+        //setTimeout(() => {  map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.7) }, 700);
         //map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.7)
+        
 
   }
 }
@@ -569,6 +615,23 @@ function addOverlay(sel) {
 
 //addLegend()
 //add the legend
+
+function addNoDataLegend() {
+
+  var infoBoxTitle = document.getElementById("infoBoxTitle")
+  var infoBoxText = document.getElementById("infoBoxText")
+  var infoBoxLink = document.getElementById("infoBoxLink")
+
+  infoBoxTitle.innerHTML = 'No Data for this Region';
+  infoBoxText.innerHTML = '';
+  infoBoxLink.innerHTML = '';
+
+  var legendTitle = document.getElementById('legendTitle')
+  var legend = document.getElementById('updateLegend')
+  legend.innerHTML = '';
+  legendTitle.innerHTML = ''
+
+}
 function addLegend(colors, breaks, current) {
 
   //console.log(allLayers)
@@ -615,8 +678,8 @@ function addLegend(colors, breaks, current) {
 
   //add sources
   function addHexSource() {
-    const hex10 = "https://sebastian-ch.github.io/sidsDataTest/data/10km.pbf"
-    const hex5 = "https://sebastian-ch.github.io/sidsDataTest/data/hex5u.pbf";
+    const hex10 = "https://sebastian-ch.github.io/sidsDataTest/data/hex10.pbf"
+    const hex5 = "https://sebastian-ch.github.io/sidsDataTest/data/hex5.pbf";
     const admin1 = "https://sebastian-ch.github.io/sidsDataTest/data/admin1.pbf";
     const admin2 = "https://sebastian-ch.github.io/sidsDataTest/data/admin2.pbf";
 
@@ -645,7 +708,7 @@ function addLegend(colors, breaks, current) {
         type: "geojson",
         data: geobuf.decode(new Pbf(allData[0])),
 
-      })
+      }) 
 
       //add 5km
       map.addSource('hex5', {
@@ -965,6 +1028,9 @@ $('.year-timeline-wrapper').hide()
 		//console.log('Dataset: ' + $(this).val());
     //console.log(this.selectedOptions[0].id)
     if(this.selectedOptions[0].innerHTML === 'GDP per capita' || this.selectedOptions[0].innerHTML === 'Population Density') {
+      if(this.selectedOptions[0].innerHTML === 'Population Density') {
+        $('#icon3d').show()
+      }
       var layers = [];
       //console.log(this.selectedOptions[0])
       for (var x in allLayers) {
@@ -973,10 +1039,11 @@ $('.year-timeline-wrapper').hide()
           layers.push(allLayers[x]);
         }
       }
-
-      addToLayersDrop(layers);
+      updateTime(layers)
+      //addToLayersDrop(layers);
 
     } else {
+      $('#icon3d').hide()
       var layersHolder = document.getElementById('layer-drop');
       var length = layersHolder.options.length;
     
@@ -1011,6 +1078,7 @@ $('.year-timeline-wrapper').hide()
     changeDataOnMap(this.selectedOptions[0].id)
 	});
 
+  var isReachedToEnd = false;
 
 	/**
 	 * Dynamic year list creation 
@@ -1018,6 +1086,7 @@ $('.year-timeline-wrapper').hide()
 
   function updateTime(layers) {
 
+    $('.year-timeline-wrapper').show()
     //console.log(yearList)
     //console.log(layers);
     //var currentLayer = {}
@@ -1093,16 +1162,24 @@ $('.year-timeline-wrapper').hide()
     
     }
 
-    var isReachedToEnd = false;
+   
+
+    
     $('body').on('change click', 'input[name="year-selected"]', function (e) {
       e.preventDefault() //so it doesn't run twice
       isReachedToEnd = false;
       var yearValue = $('[name="year-selected"]:checked').val();
-      console.log('-----')
+      $('.year-timeline-block.alpha input[type="radio"').prop('checked', true);
+      //console.log('-----')
       console.log(yearValue);
-      console.log(currentTimeLayer);
+      console.log(this)
+      var check = $(this).attr('checked')
+      if (check) $(this).removeAttr('checked').prop('checked',false)
+      else $(this).attr('checked', true).prop('checked',true)
+      console.log(this)
+      //console.log(currentTimeLayer);
       var showLayer = find(currentTimeLayer, function(o) {return o.time === yearValue})
-      console.log(showLayer)
+      //console.log(showLayer)
       changeDataOnMap(showLayer.field_name);
       //console.log(yearValue);
 	  });
@@ -1111,7 +1188,6 @@ $('.year-timeline-wrapper').hide()
 }
 	// }
 
-  
 	// Year selection 
 /*	var isReachedToEnd = false;
 	$('body').on('change click', 'input[name="year-selected"]', function () {

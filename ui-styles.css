@@ -196,7 +196,7 @@ body {
     width: 34px;
     height: 34px;
     margin-left: 16px;
-    background: url('./assets/icon3.png');
+    /*background: url('./assets/icon3.png'); */
     background-repeat: no-repeat;
     background-size: 100% 100%;
 }
@@ -889,3 +889,21 @@ input[type='radio']:checked~label .circle-radio {
 .select2~.selection-dropdown-arrow {
     display: none;
 }
+
+.loader {
+    position: absolute;
+    border: 16px solid #f3f3f3; /* Light grey */
+    border-top: 16px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
+    z-index: 3;
+    left: 45%;
+    top: 35%;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
