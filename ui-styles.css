@@ -46,7 +46,7 @@ body {
 }
 
 .UNDP-logo {
-    width: 25px;
+    width: 34px;
     height: 65px;
     background: url('./assets/UNDP-logo.svg');
     background-repeat: no-repeat;
@@ -57,7 +57,7 @@ body {
 
 .rising-up-for-sids {
     width: 131px;
-    height: 60px;
+    height: 65px;
     background: url('./assets/risingUpForSids.png');
     background-repeat: no-repeat;
     background-size: 100% 100%;
@@ -78,7 +78,7 @@ body {
 
 .country-select-menu select {
     padding: 8px 35px 8px 20px;
-    border-radius: 16px;
+    border-radius: 10px;
     outline: none;
     height: 34px;
     background: #DDDDDD;
@@ -234,7 +234,7 @@ body {
     margin: 10px 0;
     background-color: rgba(221, 221, 221, 0.7);
     padding: 10px 21px;
-    border-radius: 26px;
+    border-radius: 10px;
     transition: 1s ease-in-out all;
     opacity: 1;
     
@@ -261,7 +261,7 @@ body {
 
 .custom-selection-dropdown .form-select {
     font-size: 12px;
-    border-radius: 30px;
+    border-radius: 10px;
     padding: 4px 20px;
     background-image: none;
 }
@@ -355,7 +355,7 @@ body {
     font-weight: 600;
     font-size: 12px;
     color: #0cb5ff;
-    border-radius: 30px;
+    border-radius: 10px;
     padding: 1px 6px;
 }
 
@@ -504,7 +504,7 @@ input[type='radio']:checked~label .label-value {
     height: 8px;
     display: block;
     background-color: #333;
-    border-radius: 50%;
+    border-radius: 10px;
     margin: 0 auto;
     position: relative;
     z-index: 1;
@@ -659,7 +659,7 @@ input[type='radio']:checked~label .circle-radio {
 .tooltip-blue-eco {
     max-width: 360px;
     padding: 10px;
-    border-radius: 20px;
+    border-radius: 10px;
     background-color: #ebebeb9e;
 }
 
@@ -706,11 +706,13 @@ input[type='radio']:checked~label .circle-radio {
     background-position: right .75rem center;
     background-size: 16px 12px;
     border: 1px solid #ced4da;
-    border-radius: 32px;
+    border-radius: 10px;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    height: auto;
+    height: 34px;    
+    padding-top:7px;
+       
 }
 
 .custom-selection-dropdown .select2-selection__arrow {
@@ -725,7 +727,7 @@ input[type='radio']:checked~label .circle-radio {
     left: -18px;
     top: 36px;
     background-color: rgba(37, 42, 48, 0.5);
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
     transition: .5s ease-in-out;
     display: flex;
@@ -748,7 +750,7 @@ input[type='radio']:checked~label .circle-radio {
     padding: 10px 0;
     background-color: white;
     margin-left: 2px;
-    border-radius: 26px;
+    border-radius: 10px;
     position: absolute;
     top: -162px;
 }
@@ -784,14 +786,14 @@ input[type='radio']:checked~label .circle-radio {
 
 ::-webkit-scrollbar-thumb {
     background: #9E9E9E;
-    border-radius: 40px;
+    border-radius: 10px;
 }
 
 .population-density-box {
     width: 350px;
     height: 100px;
     margin-top: 12px;
-    border-radius: 20px;
+    border-radius: 10px;
     background-color: #DDDDDD;
     margin-left: 30px;
     /*sebastian added */
@@ -803,7 +805,7 @@ input[type='radio']:checked~label .circle-radio {
     max-width: 350px;
     margin-top: 12px;
     background-color: #ffffff;
-    border-radius: 20px;
+    border-radius: 10px;
     padding: 10px;
     margin-left: 30px;
     /*sebastian added */
