@@ -1072,6 +1072,7 @@ $('.year-timeline-wrapper').hide()
       //addToLayersDrop(layers);
 
     } else if(this.selectedOptions[0].innerHTML === 'Food Insecurity' || this.selectedOptions[0].innerHTML === 'Water Use' ||this.selectedOptions[0].innerHTML === 'Development Index') {
+      $('#icon3d').hide()
       map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.0)
       
       var layers = [];
@@ -1258,6 +1259,7 @@ $('.year-timeline-wrapper').hide()
 		} else {
 			playPauseInterval = window.setInterval(function () {
 				var $checkedBox = $('input[name="year-selected"]:checked');
+        console.log($checkedBox[0].value);
 				if ($checkedBox.parent('.year-timeline-block').hasClass('omega') && isReachedToEnd) {
 					$('.year-timeline-block.alpha input[type="radio"').prop('checked', true);
 					isReachedToEnd = false; // Reset, once replayed 

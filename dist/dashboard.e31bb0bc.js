@@ -33612,7 +33612,7 @@ module.exports = [{
   "GID_0": ""
 }];
 },{}],"data/csvData.csv":[function(require,module,exports) {
-module.exports = "/csvData.c2b74299.csv";
+module.exports = "csvData.c2b74299.csv";
 },{}],"node_modules/d3-fetch/src/blob.js":[function(require,module,exports) {
 "use strict";
 
@@ -42967,6 +42967,7 @@ $('select[name="dataset-selection"]').on('change', function () {
 
     updateTime(layers); //addToLayersDrop(layers);
   } else if (this.selectedOptions[0].innerHTML === 'Food Insecurity' || this.selectedOptions[0].innerHTML === 'Water Use' || this.selectedOptions[0].innerHTML === 'Development Index') {
+    $('#icon3d').hide();
     map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.0);
     var layers = []; //console.log(this.selectedOptions[0])
 
@@ -43121,6 +43122,7 @@ $('#year-play-pause').on('click', function (e) {
   } else {
     playPauseInterval = window.setInterval(function () {
       var $checkedBox = $('input[name="year-selected"]:checked');
+      console.log($checkedBox[0].value);
 
       if ($checkedBox.parent('.year-timeline-block').hasClass('omega') && isReachedToEnd) {
         $('.year-timeline-block.alpha input[type="radio"').prop('checked', true);
@@ -43136,6 +43138,7 @@ $('#year-play-pause').on('click', function (e) {
 
 
       var currentIdx = $checkedBox.parent('.year-timeline-block').data('year-idx');
+      console.log(currentIdx + '------');
       var nextCheckedBoxIdx = currentIdx + 1;
       $('.year-selected[value=1990]').prop('checked', true);
       $('.year-timeline-block[data-year-idx="' + nextCheckedBoxIdx + '"]').find('input[name="year-selected"]').prop('checked', true);
@@ -43264,7 +43267,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56570" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50074" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
@@ -43441,4 +43444,4 @@ function hmrAcceptRun(bundle, id) {
   }
 }
 },{}]},{},["../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js","index.js"], null)
-//# sourceMappingURL=/dashboard.e31bb0bc.js.map
+//# sourceMappingURL=dashboard.e31bb0bc.js.map
