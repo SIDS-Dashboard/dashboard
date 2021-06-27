@@ -6,6 +6,7 @@
 	<title>Geospatial UI</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="/undp_favicon.208074ca.ico">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css" integrity="sha512-Ez0cGzNzHR1tYAv56860NLspgUGuQw16GiOOp/I2LuTmpSK9xDXlgJz3XN4cnpXWDmkNBKXR/VDMTCnAaEooxA==" crossorigin="anonymous" referrerpolicy="no-referrer">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous" referrerpolicy="no-referrer">
@@ -18,8 +19,8 @@
 	
 	<!--<div id='password' class='password'>
 		<input type="text" id="fname" name="fname"><br><br>
-	  </div>-->
-
+	  </div> -->
+	
 	<!-- Logos Section Start -->
 	<div class="logos row-flex align-items-center">
 		<div class="UNDP-logo"></div>
@@ -44,6 +45,7 @@
 		</div>
 
 		<div class="row-flex" style="justify-content:flex-end;margin-top:15px;">
+			
 			<div class="add-overlay-menu">
 				<select name="overlay-select" id="add-overlay">
 					<option value="Select Country or Region">Add overlays</option>
@@ -53,7 +55,7 @@
 				</select>
 				<span class="downarrow"></span>
 			</div>
-			<div id="icon3d" class="icon2"></div>
+			<div id="icon3d" style="display: none;" class="icon2"></div>
 		</div>
 
 		<div class="row-flex" style="justify-content:flex-end;margin-top:15px;">
@@ -70,12 +72,12 @@
 			<div class="icon3"></div>
 		</div>
 
-		<div class="row-flex add-chart-button-wrap">
+		<!--<div class="row-flex add-chart-button-wrap">
 			<div class="add-chart-button row-flex align-items-center">
 				<div class="plus-sign"></div>
 				<div class="text-add-chart">Add chart</div>
 			</div>
-		</div>
+		</div>-->
 
 	</div>
 	<!-- Top right Column End -->
@@ -560,11 +562,11 @@
 
 				<div class="col-12">
 
-					<div class="custom-selection-dropdown selection-dropdown-1">
+					<div id="layer-id" class="custom-selection-dropdown selection-dropdown-1">
 						<label>Layer</label>
-						<select class="form-select" aria-label="Layer" name="layer-selection">
+						<select id="layer-drop" class="form-select" aria-label="Layer" name="layer-selection">
 							<option value="default" selected="">Select Layer</option>
-							<!--<option value="Example 2">Example 2</option> -->
+							<option value="Example 2">Example 2</option>
 						</select>
 						<span class="selection-dropdown-arrow up dataset-select-uparrow"></span>
 						<span class="selection-dropdown-arrow down dataset-select-downarrow"></span>
@@ -675,6 +677,7 @@
 		
 	</div>
 	<!-- </div> -->
+	<div class="loader"></div> 
 	<div id="map"></div>
 	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js" integrity="sha512-jGR1T3dQerLCSm/IGEGbndPwzszJBlKQ5Br9vuB0Pw2iyxOy+7AK+lJcCC8eaXyz/9du+bkCy4HXxByhxkHf+w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>

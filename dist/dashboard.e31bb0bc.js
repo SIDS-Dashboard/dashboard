@@ -42139,8 +42139,20 @@ var map = new _mapboxGl.default.Map({
 var yearList = [];
 var currentTimeLayer;
 var sourceData = {
-  hexSource: {
+  hex5Source: {
     name: 'hex5',
+    data: null
+  },
+  hex10Source: {
+    name: 'hex10',
+    data: null
+  },
+  admin1Source: {
+    name: 'admin1',
+    data: null
+  },
+  admin2Source: {
+    name: 'admin2',
     data: null
   }
 };
@@ -42194,9 +42206,6 @@ map.on("load", function () {
   map.addControl(new _mapboxGl.default.ScaleControl(), 'bottom-right');
   legendControl = new MyCustomControl();
   addHexSource();
-});
-map.once('idle', function () {
-  $('.loader').remove();
 }); //function taken from mapbox that extracts unique features, see comment below
 
 function getUniqueFeatures(array, comparatorProperty) {
@@ -42214,51 +42223,49 @@ function getUniqueFeatures(array, comparatorProperty) {
   });
   return uniqueFeatures;
 }
-/*map.on('style.load', function(){
-    var layers = map.getStyle().layers;
-  // Find the index of the first symbol layer in the map style
+
+map.on('style.load', function () {
+  var layers = map.getStyle().layers; // Find the index of the first symbol layer in the map style
+
   var firstSymbolId;
+
   for (var i = 0; i < layers.length; i++) {
-  if (layers[i].type === 'symbol') {
-  firstSymbolId = layers[i].id;
-  break;
+    if (layers[i].type === 'symbol') {
+      firstSymbolId = layers[i].id;
+      break;
+    }
   }
-  }
-  
-    if(sourceData.hexSource.data != null) {
-        map.addSource(currentGeojsonLayers.hexSize, {
-        type: "geojson",
-      data: geobuf.decode(new Pbf(sourceData.hexSource.data)),
-      })
-        map.addLayer({
-        'id': currentGeojsonLayers.hexSize,
-        'type': 'fill', 
-        'source': currentGeojsonLayers.hexSize,
-        'layout': {
-          'visibility': 'visible'
-          },
-        //'filter': ['!=', "null"],
-        'paint': {
-            'fill-color': [
-              'interpolate',
-              ['linear'],
-              ['get', currentGeojsonLayers.dataLayer],
-              currentGeojsonLayers.breaks[0], currentGeojsonLayers.color[0],
-              currentGeojsonLayers.breaks[1], currentGeojsonLayers.color[1],
-              currentGeojsonLayers.breaks[2], currentGeojsonLayers.color[2],
-              currentGeojsonLayers.breaks[3], currentGeojsonLayers.color[3],
-              currentGeojsonLayers.breaks[4], currentGeojsonLayers.color[4],
-              ],
-            'fill-opacity': 0.7,
-            
-            }
-        }, firstSymbolId);
 
-        map.setFilter(currentGeojsonLayers.hexSize,['>=',currentGeojsonLayers.dataLayer, 0])
+  if (sourceData.hex5Source.data != null) {
+    for (var x in sourceData) {
+      console.log(sourceData[x].name);
+      map.addSource(sourceData[x].name, {
+        type: 'geojson',
+        data: _geobuf.default.decode(new _pbf.default(sourceData[x].data))
+      });
+    }
+    /*map.addSource(currentGeojsonLayers.hexSize, {
+      type: "geojson",
+    data: geobuf.decode(new Pbf(sourceData.hexSource.data)),
+    }) */
+
+
+    map.addLayer({
+      'id': currentGeojsonLayers.hexSize,
+      'type': 'fill',
+      'source': currentGeojsonLayers.hexSize,
+      'layout': {
+        'visibility': 'visible'
+      },
+      //'filter': ['!=', "null"],
+      'paint': {
+        'fill-color': ['interpolate', ['linear'], ['get', currentGeojsonLayers.dataLayer], currentGeojsonLayers.breaks[0], currentGeojsonLayers.color[0], currentGeojsonLayers.breaks[1], currentGeojsonLayers.color[1], currentGeojsonLayers.breaks[2], currentGeojsonLayers.color[2], currentGeojsonLayers.breaks[3], currentGeojsonLayers.color[3], currentGeojsonLayers.breaks[4], currentGeojsonLayers.color[4]],
+        'fill-opacity': 0.7
       }
-  }) */
-
-
+    }, firstSymbolId);
+    map.setFilter(currentGeojsonLayers.hexSize, ['>=', currentGeojsonLayers.dataLayer, 0]);
+  }
+});
 var button3dWrapper = document.getElementById('icon3d');
 button3dWrapper.addEventListener('click', function (event) {
   var layers = map.getStyle().layers; // Find the index of the first symbol layer in the map style
@@ -42651,8 +42658,10 @@ function addLegend(colors, breaks, current) {
     containerDiv.classList.add('col-flex');
     containerDiv.classList.add('align-items-center');
     var words = document.createElement('div');
-    words.classList.add('population-per-km-text');
-    words.innerHTML = Number.parseFloat(breaks[x]).toFixed(3);
+    words.classList.add('population-per-km-text'); //words.innerHTML = Number.parseFloat(breaks[x]).toFixed(3)
+
+    words.innerHTML = nFormatter(breaks[x], 3); //words.innerHTML = Number(nFormatter(breaks[x], 2))
+
     var hexI = document.createElement('div');
     hexI.classList.add('population-per-km-img');
     hexI.style.backgroundColor = colors[x];
@@ -42690,22 +42699,25 @@ function addHexSource() {
     map.addSource('hex10', {
       type: "geojson",
       data: _geobuf.default.decode(new _pbf.default(allData[0]))
-    }); //add 5km
+    });
+    sourceData.hex10Source.data = allData[0]; //add 5km
 
     map.addSource('hex5', {
       type: "geojson",
       data: _geobuf.default.decode(new _pbf.default(allData[1]))
-    }); //add admin1
+    });
+    sourceData.hex5Source.data = allData[1]; //add admin1
 
     map.addSource('admin1', {
       type: "geojson",
       data: _geobuf.default.decode(new _pbf.default(allData[2]))
     });
+    sourceData.admin1Source.data = allData[2];
     map.addSource('admin2', {
       type: "geojson",
       data: _geobuf.default.decode(new _pbf.default(allData[3]))
     });
-    sourceData.hexSource.data = allData[0]; //add first layer (5km)
+    sourceData.admin2Source.data = allData[3]; //add first layer (5km)
 
     map.addLayer({
       'id': 'hex5',
@@ -42720,6 +42732,7 @@ function addHexSource() {
       }
     }, firstSymbolId);
   });
+  $('.loader').remove();
 } /////ui js
 
 
@@ -43197,6 +43210,32 @@ function check_all_values() {
 }
 
 check_all_values(); //});
+
+function nFormatter(num, digits) {
+  var si = [{
+    value: 1,
+    symbol: ""
+  }, {
+    value: 1E3,
+    symbol: "k"
+  }, {
+    value: 1E6,
+    symbol: "M"
+  }, {
+    value: 1E9,
+    symbol: "B"
+  }];
+  var rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+  var i;
+
+  for (i = si.length - 1; i > 0; i--) {
+    if (num >= si[i].value) {
+      break;
+    }
+  }
+
+  return (num / si[i].value).toFixed(digits).replace(rx, "$1") + si[i].symbol;
+}
 },{"mapbox-gl":"node_modules/mapbox-gl/dist/mapbox-gl.js","mapbox-gl/dist/mapbox-gl.css":"node_modules/mapbox-gl/dist/mapbox-gl.css","mapbox-gl-style-switcher":"node_modules/mapbox-gl-style-switcher/dist/index.js","mapbox-gl-style-switcher/styles.css":"node_modules/mapbox-gl-style-switcher/styles.css","./data/sidsNames.json":"data/sidsNames.json","./data/csvData.csv":"data/csvData.csv","d3-fetch":"node_modules/d3-fetch/src/index.js","pbf":"node_modules/pbf/index.js","geobuf":"node_modules/geobuf/index.js","lodash.find":"node_modules/lodash.find/index.js","lodash.uniq":"node_modules/lodash.uniq/index.js","chroma-js":"node_modules/chroma-js/chroma.js","./setButtons":"setButtons.js","./ui-styles.css":"ui-styles.css","./password":"password.js"}],"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -43225,7 +43264,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56048" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56570" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

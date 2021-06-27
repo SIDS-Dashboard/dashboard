@@ -21,7 +21,7 @@ import addPass from "./password";
 
 
 
-addPass()
+//addPass()
 
 
 var allLayers = []
@@ -46,10 +46,22 @@ mapboxgl.accessToken =
   var currentTimeLayer;
 
   var sourceData = {
-      hexSource: {
+      hex5Source: {
         name: 'hex5',
         data: null
-      }
+      },
+      hex10Source: {
+        name: 'hex10',
+        data: null
+      },
+      admin1Source: {
+        name: 'admin1',
+        data: null
+      },
+      admin2Source: {
+        name: 'admin2',
+        data: null
+      },
 
   }
 
@@ -98,9 +110,7 @@ mapboxgl.accessToken =
     
   });
 
-  map.once('idle', function(){
-    $('.loader').remove()
-  })
+  
   //function taken from mapbox that extracts unique features, see comment below
   function getUniqueFeatures(array, comparatorProperty) {
     var existingFeatureKeys = {};
@@ -119,7 +129,7 @@ mapboxgl.accessToken =
     return uniqueFeatures;
     }
 
-  /*map.on('style.load', function(){
+  map.on('style.load', function(){
 
     var layers = map.getStyle().layers;
     // Find the index of the first symbol layer in the map style
@@ -131,12 +141,22 @@ mapboxgl.accessToken =
     }
     }
     
-      if(sourceData.hexSource.data != null) {
+      if(sourceData.hex5Source.data != null) {
 
-        map.addSource(currentGeojsonLayers.hexSize, {
+        for (var x in sourceData) {
+
+          console.log(sourceData[x].name)
+          map.addSource(sourceData[x].name, {
+            type: 'geojson',
+            data: geobuf.decode(new Pbf(sourceData[x].data)),
+          })
+
+        }
+
+        /*map.addSource(currentGeojsonLayers.hexSize, {
           type: "geojson",
         data: geobuf.decode(new Pbf(sourceData.hexSource.data)),
-        })
+        }) */
 
         map.addLayer({
           'id': currentGeojsonLayers.hexSize,
@@ -167,7 +187,7 @@ mapboxgl.accessToken =
 
       }
 
-  }) */
+  })
 
   
   const button3dWrapper = document.getElementById('icon3d')
@@ -664,7 +684,9 @@ function addLegend(colors, breaks, current) {
 
     var words = document.createElement('div')
     words.classList.add('population-per-km-text')
-    words.innerHTML = Number.parseFloat(breaks[x]).toFixed(3)
+    //words.innerHTML = Number.parseFloat(breaks[x]).toFixed(3)
+    words.innerHTML = nFormatter(breaks[x], 3)
+    //words.innerHTML = Number(nFormatter(breaks[x], 2))
     var hexI = document.createElement('div')
     hexI.classList.add('population-per-km-img')
     hexI.style.backgroundColor = colors[x];
@@ -707,29 +729,32 @@ function addLegend(colors, breaks, current) {
       map.addSource('hex10', {
         type: "geojson",
         data: geobuf.decode(new Pbf(allData[0])),
-
       }) 
+      sourceData.hex10Source.data = allData[0];
 
       //add 5km
       map.addSource('hex5', {
         type: "geojson",
         data: geobuf.decode(new Pbf(allData[1])),
       });
+      sourceData.hex5Source.data = allData[1];
 
       //add admin1
       map.addSource('admin1', {
         type: "geojson",
         data: geobuf.decode(new Pbf(allData[2])),
       });
+      sourceData.admin1Source.data = allData[2];
 
 
       map.addSource('admin2', {
         type: "geojson",
         data: geobuf.decode(new Pbf(allData[3])),
       });
+      sourceData.admin2Source.data = allData[3];
 
 
-      sourceData.hexSource.data = allData[0];
+      
 
 
       //add first layer (5km)
@@ -748,9 +773,10 @@ function addLegend(colors, breaks, current) {
             
             }
         }, firstSymbolId);
-
-
     })
+
+      $('.loader').remove()
+  
 
   }
 
@@ -1339,3 +1365,19 @@ $('.year-timeline-wrapper').hide()
 	check_all_values()
 
 //});
+function nFormatter(num, digits) {
+  var si = [
+    { value: 1, symbol: "" },
+    { value: 1E3, symbol: "k" },
+    { value: 1E6, symbol: "M" },
+    { value: 1E9, symbol: "B" }
+  ];
+  var rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+  var i;
+  for (i = si.length - 1; i > 0; i--) {
+    if (num >= si[i].value) {
+      break;
+    }
+  }
+  return (num / si[i].value).toFixed(digits).replace(rx, "$1") + si[i].symbol;
+}
