@@ -33612,7 +33612,7 @@ module.exports = [{
   "GID_0": ""
 }];
 },{}],"data/csvData.csv":[function(require,module,exports) {
-module.exports = "csvData.c2b74299.csv";
+module.exports = "/csvData.c2b74299.csv";
 },{}],"node_modules/d3-fetch/src/blob.js":[function(require,module,exports) {
 "use strict";
 
@@ -42466,8 +42466,8 @@ function changeDataOnMap(selection) {
 
       var selecteData = uniFeatures.map(function (x) {
         return x.properties[selection];
-      });
-      console.log(selecteData);
+      }); //console.log(selecteData);
+
       var max = Math.max.apply(Math, _toConsumableArray(selecteData));
       var min = Math.min.apply(Math, _toConsumableArray(selecteData)); //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
 
@@ -42479,9 +42479,14 @@ function changeDataOnMap(selection) {
 
       var colorRamp1 = ['#edf8fb', '#b2e2e2', '#66c2a4', '#2ca25f', '#006d2c'];
       var colorRamp2 = ['#f2f0f7', '#cbc9e2', '#9e9ac8', '#756bb1', '#54278f'];
-      var colorRamp4 = ['#ffffd4', '#fed98e', '#fe9929', '#d95f0e', '#993404']; //console.log(colorz.classes)
+      var colorRamp4 = ['#ffffd4', '#fed98e', '#fe9929', '#d95f0e', '#993404'];
+      var gdpColor = ['#ca0020', '#f4a582', '#f7f7f7', '#92c5de', '#0571b0']; //console.log(colorz.classes)
       //var ramps = [colorRamp1, colorRamp2, colorRamp3, colorRamp4]
       //var colorRamp = ramps[Math.floor(Math.random() * 4)];
+
+      if (selection.substring(0, 2) === '1a') {
+        colorRamp = gdpColor;
+      }
 
       currentGeojsonLayers.breaks = breaks;
       currentGeojsonLayers.color = colorRamp; //console.log(currentGeojsonLayers)
@@ -42646,7 +42651,7 @@ function addLegend(colors, breaks, current) {
   infoBoxLink.innerHTML = '';
   infoBoxTitle.innerHTML = legData.desc + ' ' + legData.time;
   infoBoxText.innerHTML = legData.desc_long;
-  infoBoxLink.innerHTML = '<strong>Reference: </strong>' + legData.source_name + ' - ' + legData.link.link();
+  infoBoxLink.innerHTML = '<strong>Reference: </strong>' + legData.source_name + ' - <a href="' + legData.link + '" target="_blank">' + legData.link + '</a>';
   var legendTitle = document.getElementById('legendTitle');
   var legend = document.getElementById('updateLegend');
   legend.innerHTML = '';
@@ -42951,6 +42956,7 @@ $('select[name="dataset-selection"]').on('change', function () {
   //console.log(this.selectedOptions[0].id)
   if (this.selectedOptions[0].innerHTML === 'GDP per Capita' || this.selectedOptions[0].innerHTML === 'Population Density') {
     map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.0);
+    $('.year-timeline-wrapper').show();
 
     if (this.selectedOptions[0].innerHTML === 'Population Density') {
       $('#icon3d').show();
@@ -42966,8 +42972,10 @@ $('select[name="dataset-selection"]').on('change', function () {
     }
 
     updateTime(layers); //addToLayersDrop(layers);
-  } else if (this.selectedOptions[0].innerHTML === 'Food Insecurity' || this.selectedOptions[0].innerHTML === 'Water Use' || this.selectedOptions[0].innerHTML === 'Development Index') {
+  } else if (this.selectedOptions[0].innerHTML === 'Food Insecurity' || this.selectedOptions[0].innerHTML === 'Water Use' || this.selectedOptions[0].innerHTML === 'Development Potential Index') {
     $('#icon3d').hide();
+    $('.year-timeline-wrapper').hide();
+    $('.year-timeline').empty();
     map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.0);
     var layers = []; //console.log(this.selectedOptions[0])
 
@@ -43121,8 +43129,7 @@ $('#year-play-pause').on('click', function (e) {
     $(this).removeClass('pause').addClass('play');
   } else {
     playPauseInterval = window.setInterval(function () {
-      var $checkedBox = $('input[name="year-selected"]:checked');
-      console.log($checkedBox[0].value);
+      var $checkedBox = $('input[name="year-selected"]:checked'); //console.log($checkedBox[0].value);
 
       if ($checkedBox.parent('.year-timeline-block').hasClass('omega') && isReachedToEnd) {
         $('.year-timeline-block.alpha input[type="radio"').prop('checked', true);
@@ -43138,12 +43145,16 @@ $('#year-play-pause').on('click', function (e) {
 
 
       var currentIdx = $checkedBox.parent('.year-timeline-block').data('year-idx');
-      console.log(currentIdx + '------');
       var nextCheckedBoxIdx = currentIdx + 1;
       $('.year-selected[value=1990]').prop('checked', true);
       $('.year-timeline-block[data-year-idx="' + nextCheckedBoxIdx + '"]').find('input[name="year-selected"]').prop('checked', true);
+      var currentYear = $('input[name="year-selected"]:checked').val();
+      var display = (0, _lodash.default)(currentTimeLayer, function (o) {
+        return o.time === currentYear;
+      });
       console.log($('input[name="year-selected"]:checked').val());
-    }, 1000);
+      changeDataOnMap(display.field_name);
+    }, 1600);
     $(this).addClass('pause').removeClass('play');
   }
 
@@ -43267,7 +43278,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50074" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50179" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
@@ -43444,4 +43455,4 @@ function hmrAcceptRun(bundle, id) {
   }
 }
 },{}]},{},["../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js","index.js"], null)
-//# sourceMappingURL=dashboard.e31bb0bc.js.map
+//# sourceMappingURL=/dashboard.e31bb0bc.js.map

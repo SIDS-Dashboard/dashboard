@@ -89,7 +89,7 @@ body {
 .UNDP-logo {
     width: 34px;
     height: 65px;
-    background: url('UNDP-logo.c3ef9c5c.svg');
+    background: url('/UNDP-logo.c3ef9c5c.svg');
     background-repeat: no-repeat;
     background-size: 100% 100%;
     margin-right: 13px;
@@ -99,7 +99,7 @@ body {
 .rising-up-for-sids {
     width: 131px;
     height: 65px;
-    background: url('risingUpForSids.6ca41891.png');
+    background: url('/risingUpForSids.6ca41891.png');
     background-repeat: no-repeat;
     background-size: 100% 100%;
     background-color: rgba(196, 196, 196, 0.7);
@@ -137,7 +137,7 @@ body {
     position: absolute;
     top: 14px;
     right: 18px;
-    background: url('down-arrow.39fba8f1.svg');
+    background: url('/down-arrow.39fba8f1.svg');
     background-repeat: no-repeat;
     background-size: 100% 100%;
     cursor: pointer;
@@ -147,7 +147,7 @@ body {
     width: 34px;
     height: 34px;
     margin-left: 16px;
-    background: url('icon1.443e685f.png');
+    background: url('/icon1.443e685f.png');
     background-repeat: no-repeat;
     background-size: 100% 100%;
 }
@@ -176,7 +176,7 @@ body {
     position: absolute;
     top: 14px;
     right: 18px;
-    background: url('down-arrow.39fba8f1.svg');
+    background: url('/down-arrow.39fba8f1.svg');
     background-repeat: no-repeat;
     background-size: 100% 100%;
 }
@@ -185,7 +185,7 @@ body {
     width: 34px;
     height: 34px;
     margin-left: 16px;
-    background: url('icon2.8eadbe99.png');
+    background: url('/icon2.8eadbe99.png');
     background-repeat: no-repeat;
     background-size: 100% 100%;
 }
@@ -215,7 +215,7 @@ body {
     position: absolute;
     top: 12px;
     left: 14px;
-    background: url('left-arrow.63fa8854.svg');
+    background: url('/left-arrow.63fa8854.svg');
     background-repeat: no-repeat;
     background-size: 100% 100%;
     cursor: pointer;
@@ -227,7 +227,7 @@ body {
     position: absolute;
     top: 12px;
     right: 14px;
-    background: url('right-arrow.a6d2cab3.svg');
+    background: url('/right-arrow.a6d2cab3.svg');
     background-repeat: no-repeat;
     background-size: 100% 100%;
     cursor: pointer;
@@ -247,7 +247,7 @@ body {
     height: 18px;
     margin-right: 8px;
     margin-left: 4px;
-    background: url('plus-sign.5bb9b08d.png');
+    background: url('/plus-sign.5bb9b08d.png');
     background-repeat: no-repeat;
     background-size: 100% 100%;
 }
@@ -864,7 +864,7 @@ input[type='radio']:checked~label .circle-radio {
 .population-per-km-img {
     width: 25px;
     height: 21px;
-    background: url('polygon.c2df5e4a.png');
+    background: url('/polygon.c2df5e4a.png');
     background-repeat: no-repeat;
     background-size: 100% 100%;
     margin-top: 2px;
@@ -897,7 +897,7 @@ input[type='radio']:checked~label .circle-radio {
     position: absolute;
     top: 28.76px;
     right: 18px;
-    background: url('up-arrow.6046179d.svg');
+    background: url('/up-arrow.6046179d.svg');
     background-repeat: no-repeat;
     background-size: 100% 100%;
     cursor: pointer;
@@ -909,7 +909,7 @@ input[type='radio']:checked~label .circle-radio {
     position: absolute;
     top: 38px;
     right: 18px;
-    background: url('down-arrow.39fba8f1.svg');
+    background: url('/down-arrow.39fba8f1.svg');
     background-repeat: no-repeat;
     background-size: 100% 100%;
     cursor: pointer;
@@ -949,4 +949,4 @@ input[type='radio']:checked~label .circle-radio {
     100% { transform: rotate(360deg); }
   }
 
-/*# sourceMappingURL=dashboard.e31bb0bc.css.map */
+/*# sourceMappingURL=/dashboard.e31bb0bc.css.map */
