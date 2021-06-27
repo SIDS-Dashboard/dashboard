@@ -5,7 +5,7 @@ import { MapboxStyleDefinition, MapboxStyleSwitcherControl } from "mapbox-gl-sty
 import "mapbox-gl-style-switcher/styles.css";
 
 import names from './data/sidsNames.json' //
-import allTheLayers from './data/csv_data_new.csv'
+import allTheLayers from './data/csvData.csv'
 import * as d3 from 'd3-fetch';
 import Pbf from 'pbf';
 import geobuf from 'geobuf';
@@ -89,9 +89,10 @@ mapboxgl.accessToken =
         this.map = undefined;
       }
     } 
-    
-    legendControl = new MyCustomControl(); 
+
     map.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
+    legendControl = new MyCustomControl(); 
+    
     
     addHexSource()
     
@@ -245,7 +246,7 @@ mapboxgl.accessToken =
 
         var currbb = find(names, ['GID_0', event.target.id ])
 
-        sourceData.allSidsSource.lastName = currbb.NAME_0;
+        //sourceData.allSidsSource.lastName = currbb.NAME_0;
 
         var v2 = new mapboxgl.LngLatBounds([currbb.bb[0], currbb.bb[1]])
           map.fitBounds(v2, {
@@ -366,10 +367,13 @@ mapboxgl.accessToken =
       for (var i = length-1; i >= 0; i--) {
         layersHolder.options[i] = null;
       }
+      var firstBtn = document.createElement('option')
+      firstBtn.innerHTML = 'Select Layer';
+      layersHolder.appendChild(firstBtn);
 
     for (var x in layers) {
       var btn = document.createElement('option')
-      btn.innerHTML = layers[x].title + ' ' + layers[x].time;
+      btn.innerHTML = layers[x].desc + ' ' + layers[x].time;
       btn.setAttribute('id', layers[x].field_name)
       btn.setAttribute('value', 'hi')
       layersHolder.appendChild(btn);
@@ -383,6 +387,8 @@ mapboxgl.accessToken =
   }
 
   function changeDataOnMap(selection) {
+
+    console.log(selection)
     remove3d()
     //console.log(map.getStyle().layers)
     //console.log(selection);
@@ -640,7 +646,7 @@ function addLegend(colors, breaks, current) {
   infoBoxText.innerHTML = '';
   infoBoxLink.innerHTML = '';
 
-  infoBoxTitle.innerHTML = legData.title;
+  infoBoxTitle.innerHTML = legData.desc + ' ' + legData.time;
   infoBoxText.innerHTML = legData.desc_long
   infoBoxLink.innerHTML = '<strong>Reference: </strong>' + legData.source_name + ' - ' + legData.link.link()
 
@@ -1021,10 +1027,13 @@ $('.year-timeline-wrapper').hide()
 	$('select[name="dataset-selection"]').on('change', function () {
 		//console.log('Dataset: ' + $(this).val());
     //console.log(this.selectedOptions[0].id)
-    if(this.selectedOptions[0].innerHTML === 'GDP per capita' || this.selectedOptions[0].innerHTML === 'Population Density') {
+
+    if(this.selectedOptions[0].innerHTML === 'GDP per Capita' || this.selectedOptions[0].innerHTML === 'Population Density') {
+      map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.0)
       if(this.selectedOptions[0].innerHTML === 'Population Density') {
         $('#icon3d').show()
       }
+     
       var layers = [];
       //console.log(this.selectedOptions[0])
       for (var x in allLayers) {
@@ -1035,6 +1044,20 @@ $('.year-timeline-wrapper').hide()
       }
       updateTime(layers)
       //addToLayersDrop(layers);
+
+    } else if(this.selectedOptions[0].innerHTML === 'Food Insecurity' || this.selectedOptions[0].innerHTML === 'Water Use' ||this.selectedOptions[0].innerHTML === 'Development Index') {
+      map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.0)
+      
+      var layers = [];
+      //console.log(this.selectedOptions[0])
+      for (var x in allLayers) {
+        if (allLayers[x].title === this.selectedOptions[0].innerHTML) {
+          //console.log(allLayers[x]);
+          layers.push(allLayers[x]);
+        }
+      }
+
+      addToLayersDrop(layers);
 
     } else {
       $('#icon3d').hide()
@@ -1085,6 +1108,12 @@ $('.year-timeline-wrapper').hide()
     //console.log(layers);
     //var currentLayer = {}
     currentTimeLayer = layers;
+    var latestTime = currentTimeLayer.slice(-1);
+    changeDataOnMap(latestTime[0].field_name);
+
+    //var startLayer = find(currentTimeLayer, function(o) {return o.time === yearValue})
+      //console.log(showLayer)
+      //changeDataOnMap(showLayer.field_name);
     //console.log(currentLayer)
     var yearList = currentTimeLayer.map(x => x.time)
     var year_html = ''

@@ -33611,8 +33611,8 @@ module.exports = [{
   "bb": [[137.48592, 1.02621], [163.03544, 10.09033]],
   "GID_0": ""
 }];
-},{}],"data/csv_data_new.csv":[function(require,module,exports) {
-module.exports = "/csv_data_new.d9746989.csv";
+},{}],"data/csvData.csv":[function(require,module,exports) {
+module.exports = "/csvData.c2b74299.csv";
 },{}],"node_modules/d3-fetch/src/blob.js":[function(require,module,exports) {
 "use strict";
 
@@ -42074,7 +42074,7 @@ require("mapbox-gl-style-switcher/styles.css");
 
 var _sidsNames = _interopRequireDefault(require("./data/sidsNames.json"));
 
-var _csv_data_new = _interopRequireDefault(require("./data/csv_data_new.csv"));
+var _csvData = _interopRequireDefault(require("./data/csvData.csv"));
 
 var d3 = _interopRequireWildcard(require("d3-fetch"));
 
@@ -42122,7 +42122,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 var allLayers = [];
 var _default = allLayers;
 exports.default = _default;
-(0, _setButtons.default)(_sidsNames.default, _csv_data_new.default);
+(0, _setButtons.default)(_sidsNames.default, _csvData.default);
 /*Initialize Map */
 
 _mapboxGl.default.accessToken = "pk.eyJ1Ijoic2ViYXN0aWFuLWNoIiwiYSI6ImNpejkxdzZ5YzAxa2gyd21udGpmaGU0dTgifQ.IrEd_tvrl6MuypVNUGU5SQ";
@@ -42142,11 +42142,6 @@ var sourceData = {
   hexSource: {
     name: 'hex5',
     data: null
-  },
-  allSidsSource: {
-    name: 'allSids-source',
-    data: [],
-    lastName: null
   }
 };
 var currentGeojsonLayers = {
@@ -42196,8 +42191,8 @@ map.on("load", function () {
     return MyCustomControl;
   }();
 
-  legendControl = new MyCustomControl();
   map.addControl(new _mapboxGl.default.ScaleControl(), 'bottom-right');
+  legendControl = new MyCustomControl();
   addHexSource();
 });
 map.once('idle', function () {
@@ -42317,8 +42312,8 @@ wrapper.addEventListener('click', function (event) {
   console.log(event.target.id);
 
   if (!event.target.id.includes('data')) {
-    var currbb = (0, _lodash.default)(_sidsNames.default, ['GID_0', event.target.id]);
-    sourceData.allSidsSource.lastName = currbb.NAME_0;
+    var currbb = (0, _lodash.default)(_sidsNames.default, ['GID_0', event.target.id]); //sourceData.allSidsSource.lastName = currbb.NAME_0;
+
     var v2 = new _mapboxGl.default.LngLatBounds([currbb.bb[0], currbb.bb[1]]);
     map.fitBounds(v2, {
       linear: true,
@@ -42415,9 +42410,13 @@ function addToLayersDrop(layers) {
     layersHolder.options[i] = null;
   }
 
+  var firstBtn = document.createElement('option');
+  firstBtn.innerHTML = 'Select Layer';
+  layersHolder.appendChild(firstBtn);
+
   for (var x in layers) {
     var btn = document.createElement('option');
-    btn.innerHTML = layers[x].title + ' ' + layers[x].time;
+    btn.innerHTML = layers[x].desc + ' ' + layers[x].time;
     btn.setAttribute('id', layers[x].field_name);
     btn.setAttribute('value', 'hi');
     layersHolder.appendChild(btn);
@@ -42431,6 +42430,7 @@ function addToLayersDrop(layers) {
 }
 
 function changeDataOnMap(selection) {
+  console.log(selection);
   remove3d(); //console.log(map.getStyle().layers)
   //console.log(selection);
 
@@ -42637,7 +42637,7 @@ function addLegend(colors, breaks, current) {
   infoBoxTitle.innerHTML = '';
   infoBoxText.innerHTML = '';
   infoBoxLink.innerHTML = '';
-  infoBoxTitle.innerHTML = legData.title;
+  infoBoxTitle.innerHTML = legData.desc + ' ' + legData.time;
   infoBoxText.innerHTML = legData.desc_long;
   infoBoxLink.innerHTML = '<strong>Reference: </strong>' + legData.source_name + ' - ' + legData.link.link();
   var legendTitle = document.getElementById('legendTitle');
@@ -42936,7 +42936,9 @@ $('.button-option-select-1').on('click', function (e) {
 $('select[name="dataset-selection"]').on('change', function () {
   //console.log('Dataset: ' + $(this).val());
   //console.log(this.selectedOptions[0].id)
-  if (this.selectedOptions[0].innerHTML === 'GDP per capita' || this.selectedOptions[0].innerHTML === 'Population Density') {
+  if (this.selectedOptions[0].innerHTML === 'GDP per Capita' || this.selectedOptions[0].innerHTML === 'Population Density') {
+    map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.0);
+
     if (this.selectedOptions[0].innerHTML === 'Population Density') {
       $('#icon3d').show();
     }
@@ -42951,6 +42953,18 @@ $('select[name="dataset-selection"]').on('change', function () {
     }
 
     updateTime(layers); //addToLayersDrop(layers);
+  } else if (this.selectedOptions[0].innerHTML === 'Food Insecurity' || this.selectedOptions[0].innerHTML === 'Water Use' || this.selectedOptions[0].innerHTML === 'Development Index') {
+    map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.0);
+    var layers = []; //console.log(this.selectedOptions[0])
+
+    for (var x in allLayers) {
+      if (allLayers[x].title === this.selectedOptions[0].innerHTML) {
+        //console.log(allLayers[x]);
+        layers.push(allLayers[x]);
+      }
+    }
+
+    addToLayersDrop(layers);
   } else {
     $('#icon3d').hide();
     var layersHolder = document.getElementById('layer-drop');
@@ -42990,7 +43004,12 @@ function updateTime(layers) {
   //console.log(layers);
   //var currentLayer = {}
 
-  currentTimeLayer = layers; //console.log(currentLayer)
+  currentTimeLayer = layers;
+  var latestTime = currentTimeLayer.slice(-1);
+  changeDataOnMap(latestTime[0].field_name); //var startLayer = find(currentTimeLayer, function(o) {return o.time === yearValue})
+  //console.log(showLayer)
+  //changeDataOnMap(showLayer.field_name);
+  //console.log(currentLayer)
 
   var yearList = currentTimeLayer.map(function (x) {
     return x.time;
@@ -43178,7 +43197,7 @@ function check_all_values() {
 }
 
 check_all_values(); //});
-},{"mapbox-gl":"node_modules/mapbox-gl/dist/mapbox-gl.js","mapbox-gl/dist/mapbox-gl.css":"node_modules/mapbox-gl/dist/mapbox-gl.css","mapbox-gl-style-switcher":"node_modules/mapbox-gl-style-switcher/dist/index.js","mapbox-gl-style-switcher/styles.css":"node_modules/mapbox-gl-style-switcher/styles.css","./data/sidsNames.json":"data/sidsNames.json","./data/csv_data_new.csv":"data/csv_data_new.csv","d3-fetch":"node_modules/d3-fetch/src/index.js","pbf":"node_modules/pbf/index.js","geobuf":"node_modules/geobuf/index.js","lodash.find":"node_modules/lodash.find/index.js","lodash.uniq":"node_modules/lodash.uniq/index.js","chroma-js":"node_modules/chroma-js/chroma.js","./setButtons":"setButtons.js","./ui-styles.css":"ui-styles.css","./password":"password.js"}],"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"mapbox-gl":"node_modules/mapbox-gl/dist/mapbox-gl.js","mapbox-gl/dist/mapbox-gl.css":"node_modules/mapbox-gl/dist/mapbox-gl.css","mapbox-gl-style-switcher":"node_modules/mapbox-gl-style-switcher/dist/index.js","mapbox-gl-style-switcher/styles.css":"node_modules/mapbox-gl-style-switcher/styles.css","./data/sidsNames.json":"data/sidsNames.json","./data/csvData.csv":"data/csvData.csv","d3-fetch":"node_modules/d3-fetch/src/index.js","pbf":"node_modules/pbf/index.js","geobuf":"node_modules/geobuf/index.js","lodash.find":"node_modules/lodash.find/index.js","lodash.uniq":"node_modules/lodash.uniq/index.js","chroma-js":"node_modules/chroma-js/chroma.js","./setButtons":"setButtons.js","./ui-styles.css":"ui-styles.css","./password":"password.js"}],"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -43206,7 +43225,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55108" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56048" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
