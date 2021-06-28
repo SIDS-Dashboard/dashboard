@@ -61,7 +61,7 @@ body {
     background: url('./assets/risingUpForSids.png');
     background-repeat: no-repeat;
     background-size: 100% 100%;
-    background-color: rgba(196, 196, 196, 0.7);
+    background-color: rgba(196, 196, 196, 0);
    
 }
 
@@ -791,7 +791,7 @@ input[type='radio']:checked~label .circle-radio {
 
 .population-density-box {
     width: 350px;
-    height: 100px;
+    height: 200px;
     margin-top: 12px;
     border-radius: 10px;
     background-color: #DDDDDD;
