@@ -33612,7 +33612,7 @@ module.exports = [{
   "GID_0": ""
 }];
 },{}],"data/csvData.csv":[function(require,module,exports) {
-module.exports = "dist/csvData.c2b74299.csv";
+module.exports = "/csvData.c2b74299.csv";
 },{}],"node_modules/d3-fetch/src/blob.js":[function(require,module,exports) {
 "use strict";
 
@@ -43311,7 +43311,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54584" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55362" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
@@ -43488,4 +43488,4 @@ function hmrAcceptRun(bundle, id) {
   }
 }
 },{}]},{},["../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js","index.js"], null)
-//# sourceMappingURL=dist/dashboard.e31bb0bc.js.map
+//# sourceMappingURL=/dashboard.e31bb0bc.js.map
