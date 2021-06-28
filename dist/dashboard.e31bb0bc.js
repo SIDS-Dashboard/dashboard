@@ -42407,7 +42407,8 @@ function remove3d() {
 
 
 function addToLayersDrop(layers) {
-  $('#layer-id').show(); //console.log(layers);
+  $('#layer-id').show();
+  console.log(layers); //console.log()
   //console.log(yearList)
 
   var layersHolder = document.getElementById('layer-drop');
@@ -42416,10 +42417,10 @@ function addToLayersDrop(layers) {
   for (var i = length - 1; i >= 0; i--) {
     layersHolder.options[i] = null;
   }
-
-  var firstBtn = document.createElement('option');
+  /*var firstBtn = document.createElement('option')
   firstBtn.innerHTML = 'Select Layer';
-  layersHolder.appendChild(firstBtn);
+  layersHolder.appendChild(firstBtn); */
+
 
   for (var x in layers) {
     //console.log(layers[x])
@@ -42435,6 +42436,8 @@ function addToLayersDrop(layers) {
     return x.time;
   }); //console.log(layers);
   //updateTime(layers)
+
+  changeDataOnMap(layers[0].field_name); //$('#' + layers[0].field_name).prop('selected', true);
 }
 
 function changeDataOnMap(selection) {
@@ -43124,16 +43127,27 @@ function updateTime(layers) {
     e.preventDefault(); //so it doesn't run twice
 
     isReachedToEnd = false;
-    var yearValue = $('[name="year-selected"]:checked').val();
-    /*$('.year-timeline-block.alpha input[type="radio"').prop('checked', true);
+    var yearValue = $('[name="year-selected"]:checked').val(); //$('.year-timeline-block.alpha input[type="radio"').prop('checked', true);
     //console.log('-----')
-    console.log(yearValue);
-    console.log(this)
-    var check = $(this).attr('checked')
-    if (check) $(this).removeAttr('checked').prop('checked',false)
-    else $(this).attr('checked', true).prop('checked',true)
-    console.log(this)
-    //console.log(currentTimeLayer); */
+    //console.log(yearValue);
+    //console.log(this)
+
+    var check = $(this).prop('checked'); //$(this).prop('checked',true) 
+    //console.log(check);
+
+    /*if(check){
+      console.log('yo')
+      $(this).prop('checked',false)
+      console.log(this)
+    } else {
+      console.log('hi')
+      $(this).prop('checked',true) 
+    } */
+
+    /*if (check) {$(this).removeAttr('checked').prop('checked',false)}
+    else {$(this).attr('checked', true).prop('checked',true) } */
+    //console.log(this)
+    //console.log(currentTimeLayer);
 
     var showLayer = (0, _lodash.default)(currentTimeLayer, function (o) {
       return o.time === yearValue;
@@ -43311,7 +43325,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55515" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50752" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
