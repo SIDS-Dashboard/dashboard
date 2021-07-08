@@ -937,10 +937,12 @@ input[type='radio']:checked~label .circle-radio {
         stroke-width: 8;
         fill-opacity: 0.5;
         stroke: #003399;
+        
     }
     50% {
         stroke-width: 1;
         fill-opacity: 1;
+        
         
     }
 
@@ -948,6 +950,7 @@ input[type='radio']:checked~label .circle-radio {
         stroke-width: 8;
         fill-opacity: 0.5;
         stroke: #003399;
+        
     }
 
 
@@ -958,3 +961,15 @@ input[type='radio']:checked~label .circle-radio {
     100% { transform: rotate(360deg); }
     
   }
+
+  .password {
+    /* display: flex; */
+    top: 0;
+     position: absolute;
+     width: 100%;
+     height: 100%;
+     z-index: 400;
+     background-color: black;
+     align-items: center;
+     text-align: center;
+   }

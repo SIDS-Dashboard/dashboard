@@ -111,12 +111,14 @@ mapboxgl.accessToken =
       }
     })
 
-   /* var popup = new mapboxgl.Popup({
+    var popup = new mapboxgl.Popup({
       closeButton: true,
       closeOnClick: false
       });
 
   map.on('click', currentGeojsonLayers.hexSize, function(e){
+
+    console.log(document.getElementById("infoBoxTitle"))
 
     //console.log(currentGeojsonLayers.dataLayer);
     //console.log(e.features[0].properties)
@@ -125,7 +127,7 @@ mapboxgl.accessToken =
     console.log(e.features[0].geometry)
     var text = e.features[0].properties[currentGeojsonLayers.dataLayer]
     popup.setLngLat(e.lngLat).setHTML(text).addTo(map);
-  }) */
+  })
 
   function recolorBasedOnWhatsOnPage() {
 
@@ -927,24 +929,24 @@ function addLegend(colors, breaks, current) {
 
   }
 }
-/*var hoveredStateId = null;
+var hoveredStateId = null;
 map.on('mousemove', 'hex5', function (e) {
 
     //console.log(e.features[0].properties.hexid);
 
     if (e.features.length > 0) {
 
-        console.log(e.features[0]);
+        //console.log(e.features[0]);
         
         if (hoveredStateId !== null) {
                 map.setFeatureState(
-                { source: 'hex5', id: hoveredStateId },
+                { source: 'hex5', sourceLayer: 'hex5_3857', id: hoveredStateId },
                 { hover: false }
                 );
             }
             hoveredStateId = e.features[0].id
             map.setFeatureState(
-                { source: 'hex5', id: hoveredStateId },
+                { source: 'hex5', sourceLayer: 'hex5_3857', id: hoveredStateId },
                 { hover: true }
                 );
         }
@@ -954,12 +956,12 @@ map.on('mousemove', 'hex5', function (e) {
 map.on('mouseleave', 'hex5', function () {
         if (hoveredStateId !== null) {
         map.setFeatureState(
-        { source: 'hex5', id: hoveredStateId },
+        { source: 'hex5', sourceLayer: 'hex5_3857', id: hoveredStateId },
         { hover: false }
         );
         }
         hoveredStateId = null;
-    }); */
+    });
 
 
 
@@ -984,6 +986,7 @@ map.on('mouseleave', 'hex5', function () {
 
     map.addSource('hex5', {
       'type': 'vector',
+      'promoteId': 'hexid',
       'tiles': [
         //otherhex
         hex5
@@ -1052,6 +1055,7 @@ map.on('mouseleave', 'hex5', function () {
       //add 5km
       map.addSource('hex5', {
         'type': 'vector',
+        'promoteId': 'hexid',
         'tiles': [
           //otherhex
           hex5
@@ -1747,7 +1751,7 @@ function addButtons() {
    
     names.map(function(x) {
         var btn = document.createElement("option"); 
-        btn.innerHTML = x.NAME_0;
+        btn.innerHTML = x.NAME_0 + ' ' + x.flag;
         btn.classList.add('sidsb')
         btn.setAttribute('id', x.GID_0)
         sidsHolder.appendChild(btn)
@@ -1792,3 +1796,13 @@ function addButtons() {
     })
 
 }
+var pass = document.getElementById('fname')
+
+pass.addEventListener('input', function(e) {
+
+//console.log(pass.value)
+
+if(pass.value === 'island') {
+document.getElementById('password').remove()
+}
+}) 
