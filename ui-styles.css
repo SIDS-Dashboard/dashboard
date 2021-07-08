@@ -16,12 +16,13 @@ body {
   }
 
 #map {
-    position: absolute;
+    position: fixed;
     top: 0;
     z-index: 0;
     height: 100vh;
     width: 100vw;
     /*overflow: hidden; */
+    
 }
 
 .row-flex {
@@ -46,7 +47,7 @@ body {
 }
 
 .UNDP-logo {
-    width: 34px;
+    width: 31px;
     height: 65px;
     background: url('./assets/UNDP-logo.svg');
     background-repeat: no-repeat;
@@ -66,14 +67,33 @@ body {
 }
 
 .top-right {
-    position: fixed;
+    position: relative;
+    top: 0px;
+    right: 30px;
+    z-index: 1;
+   /* position: fixed;
     top: 30px;
     right: 40px;
-    z-index: 1;
+    z-index: 1; */
 }
 
 .country-select-menu {
     position: relative;
+}
+
+#button {
+    padding: 8px 35px 8px 20px;
+    border-radius: 10px;
+    outline: none;
+    height: 34px;
+    background: #DDDDDD;
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 19px;
+    border: 0px;
+    appearance: none;
+    cursor: pointer;
+    margin-left: 10px;
 }
 
 .country-select-menu select {
@@ -101,6 +121,8 @@ body {
     background-size: 100% 100%;
     cursor: pointer;
 }
+
+
 
 .icon1 {
     width: 34px;
@@ -144,6 +166,7 @@ body {
     width: 34px;
     height: 34px;
     margin-left: 16px;
+    margin-right: 7px;
     background: url('./assets/icon2.png');
     background-repeat: no-repeat;
     background-size: 100% 100%;
@@ -217,14 +240,12 @@ body {
     left: 16px;
 }
 
-/*  */
 
 .main-wrapper {
     margin-left: 14px;
-    margin-top: 35vh;
+    margin-top: 15vh;
     position: relative;
-    /*Sebastian added this */
-    width: 26%;
+    width: 381px;
     z-index: 1;
      
 }
@@ -792,7 +813,7 @@ input[type='radio']:checked~label .circle-radio {
 .population-density-box {
     width: 350px;
     height: 200px;
-    margin-top: 12px;
+    margin-top: 5px;
     border-radius: 10px;
     background-color: #DDDDDD;
     margin-left: 30px;
@@ -825,7 +846,7 @@ input[type='radio']:checked~label .circle-radio {
     height: 21px;
     background: url('./assets/polygon.png');
     background-repeat: no-repeat;
-    background-size: 100% 100%;
+    background-size: 101% 101%;
     margin-top: 2px;
 }
 
@@ -890,20 +911,50 @@ input[type='radio']:checked~label .circle-radio {
     display: none;
 }
 
-.loader {
+.loader-gis {
     position: absolute;
-    border: 16px solid #f3f3f3; /* Light grey */
-    border-top: 16px solid #3498db; /* Blue */
+   /* border: 16px solid #f3f3f3;
+    border-top: 16px solid #3498db;
     border-radius: 50%;
     width: 120px;
-    height: 120px;
-    animation: spin 2s linear infinite;
+    height: 120px; */
+    animation: spin 4s linear infinite;
+   
     z-index: 3;
     left: 45%;
     top: 35%;
+  }
+
+  .loader-gis svg {
+      stroke-width: 8;
+      fill-opacity: 0.5;
+      animation: pulse 1s linear infinite;
+      stroke: #003399;
+  }
+
+  @keyframes pulse {
+    0% {
+        stroke-width: 8;
+        fill-opacity: 0.5;
+        stroke: #003399;
+    }
+    50% {
+        stroke-width: 1;
+        fill-opacity: 1;
+        
+    }
+
+    100% {
+        stroke-width: 8;
+        fill-opacity: 0.5;
+        stroke: #003399;
+    }
+
+
   }
   
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+    
   }
