@@ -58,6 +58,7 @@ mapboxgl.accessToken =
     
 
     var layers = map.getStyle().layers;
+    console.log(layers);
     // Find the index of the first symbol layer in the map style
     for (var i = 0; i < layers.length; i++) {
     if (layers[i].type === 'symbol') {
@@ -67,10 +68,15 @@ mapboxgl.accessToken =
     }
 
     map.removeLayer('admin-1-boundary')
+    map.removeLayer('road-label')
+    map.removeLayer('road-number-shield')
+    map.removeLayer('road-exit-shield')
+    
     map.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
     //$('.loader-gis').remove()
     addHexSource()
     //addTileSources()
+    //justAdmin()
 
   });
 
@@ -111,30 +117,13 @@ mapboxgl.accessToken =
       }
     })
 
-    var popup = new mapboxgl.Popup({
-      closeButton: true,
-      closeOnClick: false
-      });
-
-  map.on('click', currentGeojsonLayers.hexSize, function(e){
-
-    console.log(document.getElementById("infoBoxTitle"))
-
-    //console.log(currentGeojsonLayers.dataLayer);
-    //console.log(e.features[0].properties)
-
-    //var coords = e.features[0].geometry.coordinates.slice();
-    console.log(e.features[0].geometry)
-    var text = e.features[0].properties[currentGeojsonLayers.dataLayer]
-    popup.setLngLat(e.lngLat).setHTML(text).addTo(map);
-  })
-
   function recolorBasedOnWhatsOnPage() {
 
     var features = map.queryRenderedFeatures({
       layers: [currentGeojsonLayers.hexSize]
     })
 
+    console.log(currentGeojsonLayers.hexSize);
     if(features) {
 
       var uniFeatures;
@@ -150,6 +139,7 @@ mapboxgl.accessToken =
       var selecteData = uniFeatures.map(x => x.properties[currentGeojsonLayers.dataLayer])
       //console.log(selecteData);
       var breaks = chroma.limits(selecteData, 'q', 4)
+      currentGeojsonLayers.breaks = breaks;
       console.log(breaks)
       map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-color',
         [
@@ -238,6 +228,7 @@ mapboxgl.accessToken =
 
                 map.addSource(sourceData[x].name, {
                     'type': 'vector',
+                    'promoteId': 'hexid',
                     'tiles': [
                       //otherhex
                       sourceData[x].data
@@ -247,6 +238,15 @@ mapboxgl.accessToken =
                   })
                 console.log(sourceData[x].name + ';;')
     
+            } else if(sourceData[x].name === 'hex10') {
+              map.addSource('hex10', {
+                'type': 'vector',
+                //type: "geojson",
+                //data: geobuf.decode(new Pbf(allData[0])),
+                url: sourceData[x].data,
+                promoteId: 'hexid'
+              }) 
+              
             } else {
                 map.addSource(sourceData[x].name, {
                     type: 'geojson',
@@ -324,6 +324,8 @@ mapboxgl.accessToken =
     
     //rotateCamera(0)
 
+    console.log(currentGeojsonLayers);
+
     map.addLayer({
       'id': id3d,
       'type': 'fill-extrusion', 
@@ -344,7 +346,18 @@ mapboxgl.accessToken =
             currentGeojsonLayers.breaks[3], currentGeojsonLayers.color[3],
             currentGeojsonLayers.breaks[4], currentGeojsonLayers.color[4],
             ],
-            'fill-extrusion-height': ['get', currentGeojsonLayers.dataLayer]
+            'fill-extrusion-height':      
+              [
+              'interpolate',
+              ['linear'],
+              ['get', currentGeojsonLayers.dataLayer],
+              currentGeojsonLayers.breaks[0], 0,
+              currentGeojsonLayers.breaks[1], 500,
+              currentGeojsonLayers.breaks[2], 5000,
+              currentGeojsonLayers.breaks[3], 11000,
+              currentGeojsonLayers.breaks[4], 50000,
+              ],
+          
           //'fill-opacity': 0.8,
         
           }
@@ -434,12 +447,94 @@ mapboxgl.accessToken =
 
   }) */
 
+  addTheOnClick()
+
+  map.on('click', function(e) {
+
+    if(map.getSource('highlightS')) {
+      map.removeLayer('highlight')
+      map.removeSource('highlightS')
+    }
+
+  })
+
+function addTheOnClick() {
+
+  map.on('click', currentGeojsonLayers.hexSize, function(e){
+
+    var popup = new mapboxgl.Popup({
+      closeButton: true,
+      closeOnClick: true
+      });
+    console.log(document.getElementById("infoBoxTitle").textContent)
+
+    //console.log(currentGeojsonLayers.dataLayer);
+    //console.log(e.features[0].properties)
+
+    //var coords = e.features[0].geometry.coordinates.slice();
+    //console.log(e.features[0].geometry)
+    var text = '<h4><b>' + document.getElementById("infoBoxTitle").textContent + '</b><br>' + e.features[0].properties[currentGeojsonLayers.dataLayer].toLocaleString() +' ' + document.getElementById("legendTitle").textContent + '</h4>'
+    popup.setLngLat(e.lngLat).setHTML(text).addTo(map);
+  })
+}
+
+function addAdminClick() {
+
+  map.on('click', currentGeojsonLayers.hexSize, function(e){
+
+    //console.log(e.features[0]);
+    //console.log(e.features[0].geometry);
+
+    if(map.getSource('highlightS')) {
+      map.removeLayer('highlight')
+      map.removeSource('highlightS')
+    }
+    
+
+    map.addSource('highlightS', {
+      type: 'geojson',
+      data: {
+        'type': 'FeatureCollection',
+        'features': []
+      }
+    })
+
+    map.getSource('highlightS').setData(e.features[0].geometry)
+
+    map.addLayer({
+      'id': 'highlight',
+      'source': 'highlightS',
+      'type': 'line',
+      'paint': {
+        'line-color': 'orange',
+        'line-width': 3
+      }
+    })
+
+
+
+    var popup = new mapboxgl.Popup({
+      closeButton: true,
+      closeOnClick: true
+      });
+    //console.log(document.getElementById("infoBoxTitle").textContent)
+
+    //console.log(currentGeojsonLayers.dataLayer);
+    //console.log(e.features[0].properties)
+
+    //var coords = e.features[0].geometry.coordinates.slice();
+    //console.log(e.features[0].geometry)
+    var text = '<h4><b>Country: </b>' + e.features[0].properties.NAME_0 + '</h4><h4><b>Region: </b>' + e.features[0].properties.NAME_1 + ' ' + e.features[0].properties.TYPE_1  + '</h4><b>' + document.getElementById("infoBoxTitle").textContent + '</b>: ' + e.features[0].properties[currentGeojsonLayers.dataLayer].toLocaleString() + ' ' + document.getElementById("legendTitle").textContent
+    popup.setLngLat(e.lngLat).setHTML(text).addTo(map);
+  })
+
+}
 
 
 
   function changeHexagonSize(sel) {
 
-    console.log(map.getStyle())
+    //console.log(map.getStyle())
     remove3d()
     currentGeojsonLayers.hexSize = sel
     console.log(sel);
@@ -454,8 +549,16 @@ mapboxgl.accessToken =
       
     }
 
-    if(sel === 'hex5') {
-        var slayer = 'hex5_3857';
+    if(sel === 'hex5' || sel === 'hex10' || sel === 'hex1') {
+      var slayer;
+      if(sel === 'hex5') {
+        slayer = 'hex5_3857';
+      } else if(sel === 'hex1') {
+        slayer = 'hex1-3857'
+      } else {
+        slayer = 'hex10-3857-a46wc4'
+      }
+        
 
         map.addLayer({
             'id': sel,
@@ -465,9 +568,6 @@ mapboxgl.accessToken =
             'layout': {
               'visibility': 'visible'
               },
-              'maxzoom': 10,
-              'minzoom': 6,
-            
             'paint': {
                 'fill-color': 'blue',
                 'fill-opacity': 0,
@@ -519,6 +619,14 @@ mapboxgl.accessToken =
         //map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.7)
       
       })
+
+      
+
+      if(sel === 'admin1') {
+        addAdminClick()
+      } else {
+        addTheOnClick();
+      }
 
   }
 
@@ -603,6 +711,7 @@ mapboxgl.accessToken =
         var uniFeatures;
         if(currentGeojsonLayers.hexSize === 'admin1') {
           uniFeatures = getUniqueFeatures(features, 'GID_1');
+          
         } else if (currentGeojsonLayers.hexSize === 'admin2') {
           uniFeatures = getUniqueFeatures(features, 'GID_2');
         } else {
@@ -612,14 +721,14 @@ mapboxgl.accessToken =
         
         //console.log(uniFeatures);
         var selecteData = uniFeatures.map(x => x.properties[selection])
-        //console.log(selecteData);
-        var max = Math.max(...selecteData)
-        var min = Math.min(...selecteData)
+        console.log(selecteData);
+        //var max = Math.max(...selecteData)
+        //var min = Math.min(...selecteData)
         
         
         //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
         var breaks = chroma.limits(selecteData, 'q', 4)
-        //console.log(breaks)
+        console.log(breaks)
         
         var colorRamp = chroma.scale(['#fafa6e','#2A4858']).mode('lch').colors(5)
         var colorRamp1 = ['#edf8fb', '#b2e2e2','#66c2a4','#2ca25f', '#006d2c' ]
@@ -735,8 +844,8 @@ mapboxgl.accessToken =
         //console.log(uniFeatures);
         var selecteData = uniFeatures.map(x => x.properties[currentGeojsonLayers.dataLayer])
         console.log(selecteData);
-        var max = Math.max(...selecteData)
-        var min = Math.min(...selecteData)
+       // var max = Math.max(...selecteData)
+        //var min = Math.min(...selecteData)
   
         var breaks = chroma.limits(selecteData, 'q', 4)
         //console.log(breaks);
@@ -917,7 +1026,7 @@ function addLegend(colors, breaks, current) {
     var words = document.createElement('div')
     words.classList.add('population-per-km-text')
     //words.innerHTML = Number.parseFloat(breaks[x]).toFixed(3)
-    words.innerHTML = nFormatter(breaks[x], 3)
+    words.innerHTML = nFormatter(breaks[x], 2)
     //words.innerHTML = Number(nFormatter(breaks[x], 2))
     var hexI = document.createElement('div')
     hexI.classList.add('population-per-km-img')
@@ -929,113 +1038,86 @@ function addLegend(colors, breaks, current) {
 
   }
 }
+
+
 var hoveredStateId = null;
-map.on('mousemove', 'hex5', function (e) {
+map.on('mousemove', currentGeojsonLayers.hexSize, function (e) {
+  
 
     //console.log(e.features[0].properties.hexid);
+  if(currentGeojsonLayers.hexSize === 'hex5') {
+      if (e.features.length > 0) {
 
-    if (e.features.length > 0) {
+          //console.log(e.features[0]);
+          if (hoveredStateId !== null) {
+                  map.setFeatureState(
+                  { source: currentGeojsonLayers.hexSize, sourceLayer: 'hex5_3857', id: hoveredStateId },
+                  { hover: false }
+                  );
+              }
+              hoveredStateId = e.features[0].id
+              map.setFeatureState(
+                  { source: currentGeojsonLayers.hexSize, sourceLayer: 'hex5_3857', id: hoveredStateId },
+                  { hover: true }
+                  );
+          }
 
-        //console.log(e.features[0]);
-        
-        if (hoveredStateId !== null) {
+        } else {
+          if (e.features.length > 0) {
+
+            //console.log(e.features[0]);
+            if (hoveredStateId !== null) {
+                    map.setFeatureState(
+                    { source: currentGeojsonLayers.hexSize, id: hoveredStateId },
+                    { hover: false }
+                    );
+                }
+                hoveredStateId = e.features[0].id
                 map.setFeatureState(
-                { source: 'hex5', sourceLayer: 'hex5_3857', id: hoveredStateId },
-                { hover: false }
-                );
+                    { source: currentGeojsonLayers.hexSize, id: hoveredStateId },
+                    { hover: true }
+                    );
             }
-            hoveredStateId = e.features[0].id
-            map.setFeatureState(
-                { source: 'hex5', sourceLayer: 'hex5_3857', id: hoveredStateId },
-                { hover: true }
-                );
         }
 
     });
 
-map.on('mouseleave', 'hex5', function () {
+map.on('mouseleave', currentGeojsonLayers.hexSize, function () {
+
+  if(currentGeojsonLayers.hexSize === 'hex5') {
         if (hoveredStateId !== null) {
         map.setFeatureState(
-        { source: 'hex5', sourceLayer: 'hex5_3857', id: hoveredStateId },
+        { source: currentGeojsonLayers.hexSize, sourceLayer: 'hex5_3857', id: hoveredStateId },
         { hover: false }
         );
         }
+      } else {
+        if (hoveredStateId !== null) {
+          map.setFeatureState(
+          { source: currentGeojsonLayers.hexSize, id: hoveredStateId },
+          { hover: false }
+          );
+          }
+
+
+      }
         hoveredStateId = null;
     });
 
 
-
-  function addTileSources() {
-
-    const hex5 = 'https://sebastian-ch.github.io/sidsDataTest/data/t5/{z}/{x}/{y}.pbf';
-    //const hex5 = 'http://127.0.0.1:8080//data/t5/{z}/{x}/{y}.pbf'
-    const otherhex = 'https://sebastian-ch.github.io/sidsDataTest/data/tile-hex-5km/{z}/{x}/{y}.pbf'
-    //const hex1 = 'https://atlasguo.github.io/undp_sids/tile/tile-hex-1km/{z}/{x}/{y}.pbf'
-    const hex1 = 'http://127.0.0.1:8080//data/t1/{z}/{x}/{y}.pbf'
-    const hex10 = 'https://sebastian-ch.github.io/sidsDataTest/data/tile-hex-10km/{z}/{x}/{y}.pbf'
-    
-
-   /* map.addSource('hex10', {
-      'type': 'vector',
-      'tiles': [
-        hex10
-      ],
-      'minzoom': 6,
-      'maxzoom': 10
-   }) */
-
-    map.addSource('hex5', {
-      'type': 'vector',
-      'promoteId': 'hexid',
-      'tiles': [
-        //otherhex
-        hex5
-      ],
-      'minzoom': 6,
-      'maxzoom': 10
-    })
-
-    map.addSource('hex1', {
-      'type': 'vector',
-      'tiles': [
-        hex1
-      ],
-      'minzoom': 6,
-      'maxzoom': 9,
-      'buffer': 0
-   })
-
-  map.addLayer({
-    'id': 'hex5',
-    'type': 'fill', 
-    'source': 'hex5',
-    //'source-layer': 'hex-5km',
-    'source-layer': 'hex5_3857',
-    'layout': {
-      'visibility': 'visible'
-      },
-    
-    'paint': {
-        'fill-color': 'blue',
-        'fill-opacity': 0,
-        }
-    }, firstSymbolId);
-
-    $('.loader-gis').remove()
-
-  }
-
   //add sources
   function addHexSource() {
-    const hex10 = "https://sebastian-ch.github.io/sidsDataTest/data/hex10.pbf"
+    //const hex10 = "https://sebastian-ch.github.io/sidsDataTest/data/hex10.pbf"
     //const hex5 = "https://sebastian-ch.github.io/sidsDataTest/data/hex5.pbf";
+    const hex10 = 'mapbox://sebastian-ch.bzzfyhz9';
     const hex5 = 'https://sebastian-ch.github.io/sidsDataTest/data/t5/{z}/{x}/{y}.pbf';
-    const admin1 = "https://sebastian-ch.github.io/sidsDataTest/data/admin1.pbf";
+    const admin1 = "https://sebastian-ch.github.io/sidsDataTest/data/admin1-new.pbf";
     const admin2 = "https://sebastian-ch.github.io/sidsDataTest/data/admin2.pbf";
-    const hex1 = 'https://sebastian-ch.github.io/sidsDataTest/data/t1/{z}/{x}/{y}.pbf'
+    //const hex1 = 'https://sebastian-ch.github.io/sidsDataTest/localTiles/tiles-1km/{z}/{x}/{y}.pbf'
+    const hex1 = 'https://sebastian-ch.github.io/sidsDataTest/data/tiles-1km/{z}/{x}/{y}.pbf'
    
 
-    var files = [hex10, admin1, admin2]
+    var files = [admin1, admin2]
     //var files = [hex5]
     var promises = [];
 
@@ -1044,13 +1126,17 @@ map.on('mouseleave', 'hex5', function () {
     })
 
     Promise.all(promises).then(function(allData){
+      //console.log(allData[0])
 
       //add 10km source
       map.addSource('hex10', {
-        type: "geojson",
-        data: geobuf.decode(new Pbf(allData[0])),
+        'type': 'vector',
+        //type: "geojson",
+        //data: geobuf.decode(new Pbf(allData[0])),
+        url: hex10,
+        promoteId: 'hexid'
       }) 
-      sourceData.hex10Source.data = allData[0];
+      sourceData.hex10Source.data = hex10;
 
       //add 5km
       map.addSource('hex5', {
@@ -1068,25 +1154,28 @@ map.on('mouseleave', 'hex5', function () {
       //add admin1
       map.addSource('admin1', {
         type: "geojson",
-        data: geobuf.decode(new Pbf(allData[1])),
+        data: geobuf.decode(new Pbf(allData[0])),
+        generateId: true
       });
-      sourceData.admin1Source.data = allData[1];
+      sourceData.admin1Source.data = allData[0];
 
 
       map.addSource('admin2', {
         type: "geojson",
-        data: geobuf.decode(new Pbf(allData[2])),
+        data: geobuf.decode(new Pbf(allData[1])),
+        generateId: true
       });
-      sourceData.admin2Source.data = allData[2];
+      sourceData.admin2Source.data = allData[1];
 
-     /* map.addSource('hex1', {
+      map.addSource('hex1', {
           'type': 'vector',
+          'promoteId': 'hexid',
           'tiles': [
             hex1
           ],
-          'minzoom': 6,
-          'maxzoom': 10
-      }) */
+          //'minzoom': 6,
+          //'maxzoom': 10
+      })
       sourceData.hex1Source.data = hex1; 
 
       
