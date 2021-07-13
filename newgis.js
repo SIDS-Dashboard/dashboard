@@ -567,7 +567,7 @@ function addAdminClick() {
     console.log(sel);
     
     var slayer;
-    const userLayers = ['hex5', 'hex10', 'admin1', 'admin2', 'hex1'];
+    const userLayers = ['hex5', 'hex10', 'admin1', 'admin2', 'hex1', 'ocean'];
 
     for (var x in userLayers) {
       if(map.getLayer(userLayers[x])) {
@@ -722,6 +722,15 @@ function addAdminClick() {
 
   function addOcean(layer) {
 
+    const userLayers = ['hex5', 'hex10', 'admin1', 'admin2', 'hex1'];
+
+    for (var x in userLayers) {
+      if(map.getLayer(userLayers[x])) {
+        map.setPaintProperty(userLayers[x], 'fill-opacity', 0)
+      }
+      
+    }
+
     currentGeojsonLayers.breaks = [-4841, -3805, -2608, -1090, 1322];
     currentGeojsonLayers.color = ['#08519c', '#3182bd', '#6baed6', '#bdd7e7', '#eff3ff' ]
     
@@ -729,6 +738,7 @@ function addAdminClick() {
       'id': 'ocean',
       'type': 'fill',
       'source': 'ocean',
+      'source-layer': 'noid-943qkc',
       'layout': {
         'visibility': 'visible'
         },
@@ -754,6 +764,10 @@ function addAdminClick() {
   }
 
   function changeDataOnMap(selection) {
+
+    if(map.getLayer('ocean')) {
+      map.removeLayer('ocean');
+    }
 
     //console.log(map.getStyle().layers)
 
@@ -1087,9 +1101,10 @@ map.on('mouseleave', currentGeojsonLayers.hexSize, function () {
     //const hex1 = 'https://sebastian-ch.github.io/sidsDataTest/localTiles/tiles-1km/{z}/{x}/{y}.pbf'
     const hex1 = 'https://sebastian-ch.github.io/sidsDataTest/data/carnew/{z}/{x}/{y}.pbf'
     //const ocean = './data/d-round.pbf';
-    const ocean = 'https://sebastian-ch.github.io/sidsDataTest/data/ocean.pbf';
+    //const ocean = 'https://sebastian-ch.github.io/sidsDataTest/data/ocean.pbf';
+    const ocean = 'mapbox://sebastian-ch.89fajy36'
 
-    var files = [admin2, ocean]
+    var files = [admin2]
     //var files = [admin2]
     var promises = [];
 
@@ -1154,13 +1169,19 @@ map.on('mouseleave', currentGeojsonLayers.hexSize, function () {
       })
       sourceData.hex1Source.data = hex1;
 
+
       map.addSource('ocean', {
+        'type': 'vector',
+        'url': ocean
+      })
+
+     /* map.addSource('ocean', {
         type: "geojson",
         data: geobuf.decode(new Pbf(allData[1])),
         //generateId: true
         'maxzoom': 12
-      });
-      sourceData.oceanSource.data = allData[1];
+      }); */
+      sourceData.oceanSource.data = ocean;
 
 
       
