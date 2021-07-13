@@ -1087,7 +1087,7 @@ map.on('mouseleave', currentGeojsonLayers.hexSize, function () {
     //const hex1 = 'https://sebastian-ch.github.io/sidsDataTest/localTiles/tiles-1km/{z}/{x}/{y}.pbf'
     const hex1 = 'https://sebastian-ch.github.io/sidsDataTest/data/carnew/{z}/{x}/{y}.pbf'
     //const ocean = './data/d-round.pbf';
-    const ocean = 'https://sebastian-ch.github.io/sidsDataTest/data/admin2.pbf';
+    const ocean = 'https://sebastian-ch.github.io/sidsDataTest/data/ocean.pbf';
 
     var files = [admin2, ocean]
     //var files = [admin2]
@@ -1926,7 +1926,7 @@ function addButtons() {
     })
 
 }
-/*var pass = document.getElementById('fname')
+var pass = document.getElementById('fname')
 
 pass.addEventListener('input', function(e) {
 
@@ -1935,4 +1935,4 @@ pass.addEventListener('input', function(e) {
 if(pass.value === 'island') {
 document.getElementById('password').remove()
 }
-}) */
+})
