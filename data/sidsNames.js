@@ -1,19 +1,19 @@
 const names = [
 {
   "NAME_0": "Pacific Region",
-  "flag": '',
+  "flag": '&#128681;',
     "bb": [[-136.1,-14.1],[-141.1,-23.9]],
     "GID_0": "PCF"
 },
 {
   "NAME_0": "Carribean Region",
-  "flag": '',
+  "flag": '	&#128681;',
     "bb": [[-89.28,1.43],[-53.86,27.08]],
     "GID_0": "CBR"
 },
 {
   "NAME_0": "Atlantic, Indian, and South China Sea",
-  "flag": '',
+  "flag": '	&#128681;',
   "bb": [[-17.8,-26.4],[94.8,30.1]],
   "GID_0": "KNA"
 },

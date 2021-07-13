@@ -25,6 +25,34 @@ body {
     
 }
 
+
+input[type=checkbox] {
+   width: 12px;
+   height: 12px;
+}
+
+#admin1-input {
+  
+    
+}
+
+ 
+ #admin1 {
+     color: red;
+     padding: 0px;
+     font-size: 14px;
+    
+ }
+ #admin2 {
+    color: blue;
+    padding: 0px;
+    font-size: 14px;
+    font-weight: bold;
+   
+}
+ 
+   
+
 .row-flex {
     display: flex;
     flex-direction: row;
@@ -133,15 +161,27 @@ body {
     background-size: 100% 100%;
 }
 
+
+
+
 .add-overlay-menu {
     position: relative;
+   
+    
 }
 
-.add-overlay-menu select {
+.add-overlay-menu:hover {
+    cursor: pointer;
+}
+
+
+
+#add-overlay {
+    
     padding: 8px 35px 8px 20px;
     border-radius: 10px;
     outline: none;
-    height: 34px;
+    /*height: 44px; */
     background: #DDDDDD;
     font-weight: 300;
     font-size: 14px;
@@ -277,7 +317,8 @@ body {
 .custom-selection-dropdown>label {
     display: block;
     margin: 0px 30px;
-    font-size: 13px;
+    font-size: 15px;
+    font-weight: bold;
 }
 
 .custom-selection-dropdown .form-select {

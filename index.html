@@ -22,12 +22,12 @@
 
 <body>
 
-	<div id='password' class='password'>
+	<!--<div id='password' class='password'>
 		<input type="text" id="fname" name="fname"><br><br>
-	</div>
+	</div>-->
 
     <div id='map'>
-        <div class="loader-gis">
+        	<div class="loader-gis">
 			<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width='170' height='170'  viewbox="0 0 200 173.20508075688772"><path fill="#003399" d="M0 86.60254037844386L50 0L150 0L200 86.60254037844386L150 173.20508075688772L50 173.20508075688772Z"></path></svg>
 		</div>
     </div>
@@ -61,18 +61,17 @@
 		</div>
 
 		<div class="row-flex" style="justify-content:flex-end;margin-top:15px;">
-			<div id='icon3d' style="display: none;" class="icon2"></div>
+			<div id="icon3d" style="display: none;" class="icon2"></div>
 			<div class="add-overlay-menu">
-				<select name='overlay-select' id='add-overlay'>
-					<option value="Select Country or Region">Add overlays</option>
-					<option value="admin1">Admin Regions 1</option>
-					<option value="admin2">Admin Regions 2</option>
-					<option value="remove">Remove Overlay</option>
+				<div name="overlay-select" id="add-overlay">
 					
-				</select>
-				<span class="downarrow"></span>
-			</div>
+					<input id='admin1-input' type='checkbox' value="admin1-overlay"> <label id='admin1'>Admin Regions 1</label></input><br>
+					<input id='admin2-input' type='checkbox' value="admin2-overlay"> <label id='admin2'>Admin Regions 2</label></input>
+
+				</div>
 			
+			</div>
+
 		</div>
 
 		<div class="row-flex" style="justify-content:flex-end;margin-top:15px;">
