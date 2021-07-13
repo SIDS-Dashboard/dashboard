@@ -911,7 +911,7 @@ function addAdminClick() {
 
 
 
-function addOverlay(sel) {
+/*function addOverlay(sel) {
   
 
   var colorz;
@@ -955,7 +955,7 @@ function addOverlay(sel) {
     }
 
   }
-}
+} */
 
 
 //addLegend()
@@ -1569,6 +1569,7 @@ $('.year-timeline-wrapper').hide()
     if(!this.checked) {
       map.removeLayer(clicked)
     } else {
+
       if(clicked === 'admin1-overlay') {
         map.addLayer({
           'id': clicked,
@@ -1584,6 +1585,9 @@ $('.year-timeline-wrapper').hide()
               
               }
           }, firstSymbolId);
+
+      
+      
       } else {
         map.addLayer({
           'id': clicked,
@@ -1597,6 +1601,13 @@ $('.year-timeline-wrapper').hide()
             
             }
         }, firstSymbolId)
+
+
+        if (map.getLayer('admin1-overlay')) {
+          map.moveLayer(clicked, 'admin1-overlay')
+        }
+
+
       }
     }
     //alert($(this).val());
@@ -1947,7 +1958,7 @@ function addButtons() {
     })
 
 }
-var pass = document.getElementById('fname')
+/*var pass = document.getElementById('fname')
 
 pass.addEventListener('input', function(e) {
 
@@ -1956,4 +1967,4 @@ pass.addEventListener('input', function(e) {
 if(pass.value === 'island') {
 document.getElementById('password').remove()
 }
-})
+}) */

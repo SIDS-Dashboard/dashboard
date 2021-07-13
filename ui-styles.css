@@ -56,6 +56,7 @@ input[type=checkbox] {
 .row-flex {
     display: flex;
     flex-direction: row;
+    
 }
 
 .col-flex {
@@ -95,6 +96,7 @@ input[type=checkbox] {
 }
 
 .top-right {
+    
     position: relative;
     top: 0px;
     right: 30px;
