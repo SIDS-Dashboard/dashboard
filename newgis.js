@@ -24,26 +24,32 @@ mapboxgl.accessToken =
   var sourceData = {
       hex5Source: {
         name: 'hex5',
+        layer: 'hex5_3857',
         data: null
       },
       hex10Source: {
         name: 'hex10',
+        layer: '',
         data: null
       },
       admin1Source: {
         name: 'admin1',
+        layer: 'admin1-3857-bpys5w',
         data: null
       },
       admin2Source: {
         name: 'admin2',
+        layer: 'admin2',
         data: null
       },
       hex1Source: {
           name: 'hex1',
+          layer: 'hex1',
           data: null
       },
       oceanSource: {
         name: 'ocean',
+        layer: 'oceans',
         data: null
     }
 
@@ -576,17 +582,21 @@ function addAdminClick() {
       
     }
 
-    if(sel === 'hex5' || sel === 'hex10' || sel === 'hex1' || sel === 'admin1') {
+    if(sel === 'hex5' || sel === 'hex10' || sel === 'hex1' || sel === 'admin1' || sel === 'admin2') {
       var slayer;
       if(sel === 'hex5') {
         slayer = 'hex5_3857';
       } else if(sel === 'hex1') {
-        slayer = 'dropped4'
+        //slayer = 'dropped4'
+        //slayer = 'aishex1'
+        slayer = 'hex1'
       } else if (sel === 'admin1') {
         slayer = 'admin1-3857-bpys5w'
         console.log(slayer);
+      } else if (sel === 'admin2') {
+        slayer = 'admin2'
       } else {
-        slayer = 'hex10-3857-a46wc4'
+        slayer = 'hex10-a6ueiz'
       }
         
 
@@ -726,28 +736,30 @@ function addAdminClick() {
 
     for (var x in userLayers) {
       if(map.getLayer(userLayers[x])) {
-        map.setPaintProperty(userLayers[x], 'fill-opacity', 0)
+       // map.setPaintProperty(userLayers[x], 'fill-opacity', 0)
+        map.removeLayer(userLayers[x])
       }
       
     }
 
-    currentGeojsonLayers.breaks = [-4841, -3805, -2608, -1090, 1322];
+    currentGeojsonLayers.breaks = [-4841, -3805, -2608, -1090, 0];
     currentGeojsonLayers.color = ['#08519c', '#3182bd', '#6baed6', '#bdd7e7', '#eff3ff' ]
     
     map.addLayer({
       'id': 'ocean',
       'type': 'fill',
       'source': 'ocean',
-      'source-layer': 'noid-943qkc',
+      //'source-layer': 'hex-10km-depth-5xnxi9',
+      'source-layer': 'oceans',
       'layout': {
         'visibility': 'visible'
         },
-        'filter': ['<', 'd', 0],
+        'filter': ['<', 'depth', 0],
         'paint': {
           'fill-color': [
             'interpolate',
             ['linear'],
-            ['get', 'd'],
+            ['get', 'depth'],
             -4841, '#08519c',
             -3805, '#3182bd',
             -2608, '#6baed6',
@@ -781,11 +793,45 @@ function addAdminClick() {
     if(map.getLayoutProperty(currentGeojsonLayers.hexSize, 'visibility', 'none')) {
       map.setLayoutProperty(currentGeojsonLayers.hexSize,'visibility','visible')
     }
-    if(map.getLayoutProperty(currentGeojsonLayers.hexSize, 'visibility','visible')) {
+    /*if(!map.getLayer(currentGeojsonLayers.hexSize)) {
 
+      //_.find(styles, function(o){return o.title === event.target.value})
+      var current = _.find(sourceData, function(o) { return o.name === currentGeojsonLayers.hexSize})
+      
+      //console.log(_.find(sourceData, function(o) { return o.name === currentGeojsonLayers.hexSize}))
+      //console.log(current.name);
+      //console.log(current);
+
+      map.addLayer({
+        'id': currentGeojsonLayers.hexSize,
+        'type': 'fill', 
+        'source': currentGeojsonLayers.hexSize,
+        'source-layer': current.layer,
+        'layout': {
+          'visibility': 'visible'
+          },
+        'paint': {
+            'fill-color': 'blue',
+            'fill-opacity': 0.8,
+                     
+            }
+        }, firstSymbolId);
+
+      
+    } */
+    if(map.getLayoutProperty(currentGeojsonLayers.hexSize, 'visibility','visible')) {
+      console.log('hey')
       var features = map.queryRenderedFeatures({
         layers: [currentGeojsonLayers.hexSize]
       })
+
+    //if(map.getLayer(currentGeojsonLayers.hexSize)) {
+      console.log('hi');
+        var features = map.queryRenderedFeatures({
+          layers: [currentGeojsonLayers.hexSize]
+        })
+
+      
   
       if(features) {
 
@@ -1090,29 +1136,32 @@ map.on('mouseleave', currentGeojsonLayers.hexSize, function () {
 
 
   //add sources
-  function addHexSource() {
+  /*function addHexSource() {
     //const hex10 = "https://sebastian-ch.github.io/sidsDataTest/data/hex10.pbf"
     //const hex5 = "https://sebastian-ch.github.io/sidsDataTest/data/hex5.pbf";
-    const hex10 = 'mapbox://sebastian-ch.bzzfyhz9';
+    const hex10 = 'mapbox://sebastian-ch.69xhs9lb';
     const hex5 = 'https://sebastian-ch.github.io/sidsDataTest/data/t5/{z}/{x}/{y}.pbf';
     //const admin1 = "https://sebastian-ch.github.io/sidsDataTest/data/admin1-new.pbf";
     const admin1 = 'mapbox://sebastian-ch.7vnjgjge';
-    const admin2 = "https://sebastian-ch.github.io/sidsDataTest/data/admin2.pbf";
+    //const admin2 = "https://sebastian-ch.github.io/sidsDataTest/data/admin2.pbf";
+    const admin2= 'https://sebastian-ch.github.io/sidsDataTest/data/admin2tiles/{z}/{x}/{y}.pbf'
+    
     //const hex1 = 'https://sebastian-ch.github.io/sidsDataTest/localTiles/tiles-1km/{z}/{x}/{y}.pbf'
-    const hex1 = 'https://sebastian-ch.github.io/sidsDataTest/data/carnew/{z}/{x}/{y}.pbf'
+    //const hex1 = 'https://sebastian-ch.github.io/sidsDataTest/data/carnew/{z}/{x}/{y}.pbf'
+    const hex1= 'https://sebastian-ch.github.io/sidsDataTest/data/aishex1tiles2/{z}/{x}/{y}.pbf'
     //const ocean = './data/d-round.pbf';
     //const ocean = 'https://sebastian-ch.github.io/sidsDataTest/data/ocean.pbf';
-    const ocean = 'mapbox://sebastian-ch.89fajy36'
+    const ocean = 'mapbox://sebastian-ch.dbe6mvw4'
 
-    var files = [admin2]
     //var files = [admin2]
-    var promises = [];
+    //var files = [admin2]
+    //var promises = [];
 
-    files.forEach(function(url){
-      promises.push(d3.buffer(url))
-    })
+    //files.forEach(function(url){
+    //  promises.push(d3.buffer(url))
+   // })
 
-    Promise.all(promises).then(function(allData){
+    //Promise.all(promises).then(function(allData){
       //console.log(allData[0])
 
       //add 10km source
@@ -1150,13 +1199,19 @@ map.on('mouseleave', currentGeojsonLayers.hexSize, function () {
 
       sourceData.admin1Source.data = admin1;
 
-
       map.addSource('admin2', {
-        type: "geojson",
-        data: geobuf.decode(new Pbf(allData[0])),
-        generateId: true
-      });
-      sourceData.admin2Source.data = allData[0];
+        'type': 'vector',
+        'promoteId': 'GID_2',
+        'tiles': [
+          admin2
+        ],
+        //'minzoom': 3,
+        'maxzoom': 12
+      })
+
+      sourceData.admin2Source.data = admin2;
+
+     
 
       map.addSource('hex1', {
           'type': 'vector',
@@ -1164,8 +1219,8 @@ map.on('mouseleave', currentGeojsonLayers.hexSize, function () {
           'tiles': [
             hex1
           ],
-          'minzoom': 3,
-          'maxzoom': 12
+          //'minzoom': 3,
+          //'maxzoom': 12
       })
       sourceData.hex1Source.data = hex1;
 
@@ -1175,12 +1230,7 @@ map.on('mouseleave', currentGeojsonLayers.hexSize, function () {
         'url': ocean
       })
 
-     /* map.addSource('ocean', {
-        type: "geojson",
-        data: geobuf.decode(new Pbf(allData[1])),
-        //generateId: true
-        'maxzoom': 12
-      }); */
+     
       sourceData.oceanSource.data = ocean;
 
 
@@ -1205,9 +1255,9 @@ map.on('mouseleave', currentGeojsonLayers.hexSize, function () {
         }, firstSymbolId);
 
         $('.loader-gis').remove()
-    })
+    //}) 
 
-  }
+  } */
 
 
 /////ui js
@@ -1565,49 +1615,40 @@ $('.year-timeline-wrapper').hide()
   $("input:checkbox").change(function(){
 
     var clicked = $(this).val();
-    console.log(this.checked);
+    console.log(clicked);
     if(!this.checked) {
       map.removeLayer(clicked)
     } else {
 
+      var slayer; var color; var source;
       if(clicked === 'admin1-overlay') {
+        source = 'admin1'
+        slayer = 'admin1-3857-bpys5w'
+        color = 'red'
+      } else if (clicked === 'admin2-overlay') {
+        source = 'admin2'
+        slayer = 'admin2'
+        color = '#003399'
+      }
+
         map.addLayer({
           'id': clicked,
           'type': 'line', 
-          'source': 'admin1',
-          'source-layer': 'admin1-3857-bpys5w',
+          'source': source,
+          'source-layer': slayer,
           'layout': {
               'visibility': 'visible'
               },
           
           'paint': {
-              'line-color': 'red',
+              'line-color': color,
               
               }
           }, firstSymbolId);
 
-      
-      
-      } else {
-        map.addLayer({
-          'id': clicked,
-          'type': 'line', 
-          'source': 'admin2',
-          'layout': {
-            'visibility': 'visible'
-            },
-        'paint': {
-            'line-color': 'blue',
-            
-            }
-        }, firstSymbolId)
-
-
         if (map.getLayer('admin1-overlay')) {
           map.moveLayer(clicked, 'admin1-overlay')
-        }
-
-
+        
       }
     }
     //alert($(this).val());
@@ -1958,7 +1999,7 @@ function addButtons() {
     })
 
 }
-/*var pass = document.getElementById('fname')
+var pass = document.getElementById('fname')
 
 pass.addEventListener('input', function(e) {
 
@@ -1967,4 +2008,4 @@ pass.addEventListener('input', function(e) {
 if(pass.value === 'island') {
 document.getElementById('password').remove()
 }
-}) */
+}) 

@@ -41,10 +41,11 @@ input[type=checkbox] {
      color: red;
      padding: 0px;
      font-size: 14px;
+     font-weight: bold;
     
  }
  #admin2 {
-    color: blue;
+    color: #003399;
     padding: 0px;
     font-size: 14px;
     font-weight: bold;
