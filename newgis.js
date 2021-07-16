@@ -1,5 +1,14 @@
 var allLayers = []
 var firstSymbolId;
+const userLayers = ['hex5', 'hex10', 'admin1', 'admin2', 'hex1', 'ocean'];
+const basemapLabels = [];
+const styles = [
+  {'title': "Satellite With Labels",'uri': "mapbox://styles/mapbox/satellite-streets-v11",},
+  {'title': "Light",'uri': "mapbox://styles/mapbox/light-v10",},
+  {'title': "Satellite Imagery", 'uri': "mapbox://styles/mapbox/satellite-v9",},
+ 
+];
+
 addButtons();
 
 
@@ -25,31 +34,37 @@ mapboxgl.accessToken =
       hex5Source: {
         name: 'hex5',
         layer: 'hex5_3857',
+        mainId: 'hexid',
         data: null
       },
       hex10Source: {
         name: 'hex10',
-        layer: '',
+        layer: 'hex10km',
+        mainId: 'hexid',
         data: null
       },
       admin1Source: {
         name: 'admin1',
+        mainId: 'GID_1',
         layer: 'admin1-3857-bpys5w',
         data: null
       },
       admin2Source: {
         name: 'admin2',
+        mainId: 'GID_2',
         layer: 'admin2',
         data: null
       },
       hex1Source: {
           name: 'hex1',
           layer: 'hex1',
+          mainId: 'hexid',
           data: null
       },
       oceanSource: {
         name: 'ocean',
         layer: 'oceans',
+        mainId: null,
         data: null
     }
 
@@ -65,30 +80,36 @@ mapboxgl.accessToken =
 
   map.on("load", function () {
 
-    
-
     var layers = map.getStyle().layers;
-    console.log(layers);
+    //console.log(layers);
     // Find the index of the first symbol layer in the map style
     for (var i = 0; i < layers.length; i++) {
-    if (layers[i].type === 'symbol') {
-    firstSymbolId = layers[i].id;
-    break;
-    }
+      if (layers[i].type === 'symbol') {
+        firstSymbolId = layers[i].id;
+        break;
+      }
     }
 
     map.removeLayer('admin-1-boundary')
-
     map.removeLayer('road-label')
     map.removeLayer('road-number-shield')
     map.removeLayer('road-exit-shield')
     map.removeLayer("admin-1-boundary-bg")
     map.removeLayer('airport-label')
-    //var layers = map.getStyle().layers;
+    var layers = map.getStyle().layers;
+    console.log(layers);
+
+    for(var x in layers) {
+
+      if(layers[x].type === 'symbol' || layers[x].type === 'line') {
+        basemapLabels.push(layers[x]);
+      }
+    }
+   
     //console.log(layers);
     
     map.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
-    //$('.loader-gis').remove()
+    $('.loader-gis').remove()
     addHexSource()
     //addTileSources()
     //justAdmin()
@@ -131,6 +152,27 @@ mapboxgl.accessToken =
         // stop listening to map.on('data'), if applicable
       }
     })
+
+
+  function addLabels() {
+    console.log($('#addLabels')[0].innerText)
+    if($('#addLabels')[0].innerText === 'Add Labels') {
+        basemapLabels.forEach(function(x) {
+            //console.log(x);
+          map.addLayer(x);
+        })
+        //$('#addLabels').toggle();
+      $('#addLabels')[0].innerText = 'Remove Labels'
+    } else {
+      basemapLabels.forEach(function(x) {
+        map.removeLayer(x.id);
+      })
+
+      $('#addLabels')[0].innerText = 'Add Labels'
+    }
+
+
+  }
 
   function recolorBasedOnWhatsOnPage() {
 
@@ -188,20 +230,30 @@ mapboxgl.accessToken =
   }
 
   const baseMapSwitcher = document.getElementById('basemap-switch');
-  const styles = [
-    {'title': "Satellite With Labels",'uri': "mapbox://styles/mapbox/satellite-streets-v11",},
-    {'title': "Light",'uri': "mapbox://styles/mapbox/light-v10",},
-    {'title': "Satellite Imagery", 'uri': "mapbox://styles/mapbox/satellite-v9",},
-   
-  ];
+  
+  $('#basemap-switch').on('change', function() {
 
-  baseMapSwitcher.addEventListener('click', (event) => {
+    var selectedBase = $(this)[0].innerHTML;
+    //var sel = $(this).innerText;
+    var currentBase = map.getStyle().name;
+
+    console.log(selectedBase);
+
+    if(selectedBase === 'Light') {
+      var thisStyle = _.find(styles, function(o){return o.title === 'Light'})
+      map.setStyle(thisStyle.uri)
+    }
+    
+
+  })
+
+  /* baseMapSwitcher.addEventListener('click', (event) => {
 
     const isOption = event.target.nodeName === "OPTION";
     if (!isOption) {
       return;
     }
-
+      console.log(event);
     //console.log(event.target.value)
     //console.log(styles)
     var thisStyle = _.find(styles, function(o){return o.title === event.target.value})
@@ -316,7 +368,7 @@ mapboxgl.accessToken =
 
     console.log(currentGeojsonLayers);
 
-  })
+  }) */
 
   
   const button3dWrapper = document.getElementById('icon3d')
@@ -572,17 +624,15 @@ function addAdminClick() {
     currentGeojsonLayers.hexSize = sel
     console.log(sel);
     
-    var slayer;
-    const userLayers = ['hex5', 'hex10', 'admin1', 'admin2', 'hex1', 'ocean'];
+    //var slayer;
 
     for (var x in userLayers) {
       if(map.getLayer(userLayers[x])) {
         map.removeLayer(userLayers[x])
       }
-      
     }
 
-    if(sel === 'hex5' || sel === 'hex10' || sel === 'hex1' || sel === 'admin1' || sel === 'admin2') {
+    /*if(sel === 'hex5' || sel === 'hex10' || sel === 'hex1' || sel === 'admin1' || sel === 'admin2') {
       var slayer;
       if(sel === 'hex5') {
         slayer = 'hex5_3857';
@@ -597,14 +647,14 @@ function addAdminClick() {
         slayer = 'admin2'
       } else {
         slayer = 'hex10-a6ueiz'
-      }
+      } */
+      var current = _.find(sourceData, function(o) { return o.name === currentGeojsonLayers.hexSize})
         
-
-        map.addLayer({
+      map.addLayer({
             'id': sel,
             'type': 'fill', 
             'source': sel,
-            'source-layer': slayer,
+            'source-layer': current.layer,
             'layout': {
               'visibility': 'visible'
               },
@@ -627,7 +677,7 @@ function addAdminClick() {
       } */
 
         
-    } else {
+    /* } else {
 
         map.addLayer({
             'id': sel,
@@ -645,7 +695,7 @@ function addAdminClick() {
                 }
             }, firstSymbolId);
 
-    }
+    } */
 
 
       if(map.getStyle().name === 'Mapbox Satellite') {
@@ -749,7 +799,6 @@ function addAdminClick() {
       'id': 'ocean',
       'type': 'fill',
       'source': 'ocean',
-      //'source-layer': 'hex-10km-depth-5xnxi9',
       'source-layer': 'oceans',
       'layout': {
         'visibility': 'visible'
@@ -780,19 +829,18 @@ function addAdminClick() {
     if(map.getLayer('ocean')) {
       map.removeLayer('ocean');
     }
-
-    //console.log(map.getStyle().layers)
-
-    //console.log(selection)
     remove3d()
+
     //console.log(map.getStyle().layers)
     //console.log(selection);
     currentGeojsonLayers.dataLayer = selection;
     console.log(currentGeojsonLayers)
 
-    if(map.getLayoutProperty(currentGeojsonLayers.hexSize, 'visibility', 'none')) {
+
+
+    /*if(map.getLayoutProperty(currentGeojsonLayers.hexSize, 'visibility', 'none')) {
       map.setLayoutProperty(currentGeojsonLayers.hexSize,'visibility','visible')
-    }
+    } */
     /*if(!map.getLayer(currentGeojsonLayers.hexSize)) {
 
       //_.find(styles, function(o){return o.title === event.target.value})
@@ -819,20 +867,37 @@ function addAdminClick() {
 
       
     } */
-    if(map.getLayoutProperty(currentGeojsonLayers.hexSize, 'visibility','visible')) {
-      console.log('hey')
-      var features = map.queryRenderedFeatures({
-        layers: [currentGeojsonLayers.hexSize]
-      })
+    if(!map.getLayer(currentGeojsonLayers.hexSize)) {
 
-    //if(map.getLayer(currentGeojsonLayers.hexSize)) {
-      console.log('hi');
+      var current = _.find(sourceData, function(o) { return o.name === currentGeojsonLayers.hexSize})
+
+      console.log(firstSymbolId);
+
+      map.addLayer({
+        'id': currentGeojsonLayers.hexSize,
+        'type': 'fill', 
+        'source': currentGeojsonLayers.hexSize,
+        'source-layer': current.layer,
+        'layout': {
+          'visibility': 'visible'
+          },
+        'paint': {
+            'fill-color': 'blue',
+            'fill-opacity': 0.0,
+                     
+            }
+        });
+
+        if(firstSymbolId) {
+          map.moveLayer(currentGeojsonLayers.hexSize, firstSymbolId);
+        }
+
+
+    } setTimeout(() => {
         var features = map.queryRenderedFeatures({
           layers: [currentGeojsonLayers.hexSize]
         })
 
-      
-  
       if(features) {
 
         var uniFeatures;
@@ -855,7 +920,7 @@ function addAdminClick() {
         
         //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
         var breaks = chroma.limits(selecteData, 'q', 4)
-        console.log(breaks)
+        //console.log(breaks)
         
         var colorRamp = chroma.scale(['#fafa6e','#2A4858']).mode('lch').colors(5)
         var colorRamp1 = ['#edf8fb', '#b2e2e2','#66c2a4','#2ca25f', '#006d2c' ]
@@ -939,12 +1004,12 @@ function addAdminClick() {
           //setTimeout(() => { map.setFilter(currentGeojsonLayers.hexSize, null) }, 500);
           
           map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.0)
-          setTimeout(() => { map.setFilter(currentGeojsonLayers.hexSize, null) }, 1000);
+          setTimeout(() => { map.setFilter(currentGeojsonLayers.hexSize, null) }, 100);
           addNoDataLegend();
         } else {
           map.setFilter(currentGeojsonLayers.hexSize,['>=',selection, 0])
           addLegend(colorRamp, breaks, selection)
-          setTimeout(() => {  map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.7) }, 500);
+          setTimeout(() => {  map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.7) }, 100);
         }
         
         //setTimeout(() => {  map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.8) }, 700);
@@ -952,56 +1017,10 @@ function addAdminClick() {
         
 
   }
-}
+  //}
+
+  },600)
   }
-
-
-
-/*function addOverlay(sel) {
-  
-
-  var colorz;
-
-  if(sel ==='remove') {
-      if(map.getLayer('admin1-overlay')) {
-          map.removeLayer('admin1-overlay')
-      }
-      if(map.getLayer('admin2-overlay')) {
-          map.removeLayer('admin2-overlay')
-      }
-  } else {
-
-    if(sel === 'admin2') {
-        colorz = 'blue'
-    } else {
-        colorz = 'red'
-    }
-    
-    var layerName = sel + '-overlay'
-
-    if (map.getLayer(layerName)) {
-        map.removeLayer(layerName)
-    } else {
-
-
-        map.addLayer({
-        'id': layerName,
-        'type': 'line', 
-        'source': sel,
-        'layout': {
-            'visibility': 'visible'
-            },
-        
-        'paint': {
-            'line-color': colorz,
-            
-            }
-        }, firstSymbolId);
-
-    }
-
-  }
-} */
 
 
 //addLegend()
@@ -1070,7 +1089,7 @@ function addLegend(colors, breaks, current) {
 }
 
 
-var hoveredStateId = null;
+/*var hoveredStateId = null;
 map.on('mousemove', currentGeojsonLayers.hexSize, function (e) {
   
 
@@ -1132,133 +1151,7 @@ map.on('mouseleave', currentGeojsonLayers.hexSize, function () {
 
       }
         hoveredStateId = null;
-    });
-
-
-  //add sources
-  /*function addHexSource() {
-    //const hex10 = "https://sebastian-ch.github.io/sidsDataTest/data/hex10.pbf"
-    //const hex5 = "https://sebastian-ch.github.io/sidsDataTest/data/hex5.pbf";
-    const hex10 = 'mapbox://sebastian-ch.69xhs9lb';
-    const hex5 = 'https://sebastian-ch.github.io/sidsDataTest/data/t5/{z}/{x}/{y}.pbf';
-    //const admin1 = "https://sebastian-ch.github.io/sidsDataTest/data/admin1-new.pbf";
-    const admin1 = 'mapbox://sebastian-ch.7vnjgjge';
-    //const admin2 = "https://sebastian-ch.github.io/sidsDataTest/data/admin2.pbf";
-    const admin2= 'https://sebastian-ch.github.io/sidsDataTest/data/admin2tiles/{z}/{x}/{y}.pbf'
-    
-    //const hex1 = 'https://sebastian-ch.github.io/sidsDataTest/localTiles/tiles-1km/{z}/{x}/{y}.pbf'
-    //const hex1 = 'https://sebastian-ch.github.io/sidsDataTest/data/carnew/{z}/{x}/{y}.pbf'
-    const hex1= 'https://sebastian-ch.github.io/sidsDataTest/data/aishex1tiles2/{z}/{x}/{y}.pbf'
-    //const ocean = './data/d-round.pbf';
-    //const ocean = 'https://sebastian-ch.github.io/sidsDataTest/data/ocean.pbf';
-    const ocean = 'mapbox://sebastian-ch.dbe6mvw4'
-
-    //var files = [admin2]
-    //var files = [admin2]
-    //var promises = [];
-
-    //files.forEach(function(url){
-    //  promises.push(d3.buffer(url))
-   // })
-
-    //Promise.all(promises).then(function(allData){
-      //console.log(allData[0])
-
-      //add 10km source
-      map.addSource('hex10', {
-        'type': 'vector',
-        //type: "geojson",
-        //data: geobuf.decode(new Pbf(allData[0])),
-        url: hex10,
-        promoteId: 'hexid'
-      }) 
-      sourceData.hex10Source.data = hex10;
-
-      //add 5km
-      map.addSource('hex5', {
-        'type': 'vector',
-        'promoteId': 'hexid',
-        'tiles': [
-          //otherhex
-          hex5
-        ],
-        //'minzoom': 3,
-        'maxzoom': 12
-      })
-      sourceData.hex5Source.data = hex5;
-
-
-      map.addSource('admin1', {
-        'type': 'vector',
-        'promoteId': 'GID_1',
-        url: admin1,
-        //'minzoom': 3,
-        'maxzoom': 12
-      })
-
-
-      sourceData.admin1Source.data = admin1;
-
-      map.addSource('admin2', {
-        'type': 'vector',
-        'promoteId': 'GID_2',
-        'tiles': [
-          admin2
-        ],
-        //'minzoom': 3,
-        'maxzoom': 12
-      })
-
-      sourceData.admin2Source.data = admin2;
-
-     
-
-      map.addSource('hex1', {
-          'type': 'vector',
-          'promoteId': 'hexid',
-          'tiles': [
-            hex1
-          ],
-          //'minzoom': 3,
-          //'maxzoom': 12
-      })
-      sourceData.hex1Source.data = hex1;
-
-
-      map.addSource('ocean', {
-        'type': 'vector',
-        'url': ocean
-      })
-
-     
-      sourceData.oceanSource.data = ocean;
-
-
-      
-
-
-      //add first layer (5km)
-      map.addLayer({
-        'id': 'hex5',
-        'type': 'fill', 
-        'source': 'hex5',
-        //'source-layer': 'hex-5km',
-        'source-layer': 'hex5_3857',
-        'layout': {
-          'visibility': 'visible'
-          },
-        
-        'paint': {
-            'fill-color': 'blue',
-            'fill-opacity': 0,
-            }
-        }, firstSymbolId);
-
-        $('.loader-gis').remove()
-    //}) 
-
-  } */
-
+    }); */
 
 /////ui js
 var selection_scroller_options = {
@@ -1531,7 +1424,8 @@ $('.year-timeline-wrapper').hide()
 	// 
 	$('select[name="dataset-selection"]').on('change', function () {
 		//console.log('Dataset: ' + $(this).val());
-    //console.log(this.selectedOptions[0].id)
+    console.log(map.getStyle().layers)
+    
     var legendTitle = document.getElementById('legendTitle')
     var legend = document.getElementById('updateLegend')
     legend.innerHTML = '';
@@ -1542,12 +1436,75 @@ $('.year-timeline-wrapper').hide()
     infoBoxTitle.innerHTML = '';
     infoBoxText.innerHTML = '';
     infoBoxLink.innerHTML = '';
+    //console.log(this.selectedOptions[0].className);
 
+    if(this.selectedOptions[0].className === 'basemap') {
+      $('#layer-id').hide()
+      $('#icon3d').hide()
+      $('.year-timeline-wrapper').hide()
+      $('.opacityslider').hide()
 
-    if(this.selectedOptions[0].innerHTML === 'GDP per Capita' || this.selectedOptions[0].innerHTML === 'Population Density') {
+      //console.log(map.getStyle().sources)
+      //console.log(styles)
+      if(map.getLayer(currentGeojsonLayers.hexSize)) {
+        map.removeLayer(currentGeojsonLayers.hexSize)
+      }
+      
+      var lyr = this.selectedOptions[0].innerHTML;
+      legend.innerHTML = '';
+      legendTitle.innerHTML = ''
+      infoBoxTitle.innerHTML = lyr
+      infoBoxText.innerHTML = '';
+      infoBoxLink.innerHTML = '';
+
+      //console.log(basemapLabels)
+      if(lyr === 'Satellite Imagery') {
+      /*  basemapLabels.forEach(function(x) {
+          map.removeLayer(x.id);
+        })
+
+        $('#addLabels')[0].innerText = 'Add Labels'
+        //console.log($('#basemap-switch').find(":selected").text())
+       */
+
+        addLabels();
+
+      } else if(map.getStyle().layers.length > 2) {
+        console.log(map.getStyle().layers);
+
+        //console.log(map.getStyle().layers)
+        
+      } else {
+        
+        addLabels()
+
+      }
+      
+      
+      //var thisStyle = _.find(styles, function(o){return o.title === lyr})
+      //map.setStyle(thisStyle.uri);
+      var layers = map.getStyle().layers;
+      //console.log(layers);
+      if(layers.length <= 2) {
+        firstSymbolId = null;
+      } else {
+        for (var i = 0; i < layers.length; i++) {
+          if (layers[i].type === 'symbol') {
+            firstSymbolId = layers[i].id;
+            break;
+          }
+      }
+    }
+
+        
+          
+
+    
+    } else if(this.selectedOptions[0].innerHTML === 'GDP per Capita' || this.selectedOptions[0].innerHTML === 'Population Density') {
       //map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.0)
       $('.year-timeline-wrapper').show()
       $('#layer-id').hide()
+      $('.opacityslider').show()
       if(this.selectedOptions[0].innerHTML === 'Population Density') {
         $('#icon3d').show()
       }
@@ -1567,6 +1524,7 @@ $('.year-timeline-wrapper').hide()
       $('#icon3d').hide()
       $('.year-timeline-wrapper').hide()
       $('.year-timeline').empty();
+      $('.opacityslider').show()
       map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.0)
       
       var layers = [];
@@ -1582,6 +1540,7 @@ $('.year-timeline-wrapper').hide()
 
     } else {
       $('#icon3d').hide()
+      $('.opacityslider').show()
       var layersHolder = document.getElementById('layer-drop');
       var length = layersHolder.options.length;
     
@@ -1859,6 +1818,12 @@ $('.year-timeline-wrapper').hide()
 
 	});
 
+
+  $('#volume').on("change mousemove", function(){
+    //console.log($(this).val());
+    map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', ($(this).val() * 0.1))
+  })
+
 	/**
 	 *  Top Toolip 
 	*/
@@ -1997,8 +1962,8 @@ function addButtons() {
         }
 
     })
-
 }
+
 var pass = document.getElementById('fname')
 
 pass.addEventListener('input', function(e) {
@@ -2008,4 +1973,4 @@ pass.addEventListener('input', function(e) {
 if(pass.value === 'island') {
 document.getElementById('password').remove()
 }
-}) 
+})

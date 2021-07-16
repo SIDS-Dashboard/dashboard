@@ -1,7 +1,7 @@
 function addHexSource() {
     //const hex10 = "https://sebastian-ch.github.io/sidsDataTest/data/hex10.pbf"
     //const hex5 = "https://sebastian-ch.github.io/sidsDataTest/data/hex5.pbf";
-    const hex10 = 'mapbox://sebastian-ch.69xhs9lb';
+    const hex10 = 'https://sebastian-ch.github.io/sidsDataTest/data/hex10km/{z}/{x}/{y}.pbf';
     const hex5 = 'https://sebastian-ch.github.io/sidsDataTest/data/t5/{z}/{x}/{y}.pbf';
     //const admin1 = "https://sebastian-ch.github.io/sidsDataTest/data/admin1-new.pbf";
     const admin1 = 'mapbox://sebastian-ch.7vnjgjge';
@@ -33,7 +33,9 @@ function addHexSource() {
         'type': 'vector',
         //type: "geojson",
         //data: geobuf.decode(new Pbf(allData[0])),
-        url: hex10,
+        'tiles': [
+           hex10
+        ],
         promoteId: 'hexid'
       }) 
       sourceData.hex10Source.data = hex10;

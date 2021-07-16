@@ -14,7 +14,12 @@ body {
     align-items: center;
     text-align: center;
   }
-
+#opacity-slider {
+    background-color: #DDDDDD;
+}
+#volume {
+    color: #DDDDDD;
+}
 #map {
     position: fixed;
     top: 0;
@@ -110,6 +115,31 @@ input[type=checkbox] {
 
 .country-select-menu {
     position: relative;
+}
+
+#addLabels {
+
+    margin-right: 5px;
+    padding: 8px 8px 8px 8px;
+    border-radius: 10px;
+    color: black;
+    height: 34px;
+    background: #DDDDDD;
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 19px;
+    
+    text-align: center;
+    cursor: pointer;
+
+}
+
+.opacityslider {
+    display: none;
+}
+
+#addLabels:hover {
+    background: #818f98;
 }
 
 #button {
@@ -286,7 +316,7 @@ input[type=checkbox] {
 
 .main-wrapper {
     margin-left: 14px;
-    margin-top: 15vh;
+    margin-top: 0vh;
     position: relative;
     width: 381px;
     z-index: 1;

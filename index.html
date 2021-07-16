@@ -87,15 +87,30 @@
 				
 		</div>
 
-		<div class="row-flex" style="justify-content:flex-end;margin-top:15px;">
+		<!--<div class="row-flex" style="justify-content:flex-end;margin-top:15px;">
 			<div class="country-select-menu" id="country-select-id">
 				<select id="basemap-switch">
 					<option value="Satellite With Labels">Satellite With Labels</option>
-					<option value='Light'>Light</option>
+					<option value='Light'>Light Basemap</option>
 					<option value='Satellite Imagery'>Satellite No Labels</option>
 				</select>
 				<span class="downarrow"></span>
 			</div>
+		</div> -->
+
+		<div class="row-flex" style="justify-content:flex-end;margin-top:15px;">
+			<div id="addLabels" class="addLabels" onclick="addLabels()">Remove Labels</div>
+			<div class="country-select-menu" id="country-select-id">
+				<div class='opacityslider'>
+					<div id='opacityslider'>
+						<input type="range" id="volume" value="7" name="volume"
+							min="0" max="10">	
+					</div>
+					<label id='volume' for="volume">Opacity</label>
+				</div>
+			</div>
+			
+
 		</div>
 
 		<!--<div class="row-flex add-chart-button-wrap">
