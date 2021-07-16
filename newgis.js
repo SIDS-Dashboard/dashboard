@@ -1846,10 +1846,10 @@ $('.year-timeline-wrapper').hide()
 
 
   $('#volume').on("change mousemove", function(){
-    console.log($(this).val());
+    //console.log($(this).val());
     map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', ($(this).val() * 0.1))
     if(map.getLayer('ocean')) {
-      console.log('hi');
+      //console.log('hi');
       map.setPaintProperty('ocean', 'fill-opacity', ($(this).val() * 0.1))
 
     }
@@ -1907,10 +1907,10 @@ $('.year-timeline-wrapper').hide()
 		var layerSelect = $('select[name="layer-selection"]').val();
 		//var year = $('input[name="year-selected"]:checked').val();
 
-		console.log('Top left nav = ' + top_left_nav);
-		console.log('Top right Button = ' + btnValue);
-		console.log('DATASET selection = ' + datasetSelect);
-		console.log('Layer selection = ' + layerSelect);
+		//console.log('Top left nav = ' + top_left_nav);
+		//console.log('Top right Button = ' + btnValue);
+		//console.log('DATASET selection = ' + datasetSelect);
+		//console.log('Layer selection = ' + layerSelect);
 		//console.log('Year selection = ' + year);
 	}
 
@@ -1994,14 +1994,3 @@ function addButtons() {
 
     })
 }
-
-var pass = document.getElementById('fname')
-
-pass.addEventListener('input', function(e) {
-
-//console.log(pass.value)
-
-if(pass.value === 'island') {
-document.getElementById('password').remove()
-}
-}) 
