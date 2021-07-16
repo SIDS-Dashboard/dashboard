@@ -392,12 +392,14 @@ mapboxgl.accessToken =
     //rotateCamera(0)
 
     console.log(currentGeojsonLayers);
+    var current = _.find(sourceData, function(o) { return o.name === currentGeojsonLayers.hexSize})
 
     map.addLayer({
       'id': id3d,
       'type': 'fill-extrusion', 
       'source': currentGeojsonLayers.hexSize,
-      'source-layer': 'hex5_3857',
+      //'source-layer': 'hex5_3857',
+      'source-layer': current.layer,
       'layout': {
         'visibility': 'visible'
         },
@@ -544,23 +546,42 @@ mapboxgl.accessToken =
   })
 
 function addTheOnClick() {
+  var currentLayer;
+  //var textInfo;
+  if(map.getLayer('ocean')) {
+    currentLayer = 'ocean';
+  } else {
+    currentLayer = currentGeojsonLayers.hexSize
+    
+  }
 
-  map.on('click', currentGeojsonLayers.hexSize, function(e){
+  
+
+  map.on('click', currentLayer, function(e){
 
     var popup = new mapboxgl.Popup({
       closeButton: true,
       closeOnClick: true
       });
+    
     console.log(document.getElementById("infoBoxTitle").textContent)
 
     //console.log(currentGeojsonLayers.dataLayer);
     //console.log(e.features[0].properties)
+    if(currentLayer === 'ocean') {
 
-    //var coords = e.features[0].geometry.coordinates.slice();
-    //console.log(e.features[0].geometry)
-    var text = '<h4><b>' + document.getElementById("infoBoxTitle").textContent + '</b><br>' + e.features[0].properties[currentGeojsonLayers.dataLayer].toLocaleString() +' ' + document.getElementById("legendTitle").textContent + '</h4>'
+      var text = '<h4><b>' + document.getElementById("infoBoxTitle").textContent + '</b><br>' + e.features[0].properties['depth'].toLocaleString() +' ' + document.getElementById("legendTitle").textContent + '</h4>'
+      console.log(e.features[0].properties['depth'].toLocaleString());
+    } else {
+
+      //var coords = e.features[0].geometry.coordinates.slice();
+      //console.log(e.features[0].geometry)
+      var text = '<h4><b>' + document.getElementById("infoBoxTitle").textContent + '</b><br>' + e.features[0].properties[currentGeojsonLayers.dataLayer].toLocaleString() +' ' + document.getElementById("legendTitle").textContent + '</h4>'
+    }
+    
     popup.setLngLat(e.lngLat).setHTML(text).addTo(map);
   })
+
 }
 
 function addAdminClick() {
@@ -620,6 +641,10 @@ function addAdminClick() {
   function changeHexagonSize(sel) {
 
     //console.log(map.getStyle())
+    if(map.getLayer('ocean')) {
+      map.removeLayer('ocean');
+    }
+    
     remove3d()
     currentGeojsonLayers.hexSize = sel
     console.log(sel);
@@ -821,6 +846,7 @@ function addAdminClick() {
 
 
     addLegend(currentGeojsonLayers.color, currentGeojsonLayers.breaks, layer)
+    //addTheOnClick()
 
   }
 
@@ -1440,7 +1466,7 @@ $('.year-timeline-wrapper').hide()
 
     if(this.selectedOptions[0].className === 'basemap') {
       $('#layer-id').hide()
-      $('#icon3d').hide()
+      //$('#icon3d').hide()
       $('.year-timeline-wrapper').hide()
       $('.opacityslider').hide()
 
@@ -1506,7 +1532,7 @@ $('.year-timeline-wrapper').hide()
       $('#layer-id').hide()
       $('.opacityslider').show()
       if(this.selectedOptions[0].innerHTML === 'Population Density') {
-        $('#icon3d').show()
+        //$('#icon3d').show()
       }
      
       var layers = [];
@@ -1521,7 +1547,7 @@ $('.year-timeline-wrapper').hide()
       //addToLayersDrop(layers);
 
     } else if(this.selectedOptions[0].innerHTML === 'Food Insecurity' || this.selectedOptions[0].innerHTML === 'Water Use' ||this.selectedOptions[0].innerHTML === 'Development Potential Index' || this.selectedOptions[0].innerHTML === 'Ocean Data') {
-      $('#icon3d').hide()
+      //$('#icon3d').hide()
       $('.year-timeline-wrapper').hide()
       $('.year-timeline').empty();
       $('.opacityslider').show()
@@ -1539,7 +1565,7 @@ $('.year-timeline-wrapper').hide()
       addToLayersDrop(layers);
 
     } else {
-      $('#icon3d').hide()
+      //$('#icon3d').hide()
       $('.opacityslider').show()
       var layersHolder = document.getElementById('layer-drop');
       var length = layersHolder.options.length;
@@ -1820,8 +1846,13 @@ $('.year-timeline-wrapper').hide()
 
 
   $('#volume').on("change mousemove", function(){
-    //console.log($(this).val());
+    console.log($(this).val());
     map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', ($(this).val() * 0.1))
+    if(map.getLayer('ocean')) {
+      console.log('hi');
+      map.setPaintProperty('ocean', 'fill-opacity', ($(this).val() * 0.1))
+
+    }
   })
 
 	/**
@@ -1973,4 +2004,4 @@ pass.addEventListener('input', function(e) {
 if(pass.value === 'island') {
 document.getElementById('password').remove()
 }
-})
+}) 
