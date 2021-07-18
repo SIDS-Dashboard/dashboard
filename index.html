@@ -29,6 +29,18 @@
 			<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width='170' height='170'  viewbox="0 0 200 173.20508075688772"><path fill="#003399" d="M0 86.60254037844386L50 0L150 0L200 86.60254037844386L150 173.20508075688772L50 173.20508075688772Z"></path></svg>
 		</div>
     </div>
+	<div id="myModal" class="modal">
+
+		<!-- Modal content -->
+		<div class="modal-content">
+		  <span class="close">&times;</span>
+		  <ul>
+			  <button id='shp'>Download Shapefile</button>
+			  <button id='gjn'>Download GeoJSON </button>
+		  </ul>
+		</div>
+	  
+	  </div>
 	
 	
 	<div id='password' class='password'>
@@ -87,16 +99,17 @@
 				
 		</div>
 
-		<!--<div class="row-flex" style="justify-content:flex-end;margin-top:15px;">
-			<div class="country-select-menu" id="country-select-id">
-				<select id="basemap-switch">
+		<div class="row-flex " style="justify-content:flex-end;margin-top:15px;">
+			<div class="country-select-menu download" id="country-select-id">
+				<div id='datadownload'>Download Data</div>
+				<!--<select id="basemap-switch">
 					<option value="Satellite With Labels">Satellite With Labels</option>
 					<option value='Light'>Light Basemap</option>
 					<option value='Satellite Imagery'>Satellite No Labels</option>
 				</select>
-				<span class="downarrow"></span>
+				<span class="downarrow"></span>-->
 			</div>
-		</div> -->
+		</div> 
 
 		<div class="row-flex" style="justify-content:flex-end;margin-top:15px;">
 			<div id="addLabels" class="addLabels" onclick="addLabels()">Remove Labels</div>
@@ -741,6 +754,11 @@
     <script src="https://unpkg.com/pbf@3.0.5/dist/pbf.js"></script>
     <script src="https://unpkg.com/geobuf@3.0.2/dist/geobuf.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.1.2/chroma.min.js"></script>
+	<script src="https://github.com/niklasvh/html2canvas/releases/download/0.4.1/html2canvas.js"></script>
+	<script src='https://unpkg.com/@turf/turf@6.3.0/turf.min.js'></script>
+	<!--shp-write originally create by mapbox, updated code from: https://github.com/mapbox/shp-write/pull/65/files -->
+	<script src='./shpwrite.js'></script>
+	
 	<script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="./data/sidsNames.js"></script>
 	<script src="./newgis.js"></script>

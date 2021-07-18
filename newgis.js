@@ -20,8 +20,9 @@ mapboxgl.accessToken =
     container: "map", // container ID
     //style: 'mapbox://styles/mapbox/light-v10?optimize=true', //?optimize=true
     style: 'mapbox://styles/mapbox/satellite-streets-v11', 
-    center: [-71.4, 19.1], // starting position [lng, lat]
-    zoom: 7,
+    center: [-61.2, 10.4], // starting position [lng, lat]
+    zoom: 9,
+    preserveDrawingBuffer: true
     //maxZoom: ,
     //minZoom: 
     //pitch: 55
@@ -97,7 +98,7 @@ mapboxgl.accessToken =
     map.removeLayer("admin-1-boundary-bg")
     map.removeLayer('airport-label')
     var layers = map.getStyle().layers;
-    console.log(layers);
+    //console.log(layers);
 
     for(var x in layers) {
 
@@ -109,7 +110,7 @@ mapboxgl.accessToken =
     //console.log(layers);
     
     map.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
-    $('.loader-gis').remove()
+    //$('.loader-gis').remove()
     addHexSource()
     //addTileSources()
     //justAdmin()
@@ -180,7 +181,7 @@ mapboxgl.accessToken =
       layers: [currentGeojsonLayers.hexSize]
     })
 
-    console.log(currentGeojsonLayers.hexSize);
+    //console.log(currentGeojsonLayers.hexSize);
     if(features) {
 
       var uniFeatures;
@@ -193,11 +194,12 @@ mapboxgl.accessToken =
         }
 
 
+      //console.log(uniFeatures.features);
       var selecteData = uniFeatures.map(x => x.properties[currentGeojsonLayers.dataLayer])
       //console.log(selecteData);
       var breaks = chroma.limits(selecteData, 'q', 4)
       currentGeojsonLayers.breaks = breaks;
-      console.log(breaks)
+      //console.log(breaks)
       map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-color',
         [
           'interpolate',
@@ -605,6 +607,7 @@ function addAdminClick() {
       }
     })
 
+    console.log(e);
     map.getSource('highlightS').setData(e.features[0].geometry)
 
     map.addLayer({
@@ -939,7 +942,7 @@ function addAdminClick() {
         
         //console.log(uniFeatures);
         var selecteData = uniFeatures.map(x => x.properties[selection])
-        console.log(selecteData);
+        //console.log(selecteData);
         var max = Math.max(...selecteData)
         var min = Math.min(...selecteData)
         
@@ -1450,7 +1453,7 @@ $('.year-timeline-wrapper').hide()
 	// 
 	$('select[name="dataset-selection"]').on('change', function () {
 		//console.log('Dataset: ' + $(this).val());
-    console.log(map.getStyle().layers)
+    //console.log(map.getStyle().layers)
     
     var legendTitle = document.getElementById('legendTitle')
     var legend = document.getElementById('updateLegend')
@@ -1469,6 +1472,7 @@ $('.year-timeline-wrapper').hide()
       //$('#icon3d').hide()
       $('.year-timeline-wrapper').hide()
       $('.opacityslider').hide()
+      $('.download').hide()
 
       //console.log(map.getStyle().sources)
       //console.log(styles)
@@ -1531,6 +1535,7 @@ $('.year-timeline-wrapper').hide()
       $('.year-timeline-wrapper').show()
       $('#layer-id').hide()
       $('.opacityslider').show()
+      $('.download').show()
       if(this.selectedOptions[0].innerHTML === 'Population Density') {
         //$('#icon3d').show()
       }
@@ -1551,6 +1556,7 @@ $('.year-timeline-wrapper').hide()
       $('.year-timeline-wrapper').hide()
       $('.year-timeline').empty();
       $('.opacityslider').show()
+      $('.download').show()
       map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.0)
       
       var layers = [];
@@ -1567,6 +1573,7 @@ $('.year-timeline-wrapper').hide()
     } else {
       //$('#icon3d').hide()
       $('.opacityslider').show()
+      $('.download').show()
       var layersHolder = document.getElementById('layer-drop');
       var length = layersHolder.options.length;
     
@@ -1933,6 +1940,137 @@ function nFormatter(num, digits) {
   }
   return (num / si[i].value).toFixed(digits).replace(rx, "$1") + si[i].symbol;
 }
+
+
+$('#datadownload').click(function(){
+
+  //$('.loader-gis').show()
+
+  map.setFilter(currentGeojsonLayers.hexSize, null)
+
+  setTimeout(() => { var features = map.queryRenderedFeatures({
+    layers: [currentGeojsonLayers.hexSize]
+  }) 
+
+  //console.log(features);
+
+  if(features) {
+    
+    var uniFeatures;
+      if(currentGeojsonLayers.hexSize === 'admin1') {
+        uniFeatures = getUniqueFeatures(features, 'GID_1');
+      } else if (currentGeojsonLayers.hexSize === 'admin2') {
+        uniFeatures = getUniqueFeatures(features, 'GID_2');
+      } else {
+        uniFeatures = getUniqueFeatures(features, 'hexid');
+      }
+      
+      console.log(uniFeatures);
+      
+
+      map.addSource('screen', {
+        type: 'geojson',
+        data: {
+          'type': 'FeatureCollection',
+          'features': uniFeatures
+          //'features': features
+        }
+      })
+      
+
+      map.addLayer({
+        'id': 'screenshot',
+        'source': 'screen',
+        'type': 'line',
+        'paint': {
+          'line-color': '#66ff00',
+          'line-width': 3
+        }
+      })
+
+     
+
+      var gdata = map.getSource('screen')._data;
+    
+    
+      
+      //exportGeojson(gdata);
+      openDownloadPage(gdata);
+     
+
+    } }, 700)
+
+    
+
+  
+
+});
+
+function openDownloadPage(gdata) {
+  $('.modal').toggle();
+  //$('.loader-gis').hide()
+
+
+  $('#shp').click(function() {
+    exportShp(gdata);
+  })
+  $('#gjn').click(function() {
+    exportGeojson(gdata);
+  })
+
+}
+
+function exportShp(obj) {
+
+  const options = {
+    folder: 'SIDSshapefile',
+    types: {
+      polygon: currentGeojsonLayers.hexSize.toString()
+    }
+  }
+  shpwrite.download(obj, options);
+  //$('.modal').toggle();
+
+}
+
+function exportGeojson(obj) {
+
+  function mapArray(ar) {
+
+    return _.map(ar.features, object =>
+      _.omit(object, ['_vectorTileFeature', 'layer', 'source','sourceLayer', 'state'])
+      );
+
+  }
+  var resultz = mapArray(obj)
+
+  resultz.forEach(function(x){
+    x.geometry = x._geometry
+    delete x._geometry
+  })
+
+
+  var fc = turf.featureCollection(resultz)
+
+  var datastring = '';
+  //$('.modal').toggle();
+
+  var datastring = "data:text/json;charset=utf-8, " + encodeURIComponent(JSON.stringify(fc))
+      var link = document.createElement('a');
+        link.download = 'download.geojson';
+        link.href = datastring
+        link.click();
+        link.delete;
+
+}
+
+$('.close').click(function(){
+  map.setFilter(currentGeojsonLayers.hexSize,['>=',currentGeojsonLayers.dataLayer, 0])
+  $('.modal').toggle();
+  map.removeLayer('screenshot')
+  map.removeSource('screen');
+
+})
 
 function addButtons() {
 
