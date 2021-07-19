@@ -1,3 +1,5 @@
+
+
 var allLayers = []
 var firstSymbolId;
 const userLayers = ['hex5', 'hex10', 'admin1', 'admin2', 'hex1', 'ocean'];
@@ -111,6 +113,7 @@ mapboxgl.accessToken =
     
     map.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
     //$('.loader-gis').remove()
+    //$('.download').show()
     addHexSource()
     //addTileSources()
     //justAdmin()
@@ -2034,7 +2037,7 @@ $('#datadownload').click(function(){
         uniFeatures = getUniqueFeatures(features, 'hexid');
       }
       
-      console.log(uniFeatures);
+      //console.log(uniFeatures);
       
 
       map.addSource('screen', {
@@ -2076,20 +2079,47 @@ $('#datadownload').click(function(){
 });
 
 function openDownloadPage(gdata) {
+  var allTheFieldIds = allLayers.map(x => x.field_name);
+  //console.log(allTheFieldIds);
+  var allchecked = [];
+
   $('.modal').toggle();
   //$('.loader-gis').hide()
 
 
   $('#shp').click(function() {
-    exportShp(gdata);
+    var removeOnes = _.difference(allTheFieldIds, allchecked);
+    exportShp(gdata, removeOnes);
   })
   $('#gjn').click(function() {
-    exportGeojson(gdata);
+    
+    //console.log(allchecked);
+    var removeOnes = _.difference(allTheFieldIds, allchecked);
+    //console.log(removeOnes)
+    exportGeojson(gdata, removeOnes);
+  })
+
+
+  $('input:checkbox').change(function(){
+    var thisid = $(this)[0].id
+   
+
+    if($(this).is(":checked")) {
+      allchecked.push(thisid);
+    }
   })
 
 }
 
-function exportShp(obj) {
+function exportShp(obj, removeOnes) {
+
+  //console.log(obj);
+
+  for(var x in obj.features) {
+    for(var y in removeOnes) {
+      delete obj.features[x].properties[removeOnes[y]]
+    }
+  }
 
   const options = {
     folder: 'SIDSshapefile',
@@ -2102,7 +2132,9 @@ function exportShp(obj) {
 
 }
 
-function exportGeojson(obj) {
+function exportGeojson(obj, removeOnes) {
+
+
 
   function mapArray(ar) {
 
@@ -2118,11 +2150,32 @@ function exportGeojson(obj) {
     delete x._geometry
   })
 
+ 
+  //console.log(resultz)
+  
+
+
+  
+
 
   var fc = turf.featureCollection(resultz)
 
+
+  //console.log(fc)
+
+  for (var x in fc.features) {
+
+    for(var y in removeOnes) {
+      
+      delete fc.features[x].properties[removeOnes[y]]
+    }
+
+  }
+
+  //console.log(fc);
+
   var datastring = '';
-  //$('.modal').toggle();
+  $('.modal').toggle();
 
   var datastring = "data:text/json;charset=utf-8, " + encodeURIComponent(JSON.stringify(fc))
       var link = document.createElement('a');
@@ -2130,7 +2183,6 @@ function exportGeojson(obj) {
         link.href = datastring
         link.click();
         link.delete;
-
 }
 
 $('.close').click(function(){
@@ -2170,6 +2222,24 @@ function addButtons() {
               'link': x.Source_Link
             }
             )
+
+            var checkbox = document.getElementById('download-attributes')
+            var newI = document.createElement('input');
+            newI.type = 'checkbox'
+            newI.setAttribute('id', x.Field_Name)
+
+            var label = document.createElement('label')
+            label.htmlFor = "id"
+            label.appendChild(document.createTextNode('\u00A0' + x.Description + ' ' + x.Temporal));
+
+
+            checkbox.appendChild(newI)
+            checkbox.appendChild(label)
+            var br = document.createElement('br')
+            checkbox.appendChild(br)
+            
+
+
         })
 
         var dataHolder = document.getElementById('dataDrop')

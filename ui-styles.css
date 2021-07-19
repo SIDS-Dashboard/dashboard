@@ -126,7 +126,7 @@ input[type=checkbox] {
     padding: 8px 8px 8px 8px;
     border-radius: 10px;
     color: black;
-    height: 40px; 
+    /*height: 40px; */
     background: #DDDDDD;
     font-weight: 300;
     font-size: 14px;
@@ -1077,7 +1077,7 @@ input[type='radio']:checked~label .circle-radio {
     }
 
 .downloadModal {
-    display: none; 
+    display: none;
     position: fixed; 
     z-index: 1; 
     left: 0;
@@ -1091,12 +1091,19 @@ input[type='radio']:checked~label .circle-radio {
     
     background-color: #fefefe;
     margin: 15% auto; 
-    padding: 20px;
+    padding: 5px;
+   
     border: 1px solid #888;
     width: 80%; 
   }
 
-  .modal-content > ul{
+  #download-buttons{
+      text-align: center;
+      margin-bottom: 0px;
+  }
+
+  .modal-content > p {
+      margin-bottom: 0;
       text-align: center;
   }
 
@@ -1125,6 +1132,7 @@ button:hover{
   .close {
     color: #aaa;
     float: right;
+    
     font-size: 28px;
     font-weight: bold;
   }
