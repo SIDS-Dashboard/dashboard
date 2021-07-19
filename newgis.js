@@ -1608,11 +1608,15 @@ $('.year-timeline-wrapper').hide()
 
     var clicked = $(this).val();
     console.log(clicked);
-    if(!this.checked) {
+    if(clicked === 'underwater-overlay') {
+      addCables()
+      
+    } else if(!this.checked) {
       map.removeLayer(clicked)
     } else {
 
       var slayer; var color; var source;
+
       if(clicked === 'admin1-overlay') {
         source = 'admin1'
         slayer = 'admin1-3857-bpys5w'
@@ -1621,7 +1625,7 @@ $('.year-timeline-wrapper').hide()
         source = 'admin2'
         slayer = 'admin2'
         color = '#003399'
-      }
+      } 
 
         map.addLayer({
           'id': clicked,
@@ -1648,6 +1652,71 @@ $('.year-timeline-wrapper').hide()
     
     });
 
+
+    function addCables() {
+
+      if(map.getLayer('underwater')) {
+        map.removeLayer('underwater')
+      } else if(!map.getSource('underwater-source')) {
+
+        d3.json('./data/cable-geo.json').then(function(d) {
+
+          map.addSource('underwater-source', {
+            'type': 'geojson',
+            'data': d
+          })
+
+          map.addLayer({
+            'id': 'underwater',
+            'type': 'line', 
+            'source': 'underwater-source',
+            
+            'layout': {
+                'visibility': 'visible'
+                },
+            
+            'paint': {
+                'line-color': ['get', 'color'],
+                'line-width': 3
+                }
+            }, firstSymbolId);
+      
+        })
+
+      } else {
+
+     
+      map.addLayer({
+        'id': 'underwater',
+        'type': 'line', 
+        'source': 'underwater-source',
+        
+        'layout': {
+            'visibility': 'visible'
+            },
+        
+        'paint': {
+            'line-color': ['get', 'color'],
+            'line-width': 3
+            }
+        }, firstSymbolId);
+      }
+
+
+
+      map.on('click', 'underwater', function(e) {
+        var popup = new mapboxgl.Popup({
+          closeButton: true,
+          closeOnClick: true
+          });
+
+
+          popup.setLngLat(e.lngLat).setHTML('<b>' + e.features[0].properties['slug'] + '</b>').addTo(map);
+      })
+
+    }
+
+  
 
 	$('select[name="layer-selection"]').on('change', function () {
 		console.log('Layer: ' + $(this).val());

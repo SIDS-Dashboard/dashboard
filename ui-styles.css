@@ -35,6 +35,13 @@ input[type=checkbox] {
    width: 12px;
    height: 12px;
 }
+
+#underwater {
+    color: black;
+     padding: 0px;
+     font-size: 14px;
+     font-weight: bold;
+}
  
  #admin1 {
      color: red;
@@ -96,8 +103,10 @@ input[type=checkbox] {
 }
 
 .top-right {
-    
-    position: relative;
+    width: 300px;
+   /* position: relative; */
+    position: absolute;
+    border: 1px sold red;
     top: 0px;
     right: 30px;
     z-index: 1;
@@ -117,7 +126,7 @@ input[type=checkbox] {
     padding: 8px 8px 8px 8px;
     border-radius: 10px;
     color: black;
-    height: 34px;
+    height: 40px; 
     background: #DDDDDD;
     font-weight: 300;
     font-size: 14px;
@@ -241,21 +250,35 @@ input[type=checkbox] {
 
 .plot-select-menu {
     position: relative;
+    visibility: none;
+   
 }
 
-.plot-select-menu select {
-    padding: 8px 34px 8px 34px;
-    border-radius: 10px;
-    outline: none;
+.selectIcon {
+    background-color: white;
+    background: url('./assets/iconmonstr-hexagon-2.svg');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    width: 34px;
     height: 34px;
+}
+
+
+#plot-select {
+    
+    padding: 8px 34px 8px 34px;
+     border-radius: 10px;
+    outline: none;
+     height: 34px;
     background: #DDDDDD;
     font-weight: 300;
     font-size: 14px;
     line-height: 19px;
     border: 0px;
-    appearance: none;
-    text-align: center;
+     appearance: none;
+     text-align: center;
     cursor: pointer;
+ 
 }
 
 .left-arrow {
@@ -310,7 +333,7 @@ input[type=checkbox] {
 
 .main-wrapper {
     margin-left: 14px;
-    margin-top: 0vh;
+    margin-top: 30vh;
     position: relative;
     width: 381px;
     z-index: 1;
