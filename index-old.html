@@ -1,163 +1,158 @@
-<!DOCTYPE html>
+<!doctype html>
 <html class="no-js" lang="">
-  <head>
-    <meta charset="utf-16" />
-    <title>Geospatial UI</title>
-    <meta name="description" content="" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<head>
+	<meta charset="utf-16">
+	<title>Geospatial UI</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
     <!--<link rel="icon" type="image/png" href="./assets/undp_favicon.ico"/>-->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css"
-      integrity="sha512-Ez0cGzNzHR1tYAv56860NLspgUGuQw16GiOOp/I2LuTmpSK9xDXlgJz3XN4cnpXWDmkNBKXR/VDMTCnAaEooxA=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-      integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css"
+		integrity="sha512-Ez0cGzNzHR1tYAv56860NLspgUGuQw16GiOOp/I2LuTmpSK9xDXlgJz3XN4cnpXWDmkNBKXR/VDMTCnAaEooxA=="
+		crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+		integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw=="
+		crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css' rel='stylesheet' />
+	<link rel="stylesheet" href="./ui-styles.css">
 
-    <link
-      href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css"
-      rel="stylesheet"
-    />
+</head>
+
+<body>
+
 	
-    <link rel="stylesheet" href="./ui-styles.css" />
-  </head>
 
-  <body>
-    <div id="map">
-      <div class="loader-gis">
-        <svg
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-          width="170"
-          height="170"
-          viewbox="0 0 200 173.20508075688772"
-        >
-          <path
-            fill="#003399"
-            d="M0 86.60254037844386L50 0L150 0L200 86.60254037844386L150 173.20508075688772L50 173.20508075688772Z"
-          ></path>
-        </svg>
-      </div>
-	  <div id='top-right-wrap'>
-		<div id='close-side'>&harr;</div>
-		<div class="country-select-menu" id='country-select-id'>
-			<select id='country-select'>
-				<option value="Select Country or Region" >Select Country or Region</option>
-				
-			</select>
-			
+    <div id='map'>
+        	<div class="loader-gis">
+			<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width='170' height='170'  viewbox="0 0 200 173.20508075688772"><path fill="#003399" d="M0 86.60254037844386L50 0L150 0L200 86.60254037844386L150 173.20508075688772L50 173.20508075688772Z"></path></svg>
 		</div>
-
-		<div id="list1" class="dropdown-check-list" tabindex="100">
-			<span class="anchor">Select Overlay</span>
-			<ul id="items" class="items">
-				<li><input id='admin1-input' value="admin1-overlay" type="checkbox" /> Admin Regions 1 </li>
-				<li><input id='admin2-input' value="admin2-overlay" type="checkbox" /> Admin Regions 2</li>
-				<li><input id='underwater'  value="underwater-overlay" type='checkbox' /> Underwater Cables </li>
-				
-			</ul>
-		</div>
-
-		<div class="country-select-menu hexsize">
-			<select class='hexbin-change' name="hexbin-change" id="plot-select">
-				<option value='hex1'>1km hexbins</option>
-				<option selected value="hex5">5km hexbins</option>
-				<option value="hex10">10km hexbin</option>
-				<option value="admin1">Admin 1 Regions</option>
-				<option value="admin2">Admin 2 Regions</option>
-			</select>
-		</div>
-
-		<div class="country-select-menu" id="country-select-id">
-			<select id="basemap-switch">
-				<option value="Mapbox Satellite Streets">Satellite With Labels</option>
-				<option value='Mapbox Light'>Light Basemap</option>
-				<option value='Satellite Imagery'>Satellite No Labels</option>
-			</select>
-			
-		</div>
-
-		<div class="country-select-menu" id="country-select-id">
-			<div class='download' id='datadownload'>Download Data</div>
-		</div>
-
-		<div class="country-select-menu" id="country-select-id">
-			<div id="addLabels" class="addLabels" onclick="addLabels()">Remove Labels</div>
-			<div id="icon3d" class="icon2"></div>
-		</div>
-	<div class="country-select-menu" id="country-select-id">
-		<div class='opacityslider'>
-			<div id='opacityslider'>
-				<input type="range" id="volume" value="8" name="volume"
-					min="0" max="10">	
-			</div>
-			<label id='volume' for="volume">Opacity</label>
-		</div>
-	</div>
-		
-
-</div>
     </div>
-    <div id="myModal" class="modal">
-      <!-- Modal content -->
-      <div class="modal-content">
-        <span class="close">&times;</span>
-        <p>Check Attributes You Would Like to Include:</p>
-        <ul id="download-attributes"></ul>
-        <ul id="download-buttons">
-          <button id="shp">Download Shapefile</button>
-          <button id="gjn">Download GeoJSON</button>
-        </ul>
-      </div>
-    </div>
+	<div id="myModal" class="modal">
 
-	<div id='password' class='password'>
-		<input type="text" id="fname" name="fname"><br><br>
+		<!-- Modal content -->
+		<div class="modal-content">
+		  <span class="close">&times;</span>
+		  <p>Check Attributes You Would Like to Include:</p>
+		  <ul id='download-attributes'>
+			 
+		  </ul>
+		  <ul id='download-buttons'>
+			  <button id='shp'>Download Shapefile</button>
+			  <button id='gjn'>Download GeoJSON </button>
+		  </ul>
+		</div>
+	  
 	  </div>
-
-
-    <!-- Logos Section Start -->
-    <div class="logos row-flex align-items-center">
-      <div class="UNDP-logo"></div>
-      <div class="rising-up-for-sids"></div>
-    </div>
-
-
 	
 	
-	 <!--Top right Column End -->
+	<!--<div id='password' class='password'>
+		<input type="text" id="fname" name="fname"><br><br>
+	  </div> -->
+	
+	<!-- Logos Section Start -->
+	<div class="logos row-flex align-items-center">
+		<div class="UNDP-logo"></div>
+		<div class="rising-up-for-sids"></div>
+	</div>
+	<!-- Top Right Column -->
+	<div class="col-flex top-right">
 
-    <div class="container main-wrapper">
-      <!-- Collapse button -->
-      <div class="collapse-btn">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="ionicon"
-          viewBox="0 0 512 512"
-        >
-          <path
-            fill="none"
-            stroke="#eee"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="48"
-            d="M328 112L184 256l144 144"
-          />
-        </svg>
-      </div>
-      <!-- Top tooltips  -->
-      <!--<div class="row tooltip-top sids">
+		<div class="row-flex" style="justify-content:flex-end;">
+			<div class="country-select-menu" id='country-select-id'>
+				<select id='country-select'>
+					<option value="Select Country or Region">Select Country or Region</option>
+					
+				</select>
+				<span class="downarrow"></span>
+			</div>
+			<!--<div class="icon1"></div>-->
+		</div>
+
+		<div class="row-flex" style="justify-content:flex-end;margin-top:15px;">
+			<div id="icon3d" class="icon2"></div>
+			<div class="add-overlay-menu">
+				<div name="overlay-select" id="add-overlay">
+					
+					<input id='admin1-input' type='checkbox' value="admin1-overlay"> <label id='admin1'>Admin Regions 1</label></input><br>
+					<input id='admin2-input' type='checkbox' value="admin2-overlay"> <label id='admin2'>Admin Regions 2</label></input><br>
+					<input id='underwater' type='checkbox' value="underwater-overlay"> <label id='underwater'>Underwater Cables</label></input>
+
+
+				</div>
+			
+			</div>
+
+		</div>
+
+		<div class="row-flex" style="justify-content:flex-end;margin-top:15px;">
+            <!--<div class="icon3"></div> -->
+			
+				<select name="hexbin-change" id="plot-select">
+					<option value='hex1'>1km hexbins</option>
+					<option selected value="hex5">5km hexbins</option>
+					<option value="hex10">10km hexbin</option>
+					<option value="admin1">Admin 1 Regions</option>
+					<option value="admin2">Admin 2 Regions</option>
+				</select>
+				
+			
+				
+		</div>
+
+		<div class="row-flex " style="justify-content:flex-end;margin-top:15px;">
+			<div class="country-select-menu" id="country-select-id">
+				<select id="basemap-switch">
+					<option value="Mapbox Satellite Streets">Satellite With Labels</option>
+					<option value='Mapbox Light'>Light Basemap</option>
+					<option value='Satellite Imagery'>Satellite No Labels</option>
+				</select>
+				<!--<span class="downarrow"></span>-->
+			</div>
+		</div>
+		
+		<div class="row-flex " style="justify-content:flex-end;margin-top:15px;">
+			<div class="country-select-menu" id="country-select-id">
+				<div class='download' id='datadownload'>Download Data</div>
+			</div>
+		</div> 
+
+		<div class="row-flex" style="justify-content:flex-end;margin-top:15px;">
+			<div id="addLabels" class="addLabels" onclick="addLabels()">Remove Labels</div>
+			<div class="country-select-menu" id="country-select-id">
+				<div class='opacityslider'>
+					<div id='opacityslider'>
+						<input type="range" id="volume" value="7" name="volume"
+							min="0" max="10">	
+					</div>
+					<label id='volume' for="volume">Opacity</label>
+				</div>
+			</div>
+			
+
+		</div>
+
+		<!--<div class="row-flex add-chart-button-wrap">
+			<div class="add-chart-button row-flex align-items-center">
+				<div class="plus-sign"></div>
+				<div class="text-add-chart">Add chart</div>
+			</div> 
+		</div>-->
+		
+	</div> 
+	<!-- Top right Column End -->
+
+	<div class="container main-wrapper">
+		<!-- Collapse button -->
+		<div class="collapse-btn">
+			<svg xmlns='http://www.w3.org/2000/svg' class='ionicon' viewBox='0 0 512 512'>
+				<path fill='none' stroke='#eee' stroke-linecap='round' stroke-linejoin='round' stroke-width='48'
+					d='M328 112L184 256l144 144' />
+			</svg>
+		</div>
+		<!-- Top tooltips  -->
+		<!--<div class="row tooltip-top sids">
 			<div class="head-img">
 				<img src="./assets/img/icons/sidsOfferPillars.png" class="sids-tooltip-head-img">
 			</div>
@@ -190,14 +185,14 @@
 				<strong> Reference: CIESIN, Columbia University (2018) -</strong>
 			</div>
 		</div> -->
-      <!-- END TOP Tooltips -->
+		<!-- END TOP Tooltips -->
 
-      <div class="app-body">
-        <!--<div class="row">
+		<div class="app-body">
+			<!--<div class="row">
 				<div class="col-6"> -->
 
-        <!-- Selection option for this is in JSON object called 'selection_scroller_options' -->
-        <!--<div id="selection-scroller-option" class="selection-scroller">
+					<!-- Selection option for this is in JSON object called 'selection_scroller_options' -->
+					<!--<div id="selection-scroller-option" class="selection-scroller">
 						<div class="scroller-option-up scroller-option tab-nav" data-tooltip-target=".tooltip-top.sids"
 							data-target="#tab1" data-idx='0'>
 							<span>SIDS offer Pillars</span>
@@ -216,7 +211,7 @@
 				</div>
 
 				<div class="col-6 p-0"> -->
-        <!-- Button Selection
+					<!-- Button Selection
 					<div class="button-selection tab" id="tab1">
 						<div class="d-flex align-items-center">
 							<img src="./assets/img/icons/blueEconomy.png" class="button-icon img-fluid">
@@ -237,7 +232,7 @@
 						</div>
 					</div> -->
 
-        <!-- SIDS offer Pillars tab hover
+					<!-- SIDS offer Pillars tab hover
 					<div id="tooleconomy" class="row align-items-center tooltip-blue-eco econo d-none">
 						<div class="col-2 justify-content-center text-center">
 							<img src="./assets/img/icons/blueEconomy.png" class="blue-eco-tooltip-icon">
@@ -286,9 +281,9 @@
 						</div>
 					</div> -->
 
-        <!-- end SIDS offer Pillars tab hover -->
+					<!-- end SIDS offer Pillars tab hover -->
 
-        <!-- hover for SDGS 
+					<!-- hover for SDGS 
 					<div id="samimg" class="row align-items-center tooltip-blue-eco econo sdg-tool d-none">
 						<div class="col-12">
 							<h3 class="text-center title-text"> Blue Economy </h3>
@@ -296,7 +291,7 @@
 						</div>
 					</div>
 					<div class="button-selection tab " id="tab3"> -->
-        <!-- Slider 1
+						<!-- Slider 1
 						<div id="SAMOA_slider" data-bs-interval="false" class="carousel slide samoa">
 							<div class="carousel-inner">
 								<div class="carousel-item active" data-imgid="1">
@@ -376,7 +371,7 @@
 								<span class="sr-only">Next</span>
 							</a>
 						</div> -->
-        <!--  
+						<!--  
 						<div id="gridsamoa" class="grid-container samoa-grid samoa d-none">
 							<div class="icon-grid">
 								<div class="icon-grid-item" data-imgid="1">
@@ -447,7 +442,7 @@
 						</div>
 					</div>
 					<div class="button-selection tab tab-2 active" id="tab2"> -->
-        <!-- Slider 2
+						<!-- Slider 2
 						<div id="sdg_slider" data-bs-interval="false" class="carousel slide sdgimg">
 							<div class="carousel-inner">
 								<div class="carousel-item active" data-imgid="1">
@@ -531,7 +526,7 @@
 							</a>
 						</div> -->
 
-        <!-- Grid for SDGs
+						<!-- Grid for SDGs
 						<div id="gridsdgs" class="grid-container sdgs d-none">
 							<div class="icon-grid">
 								<div class="icon-grid-item" data-imgid="1">
@@ -610,62 +605,53 @@
 
 			</div> -->
 
-        <div class="row">
-          <div class="col-12">
-            <div class="custom-selection-dropdown selection-dropdown-1">
-              <label>Dataset</label>
-              <select
-                class="form-select data-set-selection"
-                id="dataDrop"
-                aria-label="Dataset"
-                name="dataset-selection"
-              >
-                <option value="start" selected>Select Dataset</option>
-                <!--<option value="Example 2">Example 2</option>
+
+			<div class="row">
+
+				<div class="col-12">
+					<div class="custom-selection-dropdown selection-dropdown-1">
+						<label>Dataset</label>
+						<select class="form-select data-set-selection" id='dataDrop' aria-label="Dataset" name="dataset-selection">
+							<option value="start" selected>Select Dataset</option>
+							<!--<option value="Example 2">Example 2</option>
 							<option value="Example Dataset 3">Example Dataset 3</option>
 							<option value="Example Dataset 4">Example Dataset 4</option> -->
-              </select>
-              <!--<span class="selection-dropdown-arrow up dataset-select-uparrow"></span>
+						</select>
+						<!--<span class="selection-dropdown-arrow up dataset-select-uparrow"></span>
 						<span class="selection-dropdown-arrow down dataset-select-downarrow"></span>-->
-            </div>
-          </div>
+					</div>
+				</div>
 
-          <div class="col-12">
-            <div
-              id="layer-id"
-              class="custom-selection-dropdown selection-dropdown-1"
-            >
-              <label>Layer</label>
-              <select
-                id="layer-drop"
-                class="form-select"
-                aria-label="Layer"
-                name="layer-selection"
-              >
-                <option value="default" selected>Select Layer</option>
-                <option value="Example 2">Example 2</option>
-              </select>
-              <span
-                class="selection-dropdown-arrow up dataset-select-uparrow"
-              ></span>
-              <span
-                class="selection-dropdown-arrow down dataset-select-downarrow"
-              ></span>
-            </div>
-          </div>
-        </div>
+				<div class="col-12">
 
-        <div class="row">
-          <div class="col-12">
-            <div class="year-timeline-wrapper">
-              <div class="year-timeline-controls">
-                <a href="#" id="year-play-pause" class="play">
-                  <span>Play / Pause</span>
-                </a>
-              </div>
+					<div id='layer-id' class="custom-selection-dropdown selection-dropdown-1">
+						<label>Layer</label>
+						<select id='layer-drop' class="form-select" aria-label="Layer" name="layer-selection">
+							<option value="default" selected>Select Layer</option>
+							<option value="Example 2">Example 2</option>
+						</select>
+						<span class="selection-dropdown-arrow up dataset-select-uparrow"></span>
+						<span class="selection-dropdown-arrow down dataset-select-downarrow"></span>
+					</div>
 
-              <div class="year-timeline">
-                <!-- Here for example code, it's mainly populated by JS 
+
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-12">
+
+					<div class="year-timeline-wrapper">
+
+						<div class="year-timeline-controls">
+							<a href="#" id="year-play-pause" class="play">
+								<span>Play / Pause</span>
+							</a>
+						</div>
+
+						<div class="year-timeline">
+
+							<!-- Here for example code, it's mainly populated by JS 
 								 <div class="year-timeline-block alpha" data-year-idx="1">
 								<input type="radio" name="year-selected" value="1990" id="year-1990" checked>
 								<label for="year-1990">
@@ -707,48 +693,29 @@
 									<span class="circle-radio"></span>
 								</label>
 							</div> -->
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="app-body population-density-box col-flex">
-      <div
-        class="col-flex"
-        style="
-          overflow-y: auto;
-          padding: 0px 6px 0px 0px;
-          margin: 12px 4px 12px 16px;
-        "
-      >
-        <div id="infoBoxTitle" style="font-size: 16px; font-weight: 700">
-          SIDS Geospatial Platform
-        </div>
-        <div
-          id="infoBoxText"
-          style="font-size: 12px; font-weight: 500; margin-top: 10px"
-        >
-          This map visualizes data for the SIDS at different resolutions. Select
-          a dataset above or a country to view spatial data about that region.
-        </div>
-        <div
-          id="infoBoxLink"
-          style="font-size: 12px; font-weight: 500; margin-top: 10px"
-        ></div>
-      </div>
-    </div>
-    <div class="app-body population-per-km col-flex">
-      <div
-        class="row-flex space-evenly"
-        style="margin-top: 4px; font-size: 14px"
-        id="legendTitle"
-      >
-        Select a Dataset and Layer to view data on the map.
-      </div>
 
-      <div class="row-flex space-evenly" id="updateLegend">
-        <!--<div class="col-flex align-items-center">
+						</div>
+
+
+					</div>
+
+				</div>
+			</div>
+
+		</div>
+	</div>
+	<div class="app-body population-density-box col-flex">
+		<div class="col-flex" style="overflow-y:auto; padding:0px 6px 0px 0px;margin:12px 4px 12px 16px;">
+			<div id='infoBoxTitle' style="font-size:16px;font-weight:700;">SIDS Geospatial Platform</div>
+			<div id='infoBoxText' style="font-size:12px;font-weight:500;margin-top:10px;">This map visualizes data for the SIDS at different resolutions. Select a dataset above or a country to view spatial data about that region.</div>
+			<div id='infoBoxLink' style="font-size:12px;font-weight:500;margin-top:10px;"></div>
+		</div>
+	</div>
+	<div class="app-body population-per-km col-flex">
+		<div class="row-flex space-evenly" style="margin-top:4px;font-size: 14px;" id='legendTitle'>Select a Dataset and Layer to view data on the map.</div>
+
+		<div class="row-flex space-evenly" id='updateLegend'>
+			<!--<div class="col-flex align-items-center">
 				<div class="population-per-km-text">0.05</div>
 				<div class="population-per-km-img" style="background-color:#B3F1FF;"></div>
 			</div>
@@ -768,50 +735,42 @@
 				<div class="population-per-km-text">2236.52</div>
 				<div class="population-per-km-img" style="background-color:#006379;"></div>
 			</div> -->
-      </div>
-    </div>
-    <!-- </div> -->
+		</div>
+		
+	</div>
+	<!-- </div> -->
+	
+	
+	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"
+		integrity="sha512-jGR1T3dQerLCSm/IGEGbndPwzszJBlKQ5Br9vuB0Pw2iyxOy+7AK+lJcCC8eaXyz/9du+bkCy4HXxByhxkHf+w=="
+		crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"
-      integrity="sha512-jGR1T3dQerLCSm/IGEGbndPwzszJBlKQ5Br9vuB0Pw2iyxOy+7AK+lJcCC8eaXyz/9du+bkCy4HXxByhxkHf+w=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
-
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-      crossorigin="anonymous"
-    ></script>
-    <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+		integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+		crossorigin="anonymous"></script>
+	<!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
 		integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
 		crossorigin="anonymous"></script> -->
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/js/bootstrap.min.js"
-      integrity="sha512-EKWWs1ZcA2ZY9lbLISPz8aGR2+L7JVYqBAYTq5AXgBkSjRSuQEGqWx8R1zAX16KdXPaCjOCaKE8MCpU0wcHlHA=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/js/bootstrap.min.js"
+		integrity="sha512-EKWWs1ZcA2ZY9lbLISPz8aGR2+L7JVYqBAYTq5AXgBkSjRSuQEGqWx8R1zAX16KdXPaCjOCaKE8MCpU0wcHlHA=="
+		crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
-    <script src="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js"></script>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js'></script>
     <script src="https://unpkg.com/pbf@3.0.5/dist/pbf.js"></script>
     <script src="https://unpkg.com/geobuf@3.0.2/dist/geobuf.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.1.2/chroma.min.js"></script>
-    <script src="https://github.com/niklasvh/html2canvas/releases/download/0.4.1/html2canvas.js"></script>
-    <script src="https://unpkg.com/@turf/turf@6.3.0/turf.min.js"></script>
+	<script src="https://github.com/niklasvh/html2canvas/releases/download/0.4.1/html2canvas.js"></script>
+	<script src='https://unpkg.com/@turf/turf@6.3.0/turf.min.js'></script>
+	<!--shp-write originally create by mapbox, updated code from: https://github.com/mapbox/shp-write/pull/65/files -->
+	<script src='./shpwrite.js'></script>
 	
-
-	
-    <!--shp-write originally create by mapbox, updated code from: https://github.com/mapbox/shp-write/pull/65/files -->
-    <script src="./shpwrite.js"></script>
-
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+	<script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="./data/sidsNames.js"></script>
-    <script src="./newgis.js"></script>
-    <script src="./addSources.js"></script>
-    <script src="./pass.js"></script>
-  </body>
+	<script src="./newgis.js"></script>
+	<script src="./addSources.js"></script>
+	<!--<script src="./pass.js"></script> -->
+</body>
+
 </html>

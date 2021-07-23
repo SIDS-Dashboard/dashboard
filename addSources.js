@@ -4,7 +4,8 @@ function addHexSource() {
     const hex10 = 'https://sebastian-ch.github.io/sidsDataTest/data/hex10km/{z}/{x}/{y}.pbf';
     const hex5 = 'https://sebastian-ch.github.io/sidsDataTest/data/t5/{z}/{x}/{y}.pbf';
     //const admin1 = "https://sebastian-ch.github.io/sidsDataTest/data/admin1-new.pbf";
-    const admin1 = 'mapbox://sebastian-ch.7vnjgjge';
+    //const admin1 = 'mapbox://sebastian-ch.7vnjgjge';
+    const admin1 = 'https://sebastian-ch.github.io/sidsDataTest/data/admin1tiles/{z}/{x}/{y}.pbf'
     //const admin2 = "https://sebastian-ch.github.io/sidsDataTest/data/admin2.pbf";
     const admin2= 'https://sebastian-ch.github.io/sidsDataTest/data/admin2tiles/{z}/{x}/{y}.pbf'
     //const hex1 = 'http://localhost:8080/localTiles/hex1zip/{z}/{x}/{y}.pbf'
@@ -58,7 +59,9 @@ function addHexSource() {
       map.addSource('admin1', {
         'type': 'vector',
         'promoteId': 'GID_1',
-        url: admin1,
+        'tiles': [
+          admin1
+        ],
         //'minzoom': 3,
         'maxzoom': 12
       })
@@ -78,12 +81,6 @@ function addHexSource() {
 
       sourceData.admin2Source.data = admin2;
 
-     /* map.addSource('admin2', {
-        type: "geojson",
-        data: geobuf.decode(new Pbf(allData[0])),
-        generateId: true
-      });
-      sourceData.admin2Source.data = allData[0]; */
 
       map.addSource('hex1', {
           'type': 'vector',
@@ -91,7 +88,6 @@ function addHexSource() {
           'tiles': [
             hex1
           ],
-          //'minzoom': 3,
           //'maxzoom': 12
       })
       sourceData.hex1Source.data = hex1;
@@ -106,36 +102,9 @@ function addHexSource() {
         'maxzoom': 10,
       })
 
-     /* map.addSource('ocean', {
-        type: "geojson",
-        data: geobuf.decode(new Pbf(allData[1])),
-        //generateId: true
-        'maxzoom': 12
-      }); */
       sourceData.oceanSource.data = ocean;
 
 
-      
-
-
-      //add first layer (5km)
-      map.addLayer({
-        'id': 'hex5',
-        'type': 'fill', 
-        'source': 'hex5',
-        //'source-layer': 'hex-5km',
-        'source-layer': 'hex5_3857',
-        'layout': {
-          'visibility': 'visible'
-          },
-        
-        'paint': {
-            'fill-color': 'blue',
-            'fill-opacity': 0,
-            }
-        }, firstSymbolId);
-
-        $('.loader-gis').remove()
-    //}) 
-
+        $('.loader-gis').hide()
+    
   }

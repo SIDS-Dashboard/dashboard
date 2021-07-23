@@ -48,4 +48,4 @@ Field_Name,Description,Temporal,Band,Name,Unit,Desc_long,Source_Name,Source_Link
 7d12,Unconventional Oil Development Potential Index,,12,Development Potential Index,Index,"Unconventional oil global land suitability maps, referred to as “development potential indices” (DPIs). Created through spatial multi-criteria decision analysis techniques that accounted for both resource potential and development feasibility.",Oakleaf et al. (2019),https://www.nature.com/articles/s41597-019-0084-8
 7d13,Wind Power Development Potential Index,,13,Development Potential Index,Index,"Wind power global land suitability maps, referred to as “development potential indices” (DPIs). Created through spatial multi-criteria decision analysis techniques that accounted for both resource potential and development feasibility.",Oakleaf et al. (2019),https://www.nature.com/articles/s41597-019-0084-8
 depth,Ocean Depth,,,Ocean Data,,,,
-dem,dem,,,dem,,,,
+dem,dem,,,dem,,,,http://viewfinderpanoramas.org/Coverage%20map%20viewfinderpanoramas_org15.htm
