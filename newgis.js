@@ -645,7 +645,7 @@ map.on('zoom', function (e) {
 
 })
 
-addTheOnClick()
+//addTheOnClick()
 
 map.on('click', function (e) {
 
@@ -944,7 +944,7 @@ function changeHexagonSize(sel) {
     if (sel === 'admin1') {
         addAdminClick()
     } else {
-        addTheOnClick();
+        //addTheOnClick();
     }
 
 }

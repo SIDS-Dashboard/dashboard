@@ -50,7 +50,7 @@ function drawCreate(e) {
     
     map.once('idle', function(e) {
         var sideData = [];
-        var rend = map.queryRenderedFeatures({layers: ['hex5']});
+        var rend = map.queryRenderedFeatures({layers: [currentGeojsonLayers.hexSize]});
         //console.log(currentGeojsonLayers.dataLayer);
         console.log(rend);
         $('#draw-sidebar').show();
@@ -92,6 +92,10 @@ function drawCreate(e) {
             total += sideData[i];
         }
         var mean = total / sideData.length;
+        title.innerHTML = ''
+        maxDiv.innerHTML = "";
+        minDiv.innerHTML = "";
+        meanDiv.innerHTML = "";
 
         title.innerHTML = '<b>'+ legData.desc + '</b>'
         maxDiv.innerHTML = "Max of Selected: " + max + ' ' + legData.units;
