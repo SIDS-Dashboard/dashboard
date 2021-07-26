@@ -65,24 +65,13 @@ function drawCreate(e) {
 
         var legData = _.find(allLayers, ['field_name', currentGeojsonLayers.dataLayer])
 
-        if(document.getElementById('sideTitle')) {
-            document.getElementsByClassName('sideTitle').remove();
-            maxDiv.remove();
-            minDiv.remove();
-            meanDiv.remove();
-        }
 
         var sidebarHolder = document.getElementById('sidebar-text');
-        var title = document.createElement('div')
-        var maxDiv = document.createElement('div')
-        var minDiv = document.createElement('div')
-        var meanDiv = document.createElement('div')
+        var title = document.getElementById('sideTitle')
+        var maxDiv = document.getElementById('sideMax')
+        var minDiv = document.getElementById('sideMin')
+        var meanDiv = document.getElementById('sideMean')
 
-        maxDiv.classList.add('sideInfo')
-        minDiv.classList.add('sideInfo')
-        meanDiv.classList.add('sideInfo')
-
-        title.classList.add('sideTitle');
 
         var max = Math.max(...sideData)
         var min = Math.min(...sideData)
@@ -92,10 +81,10 @@ function drawCreate(e) {
             total += sideData[i];
         }
         var mean = total / sideData.length;
-        title.innerHTML = ''
+        /*title.innerHTML = ''
         maxDiv.innerHTML = "";
         minDiv.innerHTML = "";
-        meanDiv.innerHTML = "";
+        meanDiv.innerHTML = ""; */
 
         title.innerHTML = '<b>'+ legData.desc + '</b>'
         maxDiv.innerHTML = "Max of Selected: " + max + ' ' + legData.units;
