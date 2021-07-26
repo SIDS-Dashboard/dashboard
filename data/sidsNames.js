@@ -313,6 +313,6 @@ const names = [
     "NAME_0": "Federated States of Micronesia",
     "flag": '&#127484',
     "bb": [[137.48592,1.02621],[163.03544,10.09033]],
-    "GID_0": ""
+    "GID_0": "FSM"
   }
 ]
