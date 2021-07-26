@@ -1584,7 +1584,7 @@ $('.year-timeline-wrapper').hide()
 
 //$(document).ready(function () {
 /** Collapse/Expand for Box  */
-$('.collapse-btn').on('click', function () {
+$('.bottom-left').on('click', function () {
     $('.app-body').toggleClass('collapsed');
     $(this).toggleClass('collapsed');
 });
@@ -2646,6 +2646,7 @@ items.onblur = function (evt) {
 }
 
 $('#close-side').click(function () {
+    $(this).toggleClass('collapsed');
     console.log('hi')
 
     if (!$('#top-right-wrap').hasClass('moved')) {

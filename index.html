@@ -63,7 +63,23 @@
         </svg>
       </div>
 	  <div id='top-right-wrap'>
-		<div id='close-side'>&harr;</div>
+		<!--<div id='close-side'>&harr;</div> -->
+		<div class="collapse-btn" id='close-side'>
+			<svg
+			  xmlns="http://www.w3.org/2000/svg"
+			  class="ionicon"
+			  viewBox="0 0 512 512"
+			>
+			  <path
+				fill="none"
+				stroke="#eee"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				stroke-width="48"
+				d="M328 112L184 256l144 144"
+			  />
+			</svg>
+		  </div>
 		<div class="country-select-menu" id='country-select-id'>
 			<select id='country-select'>
 				<option value="Select Country or Region" >Select Country or Region</option>
@@ -153,7 +169,7 @@
 
     <div class="container main-wrapper">
       <!-- Collapse button -->
-      <div class="collapse-btn">
+      <div class="collapse-btn bottom-left">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           class="ionicon"
