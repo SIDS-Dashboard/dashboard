@@ -69,7 +69,7 @@ function addHexSource() {
 
       sourceData.admin1Source.data = admin1;
 
-      map.addSource('admin2', {
+   /*   map.addSource('admin2', {
         'type': 'vector',
         'promoteId': 'GID_2',
         'tiles': [
@@ -102,7 +102,7 @@ function addHexSource() {
         'maxzoom': 10,
       })
 
-      sourceData.oceanSource.data = ocean;
+      sourceData.oceanSource.data = ocean; */
 
 
         $('.loader-gis').hide()

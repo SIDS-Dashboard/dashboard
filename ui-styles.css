@@ -1163,6 +1163,18 @@ button:hover{
     
 }
 
+.closebutton {
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    padding: 10px;
+    font-weight: bold;
+    text-align: center;
+    background: whitesmoke;
+    float: right;
+}
+
 
 .country-select-menu select {
     
@@ -1268,5 +1280,25 @@ button:hover{
 
   .dropdown-menu label {
     display: block;
+  }
+
+
+  #draw-sidebar {
+      display: none;
+      top: 0;
+      position: fixed;
+      width: 25%;
+      background-color: whitesmoke;
+      z-index: 40;
+      height: 100vh;
+      transition: 0.3s;
+  }
+
+  #sidebar-text {
+      padding-top: 10px;
+      margin-top: 10px;
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
   }
 

@@ -38,8 +38,18 @@ const map = new mapboxgl.Map({
 var yearList = [];
 var currentTimeLayer;
 
-var sourceData = {
-    hex5Source: {
+  var Draw = new MapboxDraw({
+    displayControlsDefault: false,
+    controls: {
+    polygon: true,
+    trash: true
+    },
+    //defaultMode: 'draw_polygon'
+  });
+  map.addControl(Draw, 'bottom-right');
+
+  var sourceData = {
+      hex5Source: {
         name: 'hex5',
         layer: 'hex5_3857',
         mainId: 'hexid',
@@ -169,13 +179,19 @@ function addLabels() {
 
 function recolorBasedOnWhatsOnPage() {
 
+    if(!map.getLayer(currentGeojsonLayers.hexSize)) {
+      console.log('no layer')
+      return;
+    }
 
     var features = map.queryRenderedFeatures({
         layers: [currentGeojsonLayers.hexSize]
     })
 
     //console.log(currentGeojsonLayers.hexSize);
-    if (features) {
+    if(features.length > 0) {
+
+      
 
         var uniFeatures;
         if (currentGeojsonLayers.hexSize === 'admin1') {
