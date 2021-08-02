@@ -18,7 +18,10 @@ function addHexSource() {
     //const ocean = 'mapbox://sebastian-ch.9nfvaz3o'
     const ocean = 'https://sebastian-ch.github.io/sidsDataTest/data/oceans/{z}/{x}/{y}.pbf'
       //const ocean = 'http://localhost:8080/localTiles/oceant/{z}/{x}/{y}.pbf'
-    //var files = [admin2]
+    const allSids = 'https://sebastian-ch.github.io/sidsDataTest/data/allsids/{z}/{x}/{y}.pbf'
+    const hex5clipped = 'https://sebastian-ch.github.io/sidsDataTest/data/hex5clipped/{z}/{x}/{y}.pbf'
+    
+      //var files = [admin2]
     //var files = [admin2]
     //var promises = [];
 
@@ -28,6 +31,19 @@ function addHexSource() {
 
     //Promise.all(promises).then(function(allData){
       //console.log(allData[0])
+
+      map.addSource('hex5clipped', {
+        'type': 'vector',
+        //type: "geojson",
+        //data: geobuf.decode(new Pbf(allData[0])),
+        'tiles': [
+           hex5clipped
+        ],
+        promoteId: 'hexid'
+      }) 
+      sourceData.hex5clippedSource.data = hex5clipped;
+
+
 
       //add 10km source
       map.addSource('hex10', {
@@ -103,6 +119,32 @@ function addHexSource() {
       })
 
       sourceData.oceanSource.data = ocean;
+
+
+      //source-layer: allSids
+      map.addSource('allsids', {
+        'type': 'vector',
+        //'url': ocean
+        'tiles': [
+            allSids
+        ],
+        'maxzoom': 12,
+      })
+
+      map.addLayer({
+        'id': 'allsids',
+         'type': 'line',
+         'source': 'allsids',
+         'source-layer': 'allSids',
+         'layout': {
+             'visibility': 'visible'
+         },
+         'paint': {
+             'line-color': 'orange',
+             'line-width': 1
+ 
+         }
+     }, firstSymbolId);
 
 
         $('.loader-gis').hide()

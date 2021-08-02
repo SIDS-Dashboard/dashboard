@@ -1,6 +1,6 @@
 var allLayers = [];
 var firstSymbolId;
-const userLayers = ['hex5', 'hex10', 'admin1', 'admin2', 'hex1', 'ocean'];
+const userLayers = ['hex5', 'hex5clipped', 'hex10', 'admin1', 'admin2', 'hex1', 'ocean'];
 var basemapLabels = [];
 const styles = [
     {
@@ -15,13 +15,17 @@ const styles = [
         'title': "Satellite Imagery",
         'uri': "mapbox://styles/mapbox/satellite-v9",
     },
+    {
+        'title': "Mapbox Dark",
+        'uri': 'mapbox://styles/mapbox/dark-v10'
+    }
 ];
 
 addButtons();
 
 
 /*Initialize Map */
-mapboxgl.accessToken =    "pk.eyJ1Ijoic2ViYXN0aWFuLWNoIiwiYSI6ImNpejkxdzZ5YzAxa2gyd21udGpmaGU0dTgifQ.IrEd_tvrl6MuypVNUGU5SQ";
+mapboxgl.accessToken = "pk.eyJ1Ijoic2ViYXN0aWFuLWNoIiwiYSI6ImNpejkxdzZ5YzAxa2gyd21udGpmaGU0dTgifQ.IrEd_tvrl6MuypVNUGU5SQ";
 
 const map = new mapboxgl.Map({
     container: "map", // container ID
@@ -46,7 +50,8 @@ var currentTimeLayer;
     },
     //defaultMode: 'draw_polygon'
   });
-  map.addControl(Draw, 'bottom-right');
+
+  
 
   var sourceData = {
       hex5Source: {
@@ -84,6 +89,13 @@ var currentTimeLayer;
         layer: 'oceans',
         mainId: null,
         data: null
+    },
+    hex5clippedSource: {
+        name: 'hex5clipped',
+        layer: 'hex5clipped',
+        mainId: 'hexid',
+        data: null
+
     }
 
 }
@@ -108,6 +120,9 @@ map.on("load", function () {
         }
     }
 
+
+    
+
     map.removeLayer('admin-1-boundary')
     map.removeLayer('road-label')
     map.removeLayer('road-number-shield')
@@ -127,6 +142,7 @@ map.on("load", function () {
     //console.log(layers);
 
     map.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
+    //map.addControl(Draw, 'bottom-right');
     //$('.loader-gis').remove()
     //$('.download').show()
     addHexSource()
@@ -188,6 +204,8 @@ function recolorBasedOnWhatsOnPage() {
         layers: [currentGeojsonLayers.hexSize]
     })
 
+    //createMask(features);
+
     //console.log(currentGeojsonLayers.hexSize);
     if(features.length > 0) {
 
@@ -223,7 +241,7 @@ function recolorBasedOnWhatsOnPage() {
         
         
         currentGeojsonLayers.breaks = breaks;
-        //console.log(breaks)
+        console.log(breaks)
         map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-color',
         [
           'interpolate',
@@ -268,18 +286,43 @@ $('#basemap-switch').on('change', function () {
     var currentBase = map.getStyle().name;
 
     console.log(selectedBase);
-    console.log(currentBase);
+    //console.log(currentBase);
+    basemapLabels = [];
 
-    console.log(map.getStyle().sources)
+    
 
     if (selectedBase === 'Mapbox Light') {
         console.log(basemapLabels);
-        basemapLabels = [];
+        //basemapLabels = [];
         var thisStyle = _.find(styles, function (o) {
             return o.title === 'Light'
         })
-        map.setStyle(thisStyle.uri)
 
+        map.setStyle(thisStyle.uri)
+        console.log(map.getStyle().sources)
+
+    } else if(selectedBase === 'Mapbox Satellite Streets') {
+
+        console.log(basemapLabels);
+        
+        var thisStyle = _.find(styles, function (o) {
+            return o.title === 'Satellite With Labels'
+        })
+
+        map.setStyle(thisStyle.uri)
+        console.log(map.getStyle().sources)
+    } else if(selectedBase === 'Mapbox Dark') {
+
+        console.log(basemapLabels);
+        
+        var thisStyle = _.find(styles, function (o) {
+            return o.title === 'Mapbox Dark'
+        })
+
+        map.setStyle(thisStyle.uri)
+        console.log(map.getStyle().sources)
+    }
+        
         /*} else if (selectedBase === 'Satellite With Labels') {
           var thisStyle = _.find(styles, function(o){return o.title === 'Light'})
           map.setStyle(thisStyle.uri)
@@ -317,6 +360,7 @@ $('#basemap-switch').on('change', function () {
                     'visibility': 'visible'
                 },
                 'paint': {
+                    'fill-opacity': 0.8,
                     'fill-color': [
               'interpolate',
               ['linear'],
@@ -331,18 +375,15 @@ $('#basemap-switch').on('change', function () {
             }, firstSymbolId)
 
             map.setFilter(currentGeojsonLayers.hexSize, ['>=', currentGeojsonLayers.dataLayer, 0])
-
+            map.moveLayer('allsids', firstSymbolId)
+            console.log(map.getStyle().layers);
         })
         //addHexSource();
 
-        console.log(map.getStyle().sources)
+        //console.log(map.getStyle().sources)
+        //map.moveLayer(currentGeojsonLayers.hexSize, 'allsids')
 
-    }
-
-
-
-
-
+    
 
 })
 
@@ -599,6 +640,7 @@ $("#country-select").change(function (event) {
 map.on('dragend', function (e) {
     console.log(map.getZoom())
     console.log('dragend');
+    console.log(map.getBounds());
 
 
     if (!(map.getLayer('ocean') || map.getLayer('hex1') || map.getZoom() > 9)) {
@@ -629,6 +671,13 @@ map.on('zoomend', function (e) {
 map.on('zoom', function (e) {
 
 
+   /* var outline = map.queryRenderedFeatures({
+        layers: ['allsids']
+    })
+
+    console.log(outline); */
+
+
     if (map.getZoom() < 5) {
 
         //console.log('hi')
@@ -641,6 +690,40 @@ map.on('zoom', function (e) {
         $('.hexbin-change option[value="hex1"]').prop('disabled', false);
 
     }
+
+    /* if(map.getZoom() <= 4) {
+
+        if(!map.getLayer('allsids')) {
+            map.addLayer({
+                'id': 'allsids',
+                 'type': 'line',
+                 'source': 'allsids',
+                 'source-layer': 'allSids',
+                 'layout': {
+                     'visibility': 'visible'
+                 },
+                 'paint': {
+                     'line-color': 'orange',
+                     'line-width': 2
+         
+                 }
+             }, firstSymbolId);
+
+        }
+
+       
+
+    }
+
+    if(map.getZoom() > 4) {
+
+        if(map.getLayer('allsids')) {
+            map.removeLayer('allsids')
+        }
+
+
+        
+    } */
 
 
 })
@@ -757,19 +840,56 @@ function addAdminClick() {
             }
         })
 
+        console.log(feats);
         if (feats.length > 1) {
 
-            for (var x in feats) {
-                console.log(feats[x]);
-                if (feats[x].geometry.type === 'MultiPolygon') {
-                    feats[x].geometry.type = 'Polygon';
-                    feats[x].geometry.coordinates = feats[x]._geometry.coordinates[0]
+            var newOne = []
+
+            feats.forEach(function(f){
+                var geom = f.geometry
+                var props = f.properties
+                var id = f.id;
+
+                if(geom.type === 'MultiPolygon') {
+                    console.log(f);
+                    for (var i=0; i < geom.coordinates.length; i++) {
+                        var poly = {
+                            'type': 'Feature',
+                            'geometry': {
+                                'type': 'Polygon',
+                                'coordinates': geom.coordinates[i]
+                            },
+                            'id': id,
+                            'properties': props
+                        }
+                        newOne.push(poly);
+                    }
+                } else {
+                    newOne.push(f)
                 }
-            }
-            var fc = turf.featureCollection(feats)
-            //console.log(fc);
+
+                
+            })
+
+
+            //console.log(turf.polygon(newOne));
+
+
+           /* for (var x in feats) {
+               console.log(feats[x]);
+                if (feats[x].geometry.type === 'MultiPolygon') {
+                    ////console.log('multi:')
+                    //console.log(feats[x]);
+                    for(var z in feats[x].geometry.type)
+                    //feats[x].geometry.type = 'Polygon';
+                    //feats[x].geometry.coordinates = feats[x]._geometry.coordinates[0]
+                }
+            } */
+            //var fc = turf.featureCollection(feats)
+            var fc = turf.featureCollection(newOne);
+            console.log(fc);
             var joined = turf.dissolve(fc);
-            //var joined = turf.union(...fc);
+            //var joined = turf.union(...newOne);
             //console.log(joined);
             //map.getSource('highlightS').setData(joined)
             var allGeos = []
@@ -1012,10 +1132,11 @@ function addToLayersDrop(layers) {
 }
 
 function addOcean(layer) {
-
+    $('#icon3d').hide()
     $('.hexsize').toggle()
+    remove3d();
 
-    const userLayers = ['hex5', 'hex10', 'admin1', 'admin2', 'hex1'];
+    const userLayers = ['hex5', 'hex5clipped', 'hex10', 'admin1', 'admin2', 'hex1'];
 
     for (var x in userLayers) {
         if (map.getLayer(userLayers[x])) {
@@ -1058,6 +1179,8 @@ function addOcean(layer) {
 
 }
 
+
+
 function changeDataOnMap(selection) {
 
     if (map.getLayer('ocean')) {
@@ -1072,43 +1195,15 @@ function changeDataOnMap(selection) {
     console.log(currentGeojsonLayers)
 
 
-
-    /*if(map.getLayoutProperty(currentGeojsonLayers.hexSize, 'visibility', 'none')) {
-      map.setLayoutProperty(currentGeojsonLayers.hexSize,'visibility','visible')
-    } */
-    /*if(!map.getLayer(currentGeojsonLayers.hexSize)) {
-
-      //_.find(styles, function(o){return o.title === event.target.value})
-      var current = _.find(sourceData, function(o) { return o.name === currentGeojsonLayers.hexSize})
-      
-      //console.log(_.find(sourceData, function(o) { return o.name === currentGeojsonLayers.hexSize}))
-      //console.log(current.name);
-      //console.log(current);
-
-      map.addLayer({
-        'id': currentGeojsonLayers.hexSize,
-        'type': 'fill', 
-        'source': currentGeojsonLayers.hexSize,
-        'source-layer': current.layer,
-        'layout': {
-          'visibility': 'visible'
-          },
-        'paint': {
-            'fill-color': 'blue',
-            'fill-opacity': 0.8,
-                     
-            }
-        }, firstSymbolId);
-
-      
-    } */
     if (!map.getLayer(currentGeojsonLayers.hexSize)) {
 
         var current = _.find(sourceData, function (o) {
             return o.name === currentGeojsonLayers.hexSize
         })
 
-        console.log(firstSymbolId);
+        //console.log(firstSymbolId);
+
+        console.log(current)
 
         map.addLayer({
             'id': currentGeojsonLayers.hexSize,
@@ -1136,6 +1231,8 @@ function changeDataOnMap(selection) {
             layers: [currentGeojsonLayers.hexSize]
         })
 
+        //createMask(features)
+
         if (features) {
 
             var uniFeatures;
@@ -1159,7 +1256,7 @@ function changeDataOnMap(selection) {
             //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
             var breaks = chroma.limits(selecteData, 'q', 4);
             
-            console.log(breaks);
+            //console.log(breaks);
             var breaks_new = [];
             var precision = 1;
             do {
@@ -1167,7 +1264,7 @@ function changeDataOnMap(selection) {
                 for (let i = 0; i < 5; i++) {
                     breaks_new[i] = parseFloat(breaks[i].toPrecision(precision));                    
                 }
-                console.log(breaks_new);
+                //console.log(breaks_new);
             }    
             while (checkForDuplicates(breaks_new)&&(precision<10));
             breaks = breaks_new;              
@@ -1276,6 +1373,9 @@ function changeDataOnMap(selection) {
         //}
 
     }, 600)
+
+
+    map.moveLayer('allsids', firstSymbolId)
 }
 
 
@@ -1701,6 +1801,7 @@ $('select[name="dataset-selection"]').on('change', function () {
         $('.year-timeline-wrapper').hide()
         $('.opacityslider').hide()
         $('.download').hide()
+        //map.removeControl(Draw);
 
         //console.log(map.getStyle().sources)
         //console.log(styles)
@@ -1780,6 +1881,8 @@ $('select[name="dataset-selection"]').on('change', function () {
         $('.opacityslider').show()
         $('.download').show()
         $('#icon3d').show()
+        //map.addControl(Draw, 'bottom-right');
+
         if (this.selectedOptions[0].innerHTML === 'Population Density') {
             //$('#icon3d').show()
         }
@@ -1802,6 +1905,7 @@ $('select[name="dataset-selection"]').on('change', function () {
         $('.opacityslider').show()
         $('.download').show()
         $('#icon3d').show()
+        //map.addControl(Draw, 'bottom-right');
         map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.0)
 
         var layers = [];
@@ -1820,6 +1924,7 @@ $('select[name="dataset-selection"]').on('change', function () {
         $('.opacityslider').show()
         $('.download').show()
         $('#icon3d').show()
+        //map.addControl(Draw, 'bottom-right');
         var layersHolder = document.getElementById('layer-drop');
         var length = layersHolder.options.length;
 
@@ -1845,10 +1950,6 @@ $('select[name="hexbin-change"]').on('change', function () {
 
 /*$('select[name="overlay-select"]').on('change', function() {
 
-  console.log(this.selectedOptions[0].value)
-  addOverlay(this.selectedOptions[0].value)
-
-}) */
 
 
 /*$('#updateLegend').click(function(e){
@@ -1900,7 +2001,7 @@ $("input:checkbox").change(function () {
 
             'paint': {
                 'line-color': color,
-                'line-width': 5
+                'line-width': 2
 
             }
         }, firstSymbolId);
@@ -2292,135 +2393,197 @@ function nFormatter(num, digits) {
     return (num / si[i].value).toFixed(digits).replace(rx, "$1") + si[i].symbol;
 }
 
+//screenshot button functions
+$('#screenshot').click(function(){
+    
+   
 
+    $('#top-right-wrap').toggle();
+    html2canvas($('#map'), {
+        onrendered: function(canvas) {
+            console.log(canvas);
+          var img = canvas.toDataURL();
+          window.open(img)
+        }
+      });
+
+      
+      setTimeout(() => {$('#top-right-wrap').toggle()}, 1000)
+      //$('.population-density-box')
+      //$('.population-per-km')
+
+})
+
+
+//download button functions
 $('#datadownload').click(function () {
 
 
+    console.log(currentGeojsonLayers.hexSize);
+
+    if(currentGeojsonLayers.hexSize === 'admin1' || currentGeojsonLayers.hexSize === 'admin2') {
+
+        var countriesVisible = map.queryRenderedFeatures({layers: ['allsids']})
+        var countriesCheck = []
+        countriesVisible.map(function(x) {
+            countriesCheck.push(x.properties.NAME_0);
+        })
+
+        countriesCheck = _.uniq(countriesCheck);
+        console.log(countriesCheck)
+        //$('.loader-gis').show()
+
+        map.setFilter(currentGeojsonLayers.hexSize, null)
+
+        var features = map.queryRenderedFeatures({
+            layers: [currentGeojsonLayers.hexSize]
+        })
+
+        var countries = []
+        features.map(function (x) {
+            countries.push(x.properties.NAME_0)
+        })
+
+        countries = _.uniq(countries);
+        //console.log(countries);
 
 
-    //$('.loader-gis').show()
-
-    map.setFilter(currentGeojsonLayers.hexSize, null)
-
-    var features = map.queryRenderedFeatures({
-        layers: [currentGeojsonLayers.hexSize]
-    })
-
-    var countries = []
-    features.map(function (x) {
-        countries.push(x.properties.NAME_0)
-    })
-
-    countries = _.uniq(countries);
-    console.log(countries);
-
-    var feats = map.querySourceFeatures('admin1', {
-        sourceLayer: ['admin1extra'],
-        filter: ['in', 'NAME_0', ...countries]
-
-    })
-
-    console.log(feats);
+        var current = _.find(sourceData, function (o) {
+            return o.name === currentGeojsonLayers.hexSize
+        })
 
 
-    for (var x in feats) {
+        var feats = map.querySourceFeatures('admin1', {
+            sourceLayer: [current.layer],
+            filter: ['in', 'NAME_0', ...countries]
 
+        })
 
+        console.log(feats.length);
 
-    }
+        var uniqueFeats = _.uniq(feats.map(x => x.id));
+        console.log(uniqueFeats);
 
-    map.addSource('screen', {
-        type: 'geojson',
-        data: {
-            'type': 'FeatureCollection',
-            'features': feats
-            //'features': features
-        }
-    })
-
-    map.addLayer({
-        'id': 'screenshot',
-        'source': 'screen',
-        'type': 'line',
-        'paint': {
-            'line-color': '#66ff00',
-            'line-width': 3
-        }
-    })
-
-
-    //console.log(features);
-
-    if (features) {
-
-        var uniFeatures;
-        if (currentGeojsonLayers.hexSize === 'admin1') {
-            uniFeatures = getUniqueFeatures(features, 'GID_1');
-        } else if (currentGeojsonLayers.hexSize === 'admin2') {
-            uniFeatures = getUniqueFeatures(features, 'GID_2');
-        } else {
-            uniFeatures = getUniqueFeatures(features, 'hexid');
-        }
-
-        //console.log(features)
-        //console.log(uniFeatures);
-
-
-        /*map.addSource('screen', {
-          type: 'geojson',
-          data: {
-            'type': 'FeatureCollection',
-            'features': feats
-            //'features': features
-          }
-        }) */
-
-        /* map.addSource('screen1', {
-           type: 'geojson',
-           data: {
-             'type': 'FeatureCollection',
-             'features': features
-             //'features': features
-           }
-         }) */
+        uniqueFeats.forEach(function(x) {
 
 
 
 
-        /* map.addLayer({
-           'id': 'screenshot1',
-           'source': 'screen1',
-           'type': 'line',
-           'paint': {
-             'line-color': 'red',
-             'line-width': 3
-           }
-         }) */
+        })
 
-        /*map.addLayer({
-          'id': 'screenshot',
-          'source': 'screen',
-          'type': 'line',
-          'paint': {
-            'line-color': '#66ff00',
-            'line-width': 3
-          }
-        }) */
+        feats.forEach(function(f){
+
+            console.log(f.id);
 
 
 
-        //var gdata = map.getSource('screen1')._data;
+        })
+
+    
+
+        map.addSource('screen', {
+            type: 'geojson',
+            data: {
+                'type': 'FeatureCollection',
+                'features': feats
+                //'features': features
+            }
+        })
+
+        map.addLayer({
+            'id': 'screenshot',
+            'source': 'screen',
+            'type': 'line',
+            'paint': {
+                'line-color': '#66ff00',
+                'line-width': 3
+            }
+        })
+
+
+        var gdata = map.getSource('screen')._data;
 
 
 
         //exportGeojson(gdata);
-        //openDownloadPage(gdata);
+        openDownloadPage(gdata);
+
+    }
+
+    //console.log(features);
+
+    else if(currentGeojsonLayers.hexSize === 'hex5' || 'hex10' ||'hex1') {
+
+
+        var features = map.queryRenderedFeatures({
+            layers: [currentGeojsonLayers.hexSize]
+        })
+
+        if (features) {
+
+            var uniFeatures;
+            uniFeatures = getUniqueFeatures(features, 'hexid');
+            
+
+            //console.log(features)
+            //console.log(uniFeatures);
+
+
+            map.addSource('screen', {
+            type: 'geojson',
+            data: {
+                'type': 'FeatureCollection',
+                
+                'features': uniFeatures
+            }
+            }) 
+
+            /* map.addSource('screen1', {
+            type: 'geojson',
+            data: {
+                'type': 'FeatureCollection',
+                'features': features
+                //'features': features
+            }
+            }) */
+
+
+
+
+            /* map.addLayer({
+            'id': 'screenshot1',
+            'source': 'screen1',
+            'type': 'line',
+            'paint': {
+                'line-color': 'red',
+                'line-width': 3
+            }
+            }) */
+
+            map.addLayer({
+            'id': 'screenshot',
+            'source': 'screen',
+            'type': 'line',
+            'paint': {
+                'line-color': '#66ff00',
+                'line-width': 3
+            }
+            })
+
+
+
+            var gdata = map.getSource('screen')._data;
+
+
+
+            //exportGeojson(gdata);
+            openDownloadPage(gdata);
 
 
     }
 
 
-
+}
 
 
 });
@@ -2533,8 +2696,7 @@ function exportGeojson(obj, removeOnes) {
 
     map.removeLayer('screenshot')
     map.removeSource('screen');
-    map.removeLayer('screenshot1')
-    map.removeSource('screen1');
+    
 }
 
 $('.close').click(function () {
@@ -2542,8 +2704,7 @@ $('.close').click(function () {
     $('.modal').toggle();
     map.removeLayer('screenshot')
     map.removeSource('screen');
-    map.removeLayer('screenshot1')
-    map.removeSource('screen1');
+    
 
 })
 

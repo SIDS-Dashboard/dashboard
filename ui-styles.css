@@ -119,11 +119,11 @@ input[type=checkbox] {
 
 
 
-#addLabels, #datadownload {
+#addLabels, #datadownload, #screenshot {
 
 
     padding: 8px 8px 8px 8px;
-    border-radius: 10px;
+    /*border-radius: 10px; */
     color: black;
     
     background: #DDDDDD;
@@ -150,13 +150,13 @@ input[type=checkbox] {
     margin-top: 10px;
 }
 
-#addLabels:hover {
+#addLabels:hover, #screenshot:hover, #datadownload:hover {
     background: #818f98;
 }
 
 #button {
     padding: 8px 35px 8px 20px;
-    border-radius: 10px;
+    /*border-radius: 10px; */
     outline: none;
     height: 34px;
     background: #DDDDDD;
@@ -233,7 +233,7 @@ input[type=checkbox] {
     background: url('./assets/icon2.png');
     background-repeat: no-repeat;
     background-size: 100% 100%;
-    border-radius: 10px;
+    /*border-radius: 10px; */
 }
 
 .plot-select-menu {
@@ -333,16 +333,18 @@ input[type=checkbox] {
     margin: 10px 0;
     background-color: rgba(221, 221, 221, 0.7);
     padding: 10px 21px;
-    border-radius: 10px;
-    transition: 1s ease-in-out all;
+    /*border-radius: 10px; */
+    transition: 0.5s ease-in-out all;
     opacity: 1;
     
 }
+
 
 .app-body.collapsed {
     opacity: 0;
     z-index: -999;
     pointer-events: none;
+    
 }
 
 /* Custom Selection Boxes */
@@ -830,6 +832,7 @@ input[type='radio']:checked~label .circle-radio {
 }
 
 .collapse-btn {
+    
     width: 30px;
     height: 50px;
     line-height: 50px;
@@ -850,6 +853,10 @@ input[type='radio']:checked~label .circle-radio {
 
 .collapse-btn.collapsed {
     transform: rotate(180deg);
+}
+
+#close-side.collapsed {
+    transform: rotate(0deg);
 }
 
 /* Top tooltip */
@@ -903,7 +910,7 @@ input[type='radio']:checked~label .circle-radio {
     width: 350px;
     height: 200px;
     margin-top: 5px;
-    border-radius: 10px;
+    /*border-radius: 10px; */
     background-color: #DDDDDD;
     margin-left: 30px;
     /*sebastian added */
@@ -915,7 +922,7 @@ input[type='radio']:checked~label .circle-radio {
     max-width: 350px;
     margin-top: 12px;
     background-color: #ffffff;
-    border-radius: 10px;
+    /*border-radius: 10px; */
     padding: 10px;
     margin-left: 30px;
     /*sebastian added */
@@ -1122,7 +1129,7 @@ input[type='radio']:checked~label .circle-radio {
     text-decoration: none;
     text-align: center;
     padding: 8px 35px 8px 20px;
-    border-radius: 10px;
+    /*border-radius: 10px; */
     outline: none;
     height: 34px;
     background: #DDDDDD;
@@ -1181,7 +1188,7 @@ button:hover{
     max-width: 90%;
     width: 240px;
     padding: 8px 30px 8px 20px;
-    border-radius: 10px;
+    /*border-radius: 10px; */
     margin: 5px;
     outline: none;
     height: 34px;
@@ -1207,13 +1214,14 @@ button:hover{
     right: 10px;
     top: 10px;
     align-items: center;
-    border-radius: 10px;
+    /*border-radius: 10px; */
     text-align: center;
-    transition: 1s ease-in-out all;
+    transition: 0.5s ease-in-out all;
     
 }
 
 #close-side {
+    transform: rotate(180deg);
     color: white;
     display: flex;
     justify-content: center;
@@ -1225,6 +1233,8 @@ button:hover{
     top: 50%;
     left: -19px;
 }
+
+
 
 #close-side:hover {
     cursor: pointer;
@@ -1243,7 +1253,7 @@ button:hover{
     padding: 5px 50px 5px 10px;
     border: 1px solid #ccc;
     background: #DDDDDD;
-    border-radius: 10px;
+   /* border-radius: 10px; */
     
   }
 
