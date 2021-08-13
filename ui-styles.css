@@ -763,7 +763,7 @@ input[type='radio']:checked~label .circle-radio {
     background-color: #ffffff5e;
     max-width: 436px;
     position: absolute;
-    z-index: -99;
+    z-index: 4;
     left: 384px;
     top: 0px;
     width: 300px;
