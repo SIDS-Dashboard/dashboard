@@ -14,6 +14,8 @@ body {
     align-items: center;
     text-align: center;
   }
+
+  
 #opacity-slider {
     background-color: #DDDDDD;
 }
@@ -30,6 +32,8 @@ body {
    
     
 }
+
+
 
 
 input[type=checkbox] {
@@ -107,7 +111,7 @@ input[type=checkbox] {
     width: 300px;
    /* position: relative; */
     position: absolute;
-    border: 1px sold red;
+    /*border: 1px solid red; */
     top: 0px;
     right: 30px;
     z-index: 1;
@@ -321,10 +325,11 @@ input[type=checkbox] {
 
 .main-wrapper {
     margin-left: 14px;
-    margin-top: 30vh;
+    margin-top: 22vh;
+    margin-right: 0px;
     position: relative;
     width: 381px;
-    z-index: 1;
+    z-index: 4;
      
 }
 
@@ -336,8 +341,11 @@ input[type=checkbox] {
     /*border-radius: 10px; */
     transition: 0.5s ease-in-out all;
     opacity: 1;
+    height: 200px
     
 }
+
+
 
 
 .app-body.collapsed {
@@ -355,10 +363,18 @@ input[type=checkbox] {
 }
 
 .custom-selection-dropdown>label {
-    display: block;
+    /*display: block; */
     margin: 0px 30px;
     font-size: 15px;
     font-weight: bold;
+}
+
+#resetData {
+    display: none;
+}
+#resetData:hover {
+    color: blue;
+    cursor: pointer;
 }
 
 .custom-selection-dropdown .form-select {
@@ -722,7 +738,9 @@ input[type='radio']:checked~label .circle-radio {
 
 .icon-grid {
     display: grid;
+    position: absolute;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+    z-index: 40000;
 }
 
 .grid-container .icon-grid img {
@@ -748,6 +766,7 @@ input[type='radio']:checked~label .circle-radio {
     z-index: -99;
     left: 384px;
     top: 0px;
+    width: 300px;
 }
 
 .econo .text-section {
@@ -887,9 +906,9 @@ input[type='radio']:checked~label .circle-radio {
     margin: 0;
 }
 
-.main-wrapper .select2-container {
+/*.main-wrapper .select2-container {
     width: 100% !important;
-}
+} */
 
 /* Scrollbar */
 
@@ -908,14 +927,14 @@ input[type='radio']:checked~label .circle-radio {
 
 .population-density-box {
     width: 350px;
-    height: 200px;
+    height: 220px;
     margin-top: 5px;
     /*border-radius: 10px; */
     background-color: #DDDDDD;
     margin-left: 30px;
     /*sebastian added */
     position: relative;
-    z-index: 1;
+    z-index: 3;
 }
 
 .population-per-km {
@@ -928,6 +947,7 @@ input[type='radio']:checked~label .circle-radio {
     /*sebastian added */
     position: relative;
     z-index: 1;
+    height: 100px;
 }
 
 .population-per-km-text {
@@ -1106,8 +1126,8 @@ input[type='radio']:checked~label .circle-radio {
     padding: 5px;
    
     border: 1px solid #888;
-    width: 30%;
-    max-height: 200px;
+    width: 40%;
+    max-height: 600px;
     overflow: auto;
   }
 
@@ -1124,6 +1144,11 @@ input[type='radio']:checked~label .circle-radio {
       margin-bottom: 0;
       text-align: center;
   }
+
+  .modal-content > h1 {
+    margin-bottom: 0;
+    text-align: center;
+}
 
   button {
     text-decoration: none;
@@ -1201,6 +1226,10 @@ button:hover{
     text-align: center;
 }
 
+.mapboxgl-ctrl-top-right {
+    z-index: 5;
+}
+
 
 
 #top-right-wrap {
@@ -1212,7 +1241,7 @@ button:hover{
     /*height: 400px; */
     background-color: rgba(221, 221, 221, 0.7);
     right: 10px;
-    top: 10px;
+    top: 50px;
     align-items: center;
     /*border-radius: 10px; */
     text-align: center;

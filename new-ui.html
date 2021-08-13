@@ -31,7 +31,7 @@
     />
 
 	<link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.3.0/mapbox-gl-draw.css' type='text/css' />
-	<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.css" type="text/css">
+	
     <link rel="stylesheet" href="./ui-styles.css" />
   </head>
 
@@ -44,16 +44,10 @@
 			<div id='sideMin'></div>
 			<div id='sideMean'></div>
 
+
 		</div>
 	</div>
-
-	<div class="logos row-flex align-items-center">
-		<div class="UNDP-logo"></div>
-		<div class="rising-up-for-sids"></div>
-	  </div>
-
     <div class='pic' id="map">
-
       <div class="loader-gis">
         <svg
           version="1.1"
@@ -98,10 +92,9 @@
 		<div id="list1" class="dropdown-check-list" tabindex="100">
 			<span class="anchor">Select Overlay</span>
 			<ul id="items" class="items">
-				<li><input name='overlay' id='allsids-input' value="allsids" type="checkbox" checked /> SIDS Boundaries </li>
-				<li><input name='overlay' id='admin1-input' value="admin1-overlay" type="checkbox" /> Admin Regions 1 </li>
-				<li><input name='overlay' id='admin2-input' value="admin2-overlay" type="checkbox" /> Admin Regions 2</li>
-				<li><input name='overlay' id='underwater'  value="underwater-overlay" type='checkbox' /> Underwater Cables </li>
+				<li><input id='admin1-input' value="admin1-overlay" type="checkbox" /> Admin Regions 1 </li>
+				<li><input id='admin2-input' value="admin2-overlay" type="checkbox" /> Admin Regions 2</li>
+				<li><input id='underwater'  value="underwater-overlay" type='checkbox' /> Underwater Cables </li>
 				
 			</ul>
 		</div>
@@ -130,9 +123,9 @@
 			<div class='download' id='datadownload'>Download Data</div>
 		</div>
 
-		<!--<div class="country-select-menu" id="country-select-id">
+		<div class="country-select-menu" id="country-select-id">
 			<div class='screenshot' id='screenshot'>Screenshot</div>
-		</div> -->
+		</div>
 
 		<div class="country-select-menu" id="country-select-id">
 			<div id="addLabels" class="addLabels" onclick="addLabels()">Remove Labels</div>
@@ -149,41 +142,18 @@
 	</div>
 		
 
-	</div>
-
-
-
-    </div> <!---- MAP END -->
+</div>
+    </div>
     <div id="myModal" class="modal">
       <!-- Modal content -->
       <div class="modal-content">
         <span class="close">&times;</span>
-		<!--<p>Interested in downloading SIDS Admin regions or hexagons? Check our <a href=</p> -->
-		<h1>Downloads the Data Visualized on the Map -- Select the Attribute You'd Like Attached</h1>
-		<p>for all empty hexagons or admin regions, please <a href='https://github.com/SIDS-Dashboard/dataForDownload' target='_blank'>download from here</a></p>
-        <!--<p><b>What Spatial Resolution Would you like to download:</b></p>
-			<ul  id='download-resolution'>
-				<input autocomplete="off" id='hex1' name='res' type='checkbox'>
-				<label for='id'>1km Hexagons</label><br>
-				<input autocomplete="off" id='hex5' name='res' type='checkbox'>
-				<label for='id'>5km Hexagons</label><br>
-				<input autocomplete="off" id='hex10' name='res' type='checkbox'>
-				<label for='id'>10km Hexagons</label><br>
-				<input autocomplete="off" id='admin1' name='res' type='checkbox'>
-				<label for='id'>Admin Regions 1</label><br>
-				<input autocomplete="off" id='admin2' name='res' type='checkbox'>
-				<label for='id'>Admin Regions 2</label>
-			</ul>
-		<p>-----------------------------------------------------------------</p> -->
-		<p><b>What Countries Would You Like to Include in Download:</b></p>
-		<ul id="download-countries"></ul>
-			<p>-----------------------------------------------------------------</p>
-		<p><b>Check Attributes You Would Like to Include:</b></p>
+		<p>This will download the data that is visible on the screen</p>
+        <p>Check Attributes You Would Like to Include:</p>
         <ul id="download-attributes"></ul>
         <ul id="download-buttons">
           <button id="shp">Download Shapefile</button>
           <button id="gjn">Download GeoJSON</button>
-		  <button id='csv'>Download CSV file</button>
         </ul>
       </div>
     </div>
@@ -193,13 +163,19 @@
 	  </div> -->
 
 
+    <!-- Logos Section Start -->
+    <div class="logos row-flex align-items-center">
+      <div class="UNDP-logo"></div>
+      <div class="rising-up-for-sids"></div>
+    </div>
+
 
 	
 	
 	 <!--Top right Column End -->
 
     <div class="container main-wrapper">
-      
+      <!-- Collapse button -->
       <div class="collapse-btn bottom-left">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -216,8 +192,8 @@
           />
         </svg>
       </div>
-      
-      <div class="row tooltip-top sids">
+      <!-- Top tooltips  -->
+      <!--<div class="row tooltip-top sids">
 			<div class="head-img">
 				<img src="./assets/img/icons/sidsOfferPillars.png" class="sids-tooltip-head-img">
 			</div>
@@ -249,15 +225,15 @@
 				</p>
 				<strong> Reference: CIESIN, Columbia University (2018) -</strong>
 			</div>
-		</div>
-      
+		</div> -->
+      <!-- END TOP Tooltips -->
 
       <div class="app-body">
-        <div class="row">
+        <!--<div class="row">
+				<div class="col-6"> -->
 
-				<div class="col-6">
-
-        <div id="selection-scroller-option" class="selection-scroller">
+        <!-- Selection option for this is in JSON object called 'selection_scroller_options' -->
+        <!--<div id="selection-scroller-option" class="selection-scroller">
 						<div class="scroller-option-up scroller-option tab-nav" data-tooltip-target=".tooltip-top.sids"
 							data-target="#tab1" data-idx='0'>
 							<span>SIDS offer Pillars</span>
@@ -275,9 +251,9 @@
 					</div>
 				</div>
 
-				<div class="col-6 p-0">
-        
-					<div class="button-selection tab" id="tab1">
+				<div class="col-6 p-0"> -->
+        <!-- Button Selection -->
+					<!--<div class="button-selection tab" id="tab1">
 						<div class="d-flex align-items-center">
 							<img src="./assets/img/icons/blueEconomy.png" class="button-icon img-fluid">
 							<a href="#" class="btn btn-1 button-option-select-1 BE active" data-value="Blue Economy">
@@ -295,10 +271,10 @@
 								data-value="Digital Transformation">Digital
 								Transformation</a>
 						</div>
-					</div>
+					</div> -->
 
-        
-					<div id="tooleconomy" class="row align-items-center tooltip-blue-eco econo d-none">
+        <!-- SIDS offer Pillars tab hover -->
+					<!--<div id="tooleconomy" class="row align-items-center tooltip-blue-eco econo d-none">
 						<div class="col-2 justify-content-center text-center">
 							<img src="./assets/img/icons/blueEconomy.png" class="blue-eco-tooltip-icon">
 						</div>
@@ -344,18 +320,20 @@
 							<strong>Reference: CIESIN, Columbia Universty</strong>
 							<strong>Reference: CIESIN, Columbia Universty</strong>
 						</div>
-					</div>
+					</div> -->
 
-        
-					<div id="samimg" class="row align-items-center tooltip-blue-eco econo sdg-tool d-none">
+        <!-- end SIDS offer Pillars tab hover -->
+
+        <!-- hover for SDGS -->
+					<!--<div id="samimg" class="row align-items-center tooltip-blue-eco econo sdg-tool d-none">
 						<div class="col-12">
 							<h3 class="text-center title-text"> Blue Economy </h3>
 							<p class="img-tooltip-content"> </p>
 						</div>
 					</div>
-					<div class="button-selection tab " id="tab3">
-        
-						<div id="SAMOA_slider" data-bs-interval="false" class="carousel slide samoa">
+					<div class="button-selection tab " id="tab3"> -->
+        <!-- Slider 1 -->
+						<!--<div id="SAMOA_slider" data-bs-interval="false" class="carousel slide samoa">
 							<div class="carousel-inner">
 								<div class="carousel-item active" data-imgid="1">
 									<img class="d-block mx-auto carousel-img" src="./assets/img/samoa/1.png"
@@ -433,8 +411,8 @@
 								<span class="carousel-control-next-icon" aria-hidden="true"></span>
 								<span class="sr-only">Next</span>
 							</a>
-						</div>
-         
+						</div> -->
+        <!--  
 						<div id="gridsamoa" class="grid-container samoa-grid samoa d-none">
 							<div class="icon-grid">
 								<div class="icon-grid-item" data-imgid="1">
@@ -504,8 +482,8 @@
 							</div>
 						</div>
 					</div>
-					<div class="button-selection tab tab-2 active" id="tab2">
-        
+					<div class="button-selection tab tab-2 active" id="tab2"> -->
+        <!-- Slider 2
 						<div id="sdg_slider" data-bs-interval="false" class="carousel slide sdgimg">
 							<div class="carousel-inner">
 								<div class="carousel-item active" data-imgid="1">
@@ -587,8 +565,9 @@
 								<span class="carousel-control-next-icon" aria-hidden="true"></span>
 								<span class="sr-only">Next</span>
 							</a>
-						</div>
+						</div> -->
 
+        <!-- Grid for SDGs
 						<div id="gridsdgs" class="grid-container sdgs d-none">
 							<div class="icon-grid">
 								<div class="icon-grid-item" data-imgid="1">
@@ -665,12 +644,18 @@
 					</div>
 				</div>
 
+			</div> -->
+
+		<div class='row'>
+			<div class='col-12 test1'>
+				<img id='img' src='././assets/img/sdg/17.png' />
 			</div>
+		</div>	
 
         <div class="row">
           <div class="col-12">
             <div class="custom-selection-dropdown selection-dropdown-1">
-              <label id='datasetLabel'>Dataset</label><span id='resetData' onclick='resetData()'>(Remove all Filters)</span>
+              <label>Dataset</label>
               <select
                 class="form-select data-set-selection"
                 id="dataDrop"
@@ -678,9 +663,12 @@
                 name="dataset-selection"
               >
                 <option value="start" selected>Select Dataset</option>
-                
+                <!--<option value="Example 2">Example 2</option>
+							<option value="Example Dataset 3">Example Dataset 3</option>
+							<option value="Example Dataset 4">Example Dataset 4</option> -->
               </select>
-              
+              <!--<span class="selection-dropdown-arrow up dataset-select-uparrow"></span>
+						<span class="selection-dropdown-arrow down dataset-select-downarrow"></span>-->
             </div>
           </div>
 
@@ -719,14 +707,54 @@
               </div>
 
               <div class="year-timeline">
-               
+                <!-- Here for example code, it's mainly populated by JS 
+								 <div class="year-timeline-block alpha" data-year-idx="1">
+								<input type="radio" name="year-selected" value="1990" id="year-1990" checked>
+								<label for="year-1990">
+									<span class="label-value">1990</span>
+									<span class="circle-radio"></span>
+								</label>
+							</div> 
+
+							<div class="year-timeline-block" data-year-idx="2">
+								<input type="radio" name="year-selected" value="2000" id="year-2000">
+								<label for="year-2000">
+									<span class="label-value">2000</span>
+									<span class="circle-radio"></span>
+								</label>
+							</div>
+
+
+							<div class="year-timeline-block" data-year-idx="3">
+								<input type="radio" name="year-selected" value="2010" id="year-2010">
+								<label for="year-2010">
+									<span class="label-value">2010</span>
+									<span class="circle-radio"></span>
+								</label>
+							</div>
+
+
+							<div class="year-timeline-block" data-year-idx="4">
+								<input type="radio" name="year-selected" value="2015" id="year-2015">
+								<label for="year-2015">
+									<span class="label-value">2015</span>
+									<span class="circle-radio"></span>
+								</label>
+							</div>
+
+							<div class="year-timeline-block omega" data-year-idx="5">
+								<input type="radio" name="year-selected" value="2020" id="year-2020">
+								<label for="year-2020">
+									<span class="label-value">2020</span>
+									<span class="circle-radio"></span>
+								</label>
+							</div> -->
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-
     <div class=" pic app-body population-density-box col-flex">
       <div
         class="col-flex"
@@ -752,7 +780,7 @@
         ></div>
       </div>
     </div>
-     <div class="pic app-body population-per-km col-flex">
+    <div class="pic app-body population-per-km col-flex">
       <div
         class="row-flex space-evenly"
         style="margin-top: 4px; font-size: 14px"
@@ -783,8 +811,7 @@
 				<div class="population-per-km-img" style="background-color:#006379;"></div>
 			</div> -->
       </div>
-    </div> 
-
+    </div>
     <!-- </div> -->
 
     <script
@@ -818,7 +845,7 @@
     <script src="https://github.com/niklasvh/html2canvas/releases/download/0.4.1/html2canvas.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 	<script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.3.0/mapbox-gl-draw.js'></script>
-	<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.min.js"></script>
+
 	
 
 	
@@ -829,9 +856,8 @@
     <script src="./data/sidsNames.js"></script>
     <script src="./newgis.js"></script>
     <script src="./addSources.js"></script>
-	<!--<script src="./drawFunc.js"></script> -->
-	<script src='./addButtons.js'></script>
-	
+	<script src="./drawFunc.js"></script>
+	<script src='./hoverFunctions.js'></script>
 	<!--<script src='./clipFunctions.js'></script> -->
     <!--<script src="./pass.js"></script> -->
   </body>
