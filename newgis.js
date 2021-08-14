@@ -244,7 +244,7 @@ function recolorBasedOnWhatsOnPage() {
         //console.log(uniFeatures.features);
         var selecteData = features.map(x => x.properties[currentGeojsonLayers.dataLayer])
         //console.log(selecteData);
-        var breaks = chroma.limits(selecteData, 'q', 4);
+        var breaks = chroma.limits(selecteData, 'q', 5);
         
         console.log(breaks);
         var breaks_new = [];
@@ -287,7 +287,7 @@ function recolorBasedOnWhatsOnPage() {
             addNoDataLegend();
         } else {
             map.setFilter(currentGeojsonLayers.hexSize, ['>=', currentGeojsonLayers.dataLayer, 0])
-            addLegend(currentGeojsonLayers.color, breaks, precision, currentGeojsonLayers.dataLayer)
+            addLegend(currentGeojsonLayers.color, breaks, precision, currentGeojsonLayers.dataLayer,selecteData)
             setTimeout(() => {
                 map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.8)
             }, 400);
@@ -679,7 +679,7 @@ map.on('dragend', function (e) {
 
 map.on('zoomend', function (e) {
 
-    console.log(map.getZoom());
+    //console.log(map.getZoom());
     //recolorBasedOnWhatsOnPage();
 
 
@@ -1115,7 +1115,7 @@ function addToLayersDrop(layers) {
 
     $('#layer-id').show()
 
-    console.log(layers);
+    //console.log(layers);
     //console.log()
     //console.log(yearList)
     var layersHolder = document.getElementById('layer-drop');
@@ -1193,11 +1193,26 @@ function addOcean(layer) {
     }, firstSymbolId)
 
 
-    addLegend(currentGeojsonLayers.color, currentGeojsonLayers.breaks, 2, layer)
-    //addTheOnClick()
+    // following codes fail in getting the features of ocean hexagons
+    var features = map.queryRenderedFeatures({
+        layers: [currentGeojsonLayers.hexSize]
+    })
+
+    if (features) 
+    {
+        var uniFeatures;
+        uniFeatures = getUniqueFeatures(features, 'hexid');
+        console.log("uniFeatures",uniFeatures)
+        //var selecteData = features.map(x => x.properties[currentGeojsonLayers.dataLayer])
+        var selecteData = uniFeatures.map(x => x.properties[selection])
+        
+        addLegend(currentGeojsonLayers.color, currentGeojsonLayers.breaks, 2, layer,selecteData)
+        //addLegend(colorRamp, breaks, precision, selection, selecteData)
+        //addTheOnClick()
+    }
+
 
 }
-
 
 
 function changeDataOnMap(selection) {
@@ -1257,7 +1272,7 @@ function changeDataOnMap(selection) {
             layers: [currentGeojsonLayers.hexSize]
         })
 
-        console.log(features);
+        //console.log(features);
         //createMask(features)
 
         if (features) {
@@ -1281,9 +1296,7 @@ function changeDataOnMap(selection) {
 
 
             //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
-            var breaks = chroma.limits(selecteData, 'q', 4);
-            
-            //console.log(breaks);
+            var breaks = chroma.limits(selecteData, 'q', 5);
             var breaks_new = [];
             var precision = 1;
             do {
@@ -1355,22 +1368,23 @@ function changeDataOnMap(selection) {
                breaks[4], colorRamp[4],
                ]
              
-             ) */
+             ) */               
+
 
             map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-color',
-        ['case', ['boolean', ['feature-state', 'hover'], false],
-          'yellow',
-        [
-          'interpolate',
-          ['linear'],
-          ['get', selection],
-          breaks[0], colorRamp[0],
-          breaks[1], colorRamp[1],
-          breaks[2], colorRamp[2],
-          breaks[3], colorRamp[3],
-          breaks[4], colorRamp[4],
-          ]
-        ]
+                ['case', ['boolean', ['feature-state', 'hover'], false],
+                'yellow',
+                [
+                'interpolate',
+                ['linear'],
+                ['get', selection],
+                breaks[0], colorRamp[0],
+                breaks[1], colorRamp[1],
+                breaks[2], colorRamp[2],
+                breaks[3], colorRamp[3],
+                breaks[4], colorRamp[4],
+                ]
+                ]
             )
 
 
@@ -1386,7 +1400,11 @@ function changeDataOnMap(selection) {
                 addNoDataLegend();
             } else {
                 map.setFilter(currentGeojsonLayers.hexSize, ['>=', selection, 0])
-                addLegend(colorRamp, breaks, precision, selection)
+                
+                //console.log(selecteData)
+                //console.log(max)
+
+                addLegend(colorRamp, breaks, precision, selection, selecteData)
                 setTimeout(() => {
                     map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.8)
                 }, 100);
@@ -1426,7 +1444,7 @@ function addNoDataLegend() {
 
 }
 
-function addLegend(colors, breaks, precision, current) {
+function addLegend(colors, breaks, precision, current, dataset) {
 
     //console.log(allLayers)
 
@@ -1449,7 +1467,8 @@ function addLegend(colors, breaks, precision, current) {
     legend.innerHTML = '';
     legendTitle.innerHTML = ''
     legendTitle.innerHTML = '<span>' + legData.units + '</span>';
-
+    
+    /*
     for (var x in colors) {
 
         var containerDiv = document.createElement('div')
@@ -1470,6 +1489,107 @@ function addLegend(colors, breaks, precision, current) {
         legend.appendChild(containerDiv);
 
     }
+    */
+
+    //histogram
+    var element = document.getElementById("histogram");
+    if(typeof(element) != 'undefined' && element != null)
+    {
+        $('#histogram').remove(); 
+    }     
+    $('#histogram_frame').append('<canvas id="histogram" width="350" height="150"><canvas>')
+    var canvas = document.getElementById('histogram')    
+
+    console.log("Breaks:",breaks)
+    var breaks_precision = []
+    breaks_precision.push(">"+nFormatter(breaks[0], precision))
+    breaks_precision.push(">"+nFormatter(breaks[1], precision))
+    breaks_precision.push(">"+nFormatter(breaks[2], precision))
+    breaks_precision.push(">"+nFormatter(breaks[3], precision))
+    breaks_precision.push(">"+nFormatter(breaks[4], precision))
+    console.log("Breaks_Precision:",breaks_precision)
+
+    /*
+    for (i = 0; i < breaks.length; i++) {
+        console.log(breaks[i]);
+        breaks_precision.push(nFormatter(breaks[i], precision))
+    }*/
+
+    var histogram_data = [0,0,0,0,0]
+    for (i = 0; i < dataset.length; i++) {
+        if (dataset[i]<breaks[1])
+        {
+            histogram_data[0]+=1
+        }
+        else if (dataset[i]<breaks[2])
+        {
+            histogram_data[1]+=1
+        }
+        else if (dataset[i]<breaks[3])
+        {
+            histogram_data[2]+=1
+        }
+        else if (dataset[i]<breaks[4])
+        {
+            histogram_data[3]+=1
+        }
+        else
+        {
+            histogram_data[4]+=1
+        }
+    }
+    console.log("Histogram:",histogram_data)
+    var data = {
+            labels: breaks_precision,
+            datasets: [{
+                data: histogram_data,
+                backgroundColor: colors
+            }]
+        };
+
+    var option = {
+        tooltips: {
+            enabled: true
+        },
+        legend: {
+                display: false
+        },
+        annotation: {
+            annotations: [
+            {
+                type: "line",
+                mode: "vertical",
+                scaleID: "x-axis-0",
+                value: "70%",
+                borderColor: "black",
+                label: {
+                content: "Your Score",
+                enabled: true,
+                position: "center"
+                }
+            }]},
+        scales: {
+        yAxes:[{
+                display:true
+        }],
+        xAxes:[{
+            barPercentage: 0.8,
+            categoryPercentage: 1.0,
+                gridLines: {
+                display:true
+            },
+            scaleLabel: {
+            display: false,
+            labelString: legData.units
+            }
+        }]
+    }
+    };
+
+    var myHistogram = Chart.Bar(canvas,{
+        data:data,
+    options:option
+    });
 }
 
 
@@ -2596,8 +2716,7 @@ function nFormatter(num, digits) {
 
 //screenshot button functions
 $('#screenshot').click(function(){
-    
-   
+     
 
     $('#top-right-wrap').toggle();
     html2canvas($('#map'), {
