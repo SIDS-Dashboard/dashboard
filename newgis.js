@@ -242,9 +242,9 @@ function recolorBasedOnWhatsOnPage() {
         //console.log(uniFeatures.features);
         var selecteData = features.map(x => x.properties[currentGeojsonLayers.dataLayer])
         //console.log(selecteData);
-        var breaks = chroma.limits(selecteData, 'q', 5);
+        var breaks = chroma.limits(selecteData, 'q', 4);
         
-        console.log(breaks);
+        console.log("BREAK5",breaks);
         var breaks_new = [];
         var precision = 1;
         do {
@@ -272,6 +272,7 @@ function recolorBasedOnWhatsOnPage() {
           breaks[4], currentGeojsonLayers.color[4],
           ]
         )
+        console.log(currentGeojsonLayers);
 
         //map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.7)
 
@@ -1190,31 +1191,19 @@ function addOcean(layer) {
         }
     }, firstSymbolId)
 
-    var oceanLayer = map.getLayer('ocean')
-    var features = map.queryRenderedFeatures({
-        layers: [oceanLayer.ocean]
-    })
-    console.log(oceanLayer)
+    setTimeout(() => {
+        var features = map.queryRenderedFeatures({
+            layers: ['ocean']
+        })
 
+        if (features) {
+            var uniFeatures;
+            uniFeatures = getUniqueFeatures(features, 'depth');
+            var selecteData = uniFeatures.map(x => x.properties['depth']);          
+            addLegend(currentGeojsonLayers.color, currentGeojsonLayers.breaks, 2, layer,selecteData); 
+        }
 
-    // following codes fail in getting the features of ocean hexagons
-    var features = map.queryRenderedFeatures({
-        layers: [currentGeojsonLayers.hexSize]
-    })
-
-    if (features) 
-    {
-        var uniFeatures;
-        uniFeatures = getUniqueFeatures(features, 'hexid');
-        console.log("uniFeatures",uniFeatures)
-        //var selecteData = features.map(x => x.properties[currentGeojsonLayers.dataLayer])
-        var selecteData = uniFeatures.map(x => x.properties['ocean'])
-        
-        addLegend(currentGeojsonLayers.color, currentGeojsonLayers.breaks, 2, layer,selecteData)
-        //addLegend(colorRamp, breaks, precision, selection, selecteData)
-        //addTheOnClick()
-    }
-
+    }, 600)
 
 }
 
@@ -1233,8 +1222,8 @@ function changeDataOnMap(selection) {
     //console.log(currentGeojsonLayers)
 
     if(!map.getSource('hex5')) {
-        console.log('no source')
-        addHexSource()
+        //console.log('no source')
+        addHexSource();
     } else {
         //console.log('source!')
     }
@@ -1300,7 +1289,7 @@ function changeDataOnMap(selection) {
 
 
             //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
-            var breaks = chroma.limits(selecteData, 'q', 5);
+            var breaks = chroma.limits(selecteData, 'q', 4);
             //console.log("BREAK",breaks)
             var breaks_new = [];
             var precision = 1;
@@ -1312,8 +1301,7 @@ function changeDataOnMap(selection) {
                 //console.log(breaks_new);
             }    
             while (checkForDuplicates(breaks_new)&&(precision<10));
-            breaks = breaks_new;              
-            
+            breaks = breaks_new;                        
 
 
             var colorRamp = chroma.scale(['#fafa6e', '#2A4858']).mode('lch').colors(5) // yellow to dark-blue
@@ -1376,6 +1364,7 @@ function changeDataOnMap(selection) {
              ) */               
 
             //console.log("SELECTION",selecton);
+
             map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-color',
                 ['case', ['boolean', ['feature-state', 'hover'], false],
                 'yellow',
@@ -1393,7 +1382,7 @@ function changeDataOnMap(selection) {
             )
 
 
-
+            
             //map.setFilter(currentGeojsonLayers.hexSize,['>=',selection, 0])
             if (isNaN(breaks[3]) || breaks[1] == 0) {
                 //setTimeout(() => { map.setFilter(currentGeojsonLayers.hexSize, null) }, 500);
@@ -1521,7 +1510,8 @@ function addLegend(colors, breaks, precision, current, dataset) {
     var breaks_histogram = chroma.limits(dataset, 'e', nGroup);
     //console.log("breaks_histogram",breaks_histogram);
 
-    // color
+    // old color
+    /*
     var histogram_color = Array(nGroup).fill("");
     var color_index=0;
     for (var i = 0; i < nGroup; i++)   
@@ -1530,6 +1520,25 @@ function addLegend(colors, breaks, precision, current, dataset) {
             color_index+=1;    
         histogram_color[i]=colors[color_index];
     }
+    */
+
+    // new color
+    var break_index=0;
+    var histogram_break_count = Array(4).fill(0);  
+    for (var i = 0; i < nGroup; i++)   
+    {
+        if (breaks_histogram[i]>breaks[break_index+1])
+            break_index+=1;
+        histogram_break_count[break_index]+=1;
+    }    
+    var colorRampNew=[];
+    for (var i = 0; i < 4; i++)
+    {           
+        colorRampPart = chroma.scale([colors[i], colors[i+1]]).mode('lch').colors(histogram_break_count[i]);
+        colorRampNew = colorRampNew.concat(colorRampPart);
+        //console.log(colorRampNew);
+    }   
+   
 
     // precision
     var breaks_precision = []
@@ -1560,7 +1569,7 @@ function addLegend(colors, breaks, precision, current, dataset) {
             labels: breaks_precision.slice(0, -1),
             datasets: [{
                 data: histogram_data,
-                backgroundColor: histogram_color,
+                backgroundColor: colorRampNew,
             }]
         };
 
@@ -1599,7 +1608,7 @@ function addLegend(colors, breaks, precision, current, dataset) {
 
                 ticks: {
                     //scaleStepWidth: 10,
-                    maxTicksLimit: 3, 
+                    maxTicksLimit: 4, 
                     //autoSkip: true,
                     //stepSize:10,                                     
                     max: maxY,
@@ -1624,7 +1633,7 @@ function addLegend(colors, breaks, precision, current, dataset) {
                 var ticksScale=maxY;
                 while ((ticksScale>minY)&&(ticksScale>=1))
                 {
-                    console.log(ticksScale);
+                    //console.log(ticksScale);
                     chartObj.ticks.push(ticksScale);
                     ticksScale/=10;
                 }
@@ -1944,7 +1953,7 @@ function resetData() {
     }
 
     $('#resetData').toggle();
-    console.log('hi')
+    console.log('ResetData!')
 
 }
 /**sdg grid hover */
@@ -1960,7 +1969,7 @@ $(".sdgs .icon-grid-item").click(function () {
     } */
 
     var w = $('#dataDrop')[0].options
-    console.log(w);
+    //console.log(w);
     for (var z in w) {
         console.log(w[z].id)
         $('#dataDrop option[id=' + w[z].id + ']').show()
@@ -1968,11 +1977,11 @@ $(".sdgs .icon-grid-item").click(function () {
 
     $("#sdg_slider .carousel-item").removeClass("active");
     var index = $(this).data('imgid');
-    console.log(index);
+    //console.log(index);
     var filtered = _.filter(allLayers, function(o) {return o.sdg.includes(index)})
-    console.log(allLayers)
+    //console.log(allLayers)
     var filteredSDG = filtered.map(x => x.field_name)
-    console.log(filteredSDG)
+    //console.log(filteredSDG)
 
    // var w = $('#dataDrop')[0].options
     for (var x in w) {
@@ -2155,7 +2164,7 @@ $('select[name="dataset-selection"]').on('change', function () {
         $('.opacityslider').hide()
         $('.download').hide()
         //map.removeControl(Draw);
-        console.log('basemap')
+        //console.log('basemap')
         //console.log(map.getStyle().sources)
         //console.log(styles)
         if (map.getLayer(currentGeojsonLayers.hexSize)) {
@@ -2183,7 +2192,7 @@ $('select[name="dataset-selection"]').on('change', function () {
             map.setStyle(thisStyle.uri)
             //addHexSource()
             //addLabels();
-            console.log('hi')
+            //console.log('hi')
         //}
 
         
