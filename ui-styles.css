@@ -67,8 +67,7 @@ input[type=checkbox] {
 
 .row-flex {
     display: flex;
-    flex-direction: row;
-    
+    flex-direction: row;  
 }
 
 .col-flex {
@@ -78,6 +77,7 @@ input[type=checkbox] {
 
 .space-evenly {
     justify-content: space-evenly;
+    font-size: 12px;
 }
 
 .logos {
@@ -127,7 +127,7 @@ input[type=checkbox] {
 
 
     padding: 8px 8px 8px 8px;
-    /*border-radius: 10px; */
+    border-radius: 5px;
     color: black;
     
     background: #DDDDDD;
@@ -137,11 +137,14 @@ input[type=checkbox] {
     width: 120px;
     margin: 10px auto 10px auto;
     cursor: pointer;
+ 
 }
 
 #addLabels {
+    padding: 5px 5px 5px 5px;
     margin: 0px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
+    height: 30px;
 }
 
 
@@ -206,7 +209,7 @@ input[type=checkbox] {
 #add-overlay {
     
     padding: 8px 35px 8px 20px;
-    border-radius: 10px;
+    border-radius: 5px;
     outline: none;
     /*height: 44px; */
     background: #DDDDDD;
@@ -379,7 +382,8 @@ input[type=checkbox] {
 
 .custom-selection-dropdown .form-select {
     font-size: 12px;
-    border-radius: 10px;
+    border-radius: 5px;
+    height: 30px;
     padding: 4px 20px;
     background-image: none;
 }
@@ -949,7 +953,8 @@ input[type='radio']:checked~label .circle-radio {
     /*sebastian added */
     position: relative;
     z-index: 1;
-    height: 190px;
+    height: 210px;
+    font-size: 12px;
 }
 
 .population-per-km-text {
@@ -959,9 +964,14 @@ input[type='radio']:checked~label .circle-radio {
     
 }
 
+#histogram_frame
+{
+    font-size: 11px;
+}
+
 .population-per-km-img {
-    width: 25px;
-    height: 21px;
+    width: 17px;
+    height: 15px;
     background: url('./assets/polygon.png');
     background-repeat: no-repeat;
     background-size: 101% 101%;
@@ -1193,8 +1203,7 @@ button:hover{
     display: flex;
     align-content: center;
     justify-content: center;
-    width: 100%;
-    
+    width: 100%;   
 }
 
 .closebutton {
@@ -1214,11 +1223,11 @@ button:hover{
     
     max-width: 90%;
     width: 240px;
-    padding: 8px 30px 8px 20px;
+    padding: 6px 25px 6px 25px;
     /*border-radius: 10px; */
     margin: 5px;
     outline: none;
-    height: 34px;
+    height: 30px;
     background: #DDDDDD;
     font-weight: 300;
     font-size: 14px;
@@ -1276,6 +1285,7 @@ button:hover{
     display: inline-block;
     font-size: 14px;
     
+    
   }
   .dropdown-check-list .anchor {
     position: relative;
@@ -1284,7 +1294,8 @@ button:hover{
     padding: 5px 50px 5px 10px;
     border: 1px solid #ccc;
     background: #DDDDDD;
-   /* border-radius: 10px; */
+    border-radius: 5px;
+    height: 30px;
     
   }
 
@@ -1343,4 +1354,23 @@ button:hover{
       text-align: center;
       font-size: 12px;
   }
+
+  .mapboxgl-ctrl.mapboxgl-ctrl-attrib 
+  {
+    background-color: transparent;      
+  }
+
+  .mapboxgl-ctrl.mapboxgl-ctrl-attrib a:link
+  {
+    opacity:70%;
+    color:#ffffff;
+  }
+
+  .mapboxgl-ctrl-geocoder--input
+  {
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:15px;
+  }
+
+  
 

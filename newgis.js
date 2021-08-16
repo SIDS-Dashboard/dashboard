@@ -227,9 +227,7 @@ function recolorBasedOnWhatsOnPage() {
     //createMask(features);
 
     //console.log(currentGeojsonLayers.hexSize);
-    if(features.length > 0) {
-
-      
+    if(features.length > 0) {      
 
         var uniFeatures;
         if (currentGeojsonLayers.hexSize === 'admin1') {
@@ -1192,6 +1190,12 @@ function addOcean(layer) {
         }
     }, firstSymbolId)
 
+    var oceanLayer = map.getLayer('ocean')
+    var features = map.queryRenderedFeatures({
+        layers: [oceanLayer.ocean]
+    })
+    console.log(oceanLayer)
+
 
     // following codes fail in getting the features of ocean hexagons
     var features = map.queryRenderedFeatures({
@@ -1204,7 +1208,7 @@ function addOcean(layer) {
         uniFeatures = getUniqueFeatures(features, 'hexid');
         console.log("uniFeatures",uniFeatures)
         //var selecteData = features.map(x => x.properties[currentGeojsonLayers.dataLayer])
-        var selecteData = uniFeatures.map(x => x.properties[selection])
+        var selecteData = uniFeatures.map(x => x.properties['ocean'])
         
         addLegend(currentGeojsonLayers.color, currentGeojsonLayers.breaks, 2, layer,selecteData)
         //addLegend(colorRamp, breaks, precision, selection, selecteData)
@@ -1226,13 +1230,13 @@ function changeDataOnMap(selection) {
     //console.log(map.getStyle().layers)
     //console.log(selection);
     currentGeojsonLayers.dataLayer = selection;
-    console.log(currentGeojsonLayers)
+    //console.log(currentGeojsonLayers)
 
     if(!map.getSource('hex5')) {
         console.log('no source')
         addHexSource()
     } else {
-        console.log('source!')
+        //console.log('source!')
     }
 
     if (!map.getLayer(currentGeojsonLayers.hexSize)) {
@@ -1243,7 +1247,7 @@ function changeDataOnMap(selection) {
 
         //console.log(firstSymbolId);
 
-        console.log(current)
+        //console.log(current)
 
         map.addLayer({
             'id': currentGeojsonLayers.hexSize,
@@ -1297,6 +1301,7 @@ function changeDataOnMap(selection) {
 
             //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
             var breaks = chroma.limits(selecteData, 'q', 5);
+            //console.log("BREAK",breaks)
             var breaks_new = [];
             var precision = 1;
             do {
@@ -1370,7 +1375,7 @@ function changeDataOnMap(selection) {
              
              ) */               
 
-
+            //console.log("SELECTION",selecton);
             map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-color',
                 ['case', ['boolean', ['feature-state', 'hover'], false],
                 'yellow',
@@ -1468,7 +1473,7 @@ function addLegend(colors, breaks, precision, current, dataset) {
     legendTitle.innerHTML = ''
     legendTitle.innerHTML = '<span>' + legData.units + '</span>';
     
-    /*
+    
     for (var x in colors) {
 
         var containerDiv = document.createElement('div')
@@ -1489,61 +1494,69 @@ function addLegend(colors, breaks, precision, current, dataset) {
         legend.appendChild(containerDiv);
 
     }
-    */
+    
+    console.log("colors",colors)
+    console.log("breaks",breaks)
+    console.log("precision",precision)
+    console.log("current",current)
+    console.log("dataset",dataset)    
 
-    //histogram
+    // histogram
     var element = document.getElementById("histogram");
     if(typeof(element) != 'undefined' && element != null)
     {
         $('#histogram').remove(); 
     }     
-    $('#histogram_frame').append('<canvas id="histogram" width="350" height="150"><canvas>')
+    $('#histogram_frame').append('<canvas id="histogram" width="350" height="130"><canvas>')
     var canvas = document.getElementById('histogram')    
 
-    console.log("Breaks:",breaks)
+    // break
+    var nGroup=200
+    var breaks_histogram = chroma.limits(dataset, 'e', nGroup);
+    console.log("breaks_histogram",breaks_histogram);
+
+    // color
+    var histogram_color = Array(nGroup).fill("");
+    var color_index=0;
+    for (var i = 0; i < nGroup; i++)   
+    {
+        console.log(breaks_histogram[i],breaks[color_index])
+        if (breaks_histogram[i]>breaks[color_index+1])
+            color_index+=1;    
+        histogram_color[i]=colors[color_index];
+    }
+    console.log("histogram_color",histogram_color)
+
+    // precision
     var breaks_precision = []
-    breaks_precision.push(">"+nFormatter(breaks[0], precision))
-    breaks_precision.push(">"+nFormatter(breaks[1], precision))
-    breaks_precision.push(">"+nFormatter(breaks[2], precision))
-    breaks_precision.push(">"+nFormatter(breaks[3], precision))
-    breaks_precision.push(">"+nFormatter(breaks[4], precision))
-    console.log("Breaks_Precision:",breaks_precision)
+    for (i = 0; i < breaks_histogram.length; i++) {        
+        breaks_precision.push(nFormatter(breaks_histogram[i], precision))
+    }
+    console.log("breaks_precision:",breaks_precision)
 
-    /*
-    for (i = 0; i < breaks.length; i++) {
-        console.log(breaks[i]);
-        breaks_precision.push(nFormatter(breaks[i], precision))
-    }*/
-
-    var histogram_data = [0,0,0,0,0]
-    for (i = 0; i < dataset.length; i++) {
-        if (dataset[i]<breaks[1])
+    var histogram_data = Array(nGroup).fill(0);    
+    for (var i = 0; i < dataset.length; i++) {
+        for (var j = 0; j < nGroup-1; j++)
         {
-            histogram_data[0]+=1
+            if ((dataset[i]>=breaks_histogram[j])&&(dataset[i]<breaks_histogram[j+1]))
+            {
+                histogram_data[j]+=1                
+            }            
         }
-        else if (dataset[i]<breaks[2])
+        if (dataset[i]>=breaks_histogram[nGroup-1])
         {
-            histogram_data[1]+=1
-        }
-        else if (dataset[i]<breaks[3])
-        {
-            histogram_data[2]+=1
-        }
-        else if (dataset[i]<breaks[4])
-        {
-            histogram_data[3]+=1
-        }
-        else
-        {
-            histogram_data[4]+=1
+            histogram_data[nGroup-1]+=1
         }
     }
-    console.log("Histogram:",histogram_data)
+    console.log("histogram_data",histogram_data)
+
+    var colorRampN = chroma.scale([colors[0], colors[4]]).mode('lch').colors(nGroup) // yellow to dark-blue
+            
     var data = {
-            labels: breaks_precision,
+            labels: breaks_precision.slice(0, -1),
             datasets: [{
                 data: histogram_data,
-                backgroundColor: colors
+                backgroundColor: histogram_color,
             }]
         };
 
@@ -1569,18 +1582,38 @@ function addLegend(colors, breaks, precision, current, dataset) {
                 }
             }]},
         scales: {
+            borderWidth:0,
         yAxes:[{
-                display:true
+                display:true,
+                type: "logarithmic",
+                ticks: {
+                    maxTicksLimit: 5,
+                    callback: function(label, index, labels) {
+                        if (label>1000000000)
+                        return label/1000000000+'B';
+                        else if (label>1000000)
+                        return label/1000000+'M';
+                        else if (label>1000)
+                        return label/1000+'K';
+                        else return label;                    
+                    }
+                }
         }],
-        xAxes:[{
-            barPercentage: 0.8,
+        xAxes:[{            
+            barPercentage: 1.0,
             categoryPercentage: 1.0,
-                gridLines: {
+            gridLines: 
+            {
                 display:true
             },
-            scaleLabel: {
-            display: false,
-            labelString: legData.units
+            scaleLabel: 
+            {
+                display: false,
+                labelString: legData.units
+            },
+            ticks: {
+                maxTicksLimit: 10
+
             }
         }]
     }
@@ -1910,7 +1943,7 @@ $(".sdgs .icon-grid-item").click(function () {
 
    // var w = $('#dataDrop')[0].options
     for (var x in w) {
-        console.log(w[x].id)
+        //console.log(w[x].id)
         if(!filteredSDG.includes(w[x].id)) {
             //console.log('dropped')
             $('#dataDrop option[id=' + w[x].id + ']').hide()
@@ -2190,7 +2223,7 @@ $('select[name="dataset-selection"]').on('change', function () {
 
     } else if (this.selectedOptions[0].innerHTML === 'GDP per Capita' || this.selectedOptions[0].innerHTML === 'Population Density') {
         //map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.0)
-        console.log(this.selectedOptions[0].innerHTML)
+        //console.log(this.selectedOptions[0].innerHTML)
         $('.year-timeline-wrapper').show()
         $('#layer-id').hide()
         $('.opacityslider').show()
@@ -2470,7 +2503,7 @@ function updateTime(layers) {
         var distance_to_next = yearList[i] - yearList[0];
 
         if (i == yearList.length - 1) {
-            console.log('is omega');
+            //console.log('is omega');
         }
 
         var size_in_percentage = (distance_to_next / different_first_last) * 100;
@@ -2617,7 +2650,7 @@ $('.tab-nav').on('click', function () {
 
 
 $('#volume').on("change mousemove", function () {
-    console.log($(this).val());
+    //console.log($(this).val());
     map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', ($(this).val() * 0.1))
     if (map.getLayer('ocean')) {
         //console.log('hi');
