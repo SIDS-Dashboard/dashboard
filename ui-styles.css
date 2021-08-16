@@ -344,7 +344,7 @@ input[type=checkbox] {
     /*border-radius: 10px; */
     transition: 0.5s ease-in-out all;
     opacity: 1;
-    height: 200px
+    height: 210px
     
 }
 
@@ -1037,6 +1037,7 @@ input[type='radio']:checked~label .circle-radio {
 }
 
 .select2~.selection-dropdown-arrow {
+
     display: none;
 }
 

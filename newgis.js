@@ -1447,6 +1447,12 @@ function addNoDataLegend() {
     legend.innerHTML = '';
     legendTitle.innerHTML = ''
 
+    var element = document.getElementById("histogram");
+    if(typeof(element) != 'undefined' && element != null)
+    {
+        $('#histogram').remove(); 
+    }    
+
 }
 
 function addLegend(colors, breaks, precision, current, dataset) {
@@ -1495,11 +1501,11 @@ function addLegend(colors, breaks, precision, current, dataset) {
 
     }
     
-    console.log("colors",colors)
-    console.log("breaks",breaks)
-    console.log("precision",precision)
-    console.log("current",current)
-    console.log("dataset",dataset)    
+    //console.log("colors",colors)
+    //console.log("breaks",breaks)
+    //console.log("precision",precision)
+    //console.log("current",current)
+    //console.log("dataset",dataset)    
 
     // histogram
     var element = document.getElementById("histogram");
@@ -1507,32 +1513,30 @@ function addLegend(colors, breaks, precision, current, dataset) {
     {
         $('#histogram').remove(); 
     }     
-    $('#histogram_frame').append('<canvas id="histogram" width="350" height="130"><canvas>')
+    $('#histogram_frame').append('<canvas id="histogram" width="320" height="130"><canvas>')
     var canvas = document.getElementById('histogram')    
 
     // break
     var nGroup=200
     var breaks_histogram = chroma.limits(dataset, 'e', nGroup);
-    console.log("breaks_histogram",breaks_histogram);
+    //console.log("breaks_histogram",breaks_histogram);
 
     // color
     var histogram_color = Array(nGroup).fill("");
     var color_index=0;
     for (var i = 0; i < nGroup; i++)   
-    {
-        console.log(breaks_histogram[i],breaks[color_index])
+    {        
         if (breaks_histogram[i]>breaks[color_index+1])
             color_index+=1;    
         histogram_color[i]=colors[color_index];
     }
-    console.log("histogram_color",histogram_color)
 
     // precision
     var breaks_precision = []
     for (i = 0; i < breaks_histogram.length; i++) {        
         breaks_precision.push(nFormatter(breaks_histogram[i], precision))
     }
-    console.log("breaks_precision:",breaks_precision)
+    //console.log("breaks_precision:",breaks_precision)
 
     var histogram_data = Array(nGroup).fill(0);    
     for (var i = 0; i < dataset.length; i++) {
@@ -1548,7 +1552,7 @@ function addLegend(colors, breaks, precision, current, dataset) {
             histogram_data[nGroup-1]+=1
         }
     }
-    console.log("histogram_data",histogram_data)
+    //console.log("histogram_data",histogram_data)
 
     var colorRampN = chroma.scale([colors[0], colors[4]]).mode('lch').colors(nGroup) // yellow to dark-blue
             
@@ -1560,7 +1564,13 @@ function addLegend(colors, breaks, precision, current, dataset) {
             }]
         };
 
+    var maxY=Math.pow(10,Math.ceil(Math.log10(Math.max(...histogram_data))));
+    var minY=Math.pow(10,Math.ceil(Math.log10(Math.min(...histogram_data))));
+    
+    //console.log(maxY,minY);
+    //console.log(Math.min(...histogram_data));
     var option = {
+        responsive: true,
         tooltips: {
             enabled: true
         },
@@ -1586,18 +1596,41 @@ function addLegend(colors, breaks, precision, current, dataset) {
         yAxes:[{
                 display:true,
                 type: "logarithmic",
+
                 ticks: {
-                    maxTicksLimit: 5,
-                    callback: function(label, index, labels) {
-                        if (label>1000000000)
-                        return label/1000000000+'B';
-                        else if (label>1000000)
-                        return label/1000000+'M';
-                        else if (label>1000)
-                        return label/1000+'K';
-                        else return label;                    
-                    }
+                    //scaleStepWidth: 10,
+                    maxTicksLimit: 3, 
+                    //autoSkip: true,
+                    //stepSize:10,                                     
+                    max: maxY,
+                    //min: 1,
+                    callback: function (value, index, values) 
+                    {                        
+                            if (value === 100000000) return "100M";
+                            if (value === 10000000) return "10M";
+                            if (value === 1000000) return "1M";
+                            if (value === 100000) return "100K";
+                            if (value === 10000) return "10K";
+                            if (value === 1000) return "1K";
+                            if (value === 100) return "100";
+                            if (value === 10) return "10";
+                            if (value === 1) return "1";
+                            return null;
+                   
                 }
+            },
+            afterBuildTicks: function (chartObj) { //Build ticks labelling as per your need
+                chartObj.ticks = [];
+                var ticksScale=maxY;
+                while ((ticksScale>minY)&&(ticksScale>=1))
+                {
+                    console.log(ticksScale);
+                    chartObj.ticks.push(ticksScale);
+                    ticksScale/=10;
+                }
+                
+            }
+
         }],
         xAxes:[{            
             barPercentage: 1.0,
@@ -2136,7 +2169,12 @@ $('select[name="dataset-selection"]').on('change', function () {
         infoBoxText.innerHTML = '';
         infoBoxLink.innerHTML = '';
 
-        
+        var element = document.getElementById("histogram");
+        if(typeof(element) != 'undefined' && element != null)
+        {
+            $('#histogram').remove(); 
+        }    
+
         //if (map.getStyle().name != 'Mapbox Satellite Streets') {
             
             var thisStyle = _.find(styles, function (o) {
