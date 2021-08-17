@@ -1,11 +1,10 @@
 body {
-    
-   overflow-y: hidden;
+    overflow-y: hidden;
 }
 
 .password {
-   /* display: flex; */
-   top: 0;
+    /* display: flex; */
+    top: 0;
     position: absolute;
     width: 100%;
     height: 100%;
@@ -13,61 +12,53 @@ body {
     background-color: black;
     align-items: center;
     text-align: center;
-  }
+}
 
-  
 #opacity-slider {
     background-color: #DDDDDD;
 }
+
 #volume {
     color: #DDDDDD;
-    
 }
+
 #map {
     position: fixed;
     top: 0;
     z-index: 0;
     height: 100vh;
     width: 100vw;
-   
-    
 }
 
-
-
-
 input[type=checkbox] {
-   width: 12px;
-   height: 12px;
+    width: 12px;
+    height: 12px;
 }
 
 #underwater {
     color: black;
-     padding: 0px;
-     font-size: 14px;
-     font-weight: bold;
+    padding: 0px;
+    font-size: 14px;
+    font-weight: bold;
 }
- 
- #admin1 {
-     color: red;
-     padding: 0px;
-     font-size: 14px;
-     font-weight: bold;
-    
- }
- #admin2 {
+
+#admin1 {
+    color: red;
+    padding: 0px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#admin2 {
     color: #003399;
     padding: 0px;
     font-size: 14px;
     font-weight: bold;
-   
 }
- 
-   
 
 .row-flex {
     display: flex;
-    flex-direction: row;  
+    flex-direction: row;
 }
 
 .col-flex {
@@ -94,7 +85,6 @@ input[type=checkbox] {
     background-repeat: no-repeat;
     background-size: 100% 100%;
     margin-right: 13px;
-
 }
 
 .rising-up-for-sids {
@@ -104,32 +94,26 @@ input[type=checkbox] {
     background-repeat: no-repeat;
     background-size: 100% 100%;
     background-color: rgba(196, 196, 196, 0);
-   
 }
 
 .top-right {
     width: 300px;
-   /* position: relative; */
+    /* position: relative; */
     position: absolute;
     /*border: 1px solid red; */
     top: 0px;
     right: 30px;
     z-index: 1;
-   /* position: fixed;
+    /* position: fixed;
     top: 30px;
     right: 40px;
     z-index: 1; */
 }
 
-
-
 #addLabels, #datadownload, #screenshot {
-
-
     padding: 8px 8px 8px 8px;
     border-radius: 5px;
     color: black;
-    
     background: #DDDDDD;
     font-weight: 300;
     font-size: 14px;
@@ -137,7 +121,6 @@ input[type=checkbox] {
     width: 120px;
     margin: 10px auto 10px auto;
     cursor: pointer;
- 
 }
 
 #addLabels {
@@ -146,8 +129,6 @@ input[type=checkbox] {
     margin-bottom: 8px;
     height: 30px;
 }
-
-
 
 .opacityslider, .download {
     display: none;
@@ -176,12 +157,6 @@ input[type=checkbox] {
     margin-left: 10px;
 }
 
-
-
-
-
-
-
 .icon1 {
     width: 34px;
     height: 34px;
@@ -191,23 +166,15 @@ input[type=checkbox] {
     background-size: 100% 100%;
 }
 
-
-
-
 .add-overlay-menu {
     position: relative;
-   
-    
 }
 
 .add-overlay-menu:hover {
     cursor: pointer;
 }
 
-
-
 #add-overlay {
-    
     padding: 8px 35px 8px 20px;
     border-radius: 5px;
     outline: none;
@@ -246,7 +213,6 @@ input[type=checkbox] {
 .plot-select-menu {
     position: relative;
     visibility: none;
-   
 }
 
 .selectIcon {
@@ -258,9 +224,8 @@ input[type=checkbox] {
     height: 34px;
 }
 
-
 /*#plot-select {
-    
+
     padding: 8px 34px 8px 34px;
      border-radius: 10px;
     outline: none;
@@ -273,7 +238,7 @@ input[type=checkbox] {
      appearance: none;
      text-align: center;
     cursor: pointer;
- 
+
 } */
 
 .left-arrow {
@@ -325,7 +290,6 @@ input[type=checkbox] {
     left: 16px;
 }
 
-
 .main-wrapper {
     margin-left: 14px;
     margin-top: 22vh;
@@ -333,7 +297,6 @@ input[type=checkbox] {
     position: relative;
     width: 381px;
     z-index: 4;
-     
 }
 
 .app-body {
@@ -345,17 +308,12 @@ input[type=checkbox] {
     transition: 0.5s ease-in-out all;
     opacity: 1;
     height: 210px
-    
 }
-
-
-
 
 .app-body.collapsed {
     opacity: 0;
     z-index: -999;
     pointer-events: none;
-    
 }
 
 /* Custom Selection Boxes */
@@ -375,6 +333,7 @@ input[type=checkbox] {
 #resetData {
     display: none;
 }
+
 #resetData:hover {
     color: blue;
     cursor: pointer;
@@ -518,7 +477,6 @@ input[type=checkbox] {
     left: -8px;
     z-index: 2;
 }
-
 
 #icon3d {
     display: none;
@@ -845,9 +803,8 @@ input[type='radio']:checked~label .circle-radio {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    height: 34px;    
-    padding-top:7px;
-       
+    height: 34px;
+    padding-top: 7px;
 }
 
 .custom-selection-dropdown .select2-selection__arrow {
@@ -855,7 +812,6 @@ input[type='radio']:checked~label .circle-radio {
 }
 
 .collapse-btn {
-    
     width: 30px;
     height: 50px;
     line-height: 50px;
@@ -961,11 +917,9 @@ input[type='radio']:checked~label .circle-radio {
     font-size: 11px;
     line-height: 14px;
     margin-top: 5px;
-    
 }
 
-#histogram_frame
-{
+#histogram_frame {
     font-size: 11px;
 }
 
@@ -1037,133 +991,124 @@ input[type='radio']:checked~label .circle-radio {
 }
 
 .select2~.selection-dropdown-arrow {
-
     display: none;
 }
 
 .loader-gis {
     position: absolute;
-   /* border: 16px solid #f3f3f3;
+    /* border: 16px solid #f3f3f3;
     border-top: 16px solid #3498db;
     border-radius: 50%;
     width: 120px;
     height: 120px; */
     animation: spin 4s linear infinite;
-   
     z-index: 3;
     left: 45%;
     top: 35%;
-  }
+}
 
-  .loader-gis svg {
-      stroke-width: 8;
-      fill-opacity: 0.5;
-      animation: pulse 1s linear infinite;
-      stroke: #003399;
-  }
+.loader-gis svg {
+    stroke-width: 8;
+    fill-opacity: 0.5;
+    animation: pulse 1s linear infinite;
+    stroke: #003399;
+}
 
-  @keyframes pulse {
+@keyframes pulse {
     0% {
         stroke-width: 8;
         fill-opacity: 0.5;
         stroke: #003399;
-        
     }
     50% {
         stroke-width: 1;
         fill-opacity: 1;
-        
-        
     }
-
     100% {
         stroke-width: 8;
         fill-opacity: 0.5;
         stroke: #003399;
-        
     }
+}
 
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
 
-  }
-  
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-    
-  }
-
-  .password {
+.password {
     /* display: flex; */
     top: 0;
-     position: absolute;
-     width: 100%;
-     height: 100%;
-     z-index: 400;
-     background-color: black;
-     align-items: center;
-     text-align: center;
-   }
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 400;
+    background-color: black;
+    align-items: center;
+    text-align: center;
+}
 
-   #basemap-switch {
-       margin-top: 5px;
-   }
+#basemap-switch {
+    margin-top: 5px;
+}
 
-   .mapbox-popup-content-wrapper {
-       padding: 1%;
-       width: 300px;
-   }
+.mapbox-popup-content-wrapper {
+    padding: 1%;
+    width: 300px;
+}
 
- h4 {
+h4 {
     font-size: 1rem;
     padding: 0;
     margin: 0;
-    }
+}
 
 .downloadModal {
     display: none;
-    position: fixed; 
-    z-index: 1; 
+    position: fixed;
+    z-index: 1;
     left: 0;
     top: 0;
-    width: 100%; 
-    height: 100%; 
-    overflow: auto; 
-    background-color: rgb(0,0,0);
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
 }
 
-
 .modal-content {
-    
     background-color: #fefefe;
-    margin: 5% auto; 
+    margin: 5% auto;
     padding: 5px;
-   
     border: 1px solid #888;
     width: 40%;
     max-height: 600px;
     overflow: auto;
-  }
+}
 
-  .modal-content > label {
-      font-size: 10px;
-  }
+.modal-content>label {
+    font-size: 10px;
+}
 
-  #download-buttons{
-      text-align: center;
-      margin-bottom: 0px;
-  }
+#download-buttons {
+    text-align: center;
+    margin-bottom: 0px;
+}
 
-  .modal-content > p {
-      margin-bottom: 0;
-      text-align: center;
-  }
-
-  .modal-content > h1 {
+.modal-content>p {
     margin-bottom: 0;
     text-align: center;
 }
 
-  button {
+.modal-content>h1 {
+    margin-bottom: 0;
+    text-align: center;
+}
+
+button {
     text-decoration: none;
     text-align: center;
     padding: 8px 35px 8px 20px;
@@ -1177,34 +1122,34 @@ input[type='radio']:checked~label .circle-radio {
     border: 0px;
     appearance: none;
     cursor: pointer;
-  }
+}
 
-button:hover{
+button:hover {
     cursor: pointer;
     background: #818f98;
 }
-  
-  /* The Close Button */
-  .close {
+
+/* The Close Button */
+
+.close {
     color: #aaa;
     float: right;
-    
     font-size: 28px;
     font-weight: bold;
-  }
-  .close:hover {
+}
+
+.close:hover {
     color: black;
     text-decoration: none;
     cursor: pointer;
-  }
-
+}
 
 .country-select-menu {
     position: relative;
     display: flex;
     align-content: center;
     justify-content: center;
-    width: 100%;   
+    width: 100%;
 }
 
 .closebutton {
@@ -1219,9 +1164,7 @@ button:hover{
     float: right;
 }
 
-
 .country-select-menu select {
-    
     max-width: 90%;
     width: 240px;
     padding: 6px 25px 6px 25px;
@@ -1242,8 +1185,6 @@ button:hover{
     z-index: 5;
 }
 
-
-
 #top-right-wrap {
     z-index: 3;
     position: absolute;
@@ -1258,7 +1199,6 @@ button:hover{
     /*border-radius: 10px; */
     text-align: center;
     transition: 0.5s ease-in-out all;
-    
 }
 
 #close-side {
@@ -1275,20 +1215,16 @@ button:hover{
     left: -19px;
 }
 
-
-
 #close-side:hover {
     cursor: pointer;
 }
 
-
 .dropdown-check-list {
     display: inline-block;
     font-size: 14px;
-    
-    
-  }
-  .dropdown-check-list .anchor {
+}
+
+.dropdown-check-list .anchor {
     position: relative;
     cursor: pointer;
     display: inline-block;
@@ -1297,11 +1233,9 @@ button:hover{
     background: #DDDDDD;
     border-radius: 5px;
     height: 30px;
-    
-  }
+}
 
-  
-  .dropdown-check-list .anchor:after {
+.dropdown-check-list .anchor:after {
     position: absolute;
     content: "";
     border-left: 2px solid black;
@@ -1314,64 +1248,59 @@ button:hover{
     -o-transform: rotate(-135deg);
     -webkit-transform: rotate(-135deg);
     transform: rotate(-135deg);
-  }
-  .dropdown-check-list .anchor:active:after {
+}
+
+.dropdown-check-list .anchor:active:after {
     right: 8px;
     top: 21%;
-  }
-  .dropdown-check-list ul.items {
+}
+
+.dropdown-check-list ul.items {
     padding: 2px;
     display: none;
     margin: 0;
     border: 1px solid #ccc;
     border-top: none;
     background: #DDDDDD;
-    
-  }
-  .dropdown-check-list ul.items li {
+}
+
+.dropdown-check-list ul.items li {
     list-style: none;
-  }
+}
 
-  .dropdown-menu label {
+.dropdown-menu label {
     display: block;
-  }
+}
 
+#draw-sidebar {
+    display: none;
+    top: 0;
+    position: fixed;
+    width: 25%;
+    background-color: whitesmoke;
+    z-index: 40;
+    height: 100vh;
+    transition: 0.3s;
+}
 
-  #draw-sidebar {
-      display: none;
-      top: 0;
-      position: fixed;
-      width: 25%;
-      background-color: whitesmoke;
-      z-index: 40;
-      height: 100vh;
-      transition: 0.3s;
-  }
+#sidebar-text {
+    padding-top: 10px;
+    margin-top: 10px;
+    width: 100%;
+    text-align: center;
+    font-size: 12px;
+}
 
-  #sidebar-text {
-      padding-top: 10px;
-      margin-top: 10px;
-      width: 100%;
-      text-align: center;
-      font-size: 12px;
-  }
+.mapboxgl-ctrl.mapboxgl-ctrl-attrib {
+    background-color: transparent;
+}
 
-  .mapboxgl-ctrl.mapboxgl-ctrl-attrib 
-  {
-    background-color: transparent;      
-  }
+.mapboxgl-ctrl.mapboxgl-ctrl-attrib a:link {
+    opacity: 70%;
+    color: #ffffff;
+}
 
-  .mapboxgl-ctrl.mapboxgl-ctrl-attrib a:link
-  {
-    opacity:70%;
-    color:#ffffff;
-  }
-
-  .mapboxgl-ctrl-geocoder--input
-  {
-    font-family:Arial, Helvetica, sans-serif;
-    font-size:15px;
-  }
-
-  
-
+.mapboxgl-ctrl-geocoder--input {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+}
