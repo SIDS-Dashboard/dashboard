@@ -45,17 +45,17 @@ const map = new mapboxgl.Map({
 var yearList = [];
 var currentTimeLayer;
 
-  /*var Draw = new MapboxDraw({
-    displayControlsDefault: false,
-    controls: {
-    polygon: true,
-    trash: true
-    },
-    //defaultMode: 'draw_polygon'
-  }); */
+/*var Draw = new MapboxDraw({
+  displayControlsDefault: false,
+  controls: {
+  polygon: true,
+  trash: true
+  },
+  //defaultMode: 'draw_polygon'
+}); */
 
-  var sourceData = {
-      hex5Source: {
+var sourceData = {
+    hex5Source: {
         name: 'hex5',
         layer: 'hex5',
         mainId: 'hexid',
@@ -186,7 +186,7 @@ function addLabels() {
         basemapLabels.forEach(function (x) {
             console.log(x);
             map.addLayer(x);
-            if(x.type === 'line') {
+            if (x.type === 'line') {
                 map.moveLayer(x.id, currentGeojsonLayers.hexSize)
             }
 
@@ -203,11 +203,26 @@ function addLabels() {
 
 }
 
+function addBivar() {
+    console.log("Bivar0");
+    console.log($('#addBivar')[0].innerText);
+    if ($('#addBivar')[0].innerText === 'Add BiVar') {
+        console.log("Bivar1");
+        //$('#addBivar').toggle();
+        $('#addBivar')[0].innerText = 'Remove Bivar'
+    } else {
+
+        $('#addBivar')[0].innerText = 'Add Bivar'
+        console.log("Bivar2");
+    }
+
+}
+
 function recolorBasedOnWhatsOnPage() {
 
-    if(!map.getLayer(currentGeojsonLayers.hexSize)) {
-      //console.log('no layer')
-      return;
+    if (!map.getLayer(currentGeojsonLayers.hexSize)) {
+        //console.log('no layer')
+        return;
     }
 
     var features = map.queryRenderedFeatures({
@@ -217,7 +232,7 @@ function recolorBasedOnWhatsOnPage() {
     //createMask(features);
 
     //console.log(currentGeojsonLayers.hexSize);
-    if(features.length > 0) {      
+    if (features.length > 0) {
 
         var uniFeatures;
         if (currentGeojsonLayers.hexSize === 'admin1') {
@@ -228,56 +243,137 @@ function recolorBasedOnWhatsOnPage() {
             uniFeatures = getUniqueFeatures(features, 'hexid');
         }
 
-        //console.log(uniFeatures.features);
-        var selecteData = features.map(x => x.properties[currentGeojsonLayers.dataLayer])
-        //console.log(selecteData);
-        var breaks = chroma.limits(selecteData, 'q', 4);
+        if (bi_var != '') {
+            // bi-var                 
+            var selecteData = uniFeatures.map(x => x.properties[main_var])
+            var selecteData_biv = uniFeatures.map(x => x.properties[bi_var]);//popden
+            var breaksX = chroma.limits(selecteData, 'q', 3);
+            var breaksY = chroma.limits(selecteData_biv, 'q', 3);
+            var bivar_colors = colorSeqSeq3['blue-pink-purple'];
 
-        //console.log("BREAK",breaks);
-        var breaks_new = [];
-        var precision = 1;
-        do {
-            precision++;
-            for (let i = 0; i < 5; i++) {
-                breaks_new[i] = parseFloat(breaks[i].toPrecision(precision));                    
+            var featureCount = uniFeatures.length;
+            var bivarClass = Array(featureCount).fill(0);
+            var breaksX = chroma.limits(selecteData, 'q', 3);
+            var breaksY = chroma.limits(selecteData_biv, 'q', 3);
+
+            for (var i = 0; i < featureCount; i++) {
+                var x = selecteData[i];
+                var y = selecteData_biv[i];
+                var v1, v2;
+                if (x < breaksX[1])
+                    v1 = 1
+                else if (x < breaksX[2])
+                    v1 = 2
+                else v1 = 3;
+                if (y < breaksY[1])
+                    v2 = 1
+                else if (y < breaksY[2])
+                    v2 = 2
+                else v2 = 3;
+                switch (String(v1) + String(v2)) {
+                    case "11": bivarClass[i] = 1; break;
+                    case "12": bivarClass[i] = 2; break;
+                    case "13": bivarClass[i] = 3; break;
+                    case "21": bivarClass[i] = 4; break;
+                    case "22": bivarClass[i] = 5; break;
+                    case "23": bivarClass[i] = 6; break;
+                    case "31": bivarClass[i] = 7; break;
+                    case "32": bivarClass[i] = 8; break;
+                    case "33": bivarClass[i] = 9; break;
+                }
+                uniFeatures[i]["properties"]["bivarClass"] = bivarClass[i];
             }
-            //console.log(breaks_new);
-        }    
-        while (checkForDuplicates(breaks_new)&&(precision<10));
-        breaks = breaks_new;          
 
-        currentGeojsonLayers.breaks = breaks;
-        //console.log(breaks)
-        map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-color',
-        [
-          'interpolate',
-          ['linear'],
-          ['get', currentGeojsonLayers.dataLayer],
-          breaks[0], currentGeojsonLayers.color[0],
-          breaks[1], currentGeojsonLayers.color[1],
-          breaks[2], currentGeojsonLayers.color[2],
-          breaks[3], currentGeojsonLayers.color[3],
-          breaks[4], currentGeojsonLayers.color[4],
-          ]
-        )
-        //console.log(currentGeojsonLayers);
+            //convert rendered features to geojson format
+            var fc = turf.featureCollection(uniFeatures);
 
-        //map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.7)
+            if (map.getLayer('newone')) {
+                map.removeLayer('newone');
+                map.removeSource('newone');
+            }
 
-        //addLegend(currentGeojsonLayers.color, breaks, currentGeojsonLayers.dataLayer)
-        if (isNaN(breaks[3]) || breaks[1] == 0) {
+            //add new source 
+            map.addSource('newone', {
+                type: 'geojson',
+                data: fc //data is the new geojson 
+            })
+            map.addLayer({
+                'id': 'newone',
+                'source': 'newone',
+                'type': 'fill',
+                'paint': {
+                    'fill-color':
+                        [
+                            'step',
+                            ['get', 'bivarClass'],
+                            bivar_colors[0],
+                            1, bivar_colors[1],
+                            2, bivar_colors[2],
+                            3, bivar_colors[3],
+                            4, bivar_colors[4],
+                            5, bivar_colors[5],
+                            6, bivar_colors[6],
+                            7, bivar_colors[7],
+                            8, bivar_colors[8],
+                        ],
+                    'fill-opacity': 0.9,
+                }
+            })
 
-            map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.0)
-            setTimeout(() => {
-                map.setFilter(currentGeojsonLayers.hexSize, null)
-            }, 1000);
-            addNoDataLegend();
-        } else {
-            map.setFilter(currentGeojsonLayers.hexSize, ['>=', currentGeojsonLayers.dataLayer, 0])
-            addLegend(currentGeojsonLayers.color, breaks, precision, currentGeojsonLayers.dataLayer,selecteData)
-            setTimeout(() => {
-                map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.8)
-            }, 400);
+        }
+        else {
+
+            //console.log(uniFeatures.features);
+            var selecteData = features.map(x => x.properties[currentGeojsonLayers.dataLayer])
+            //console.log(selecteData);
+            var breaks = chroma.limits(selecteData, 'q', 4);
+
+            //console.log("BREAK",breaks);
+            var breaks_new = [];
+            var precision = 1;
+            do {
+                precision++;
+                for (let i = 0; i < 5; i++) {
+                    breaks_new[i] = parseFloat(breaks[i].toPrecision(precision));
+                }
+                //console.log(breaks_new);
+            }
+            while (checkForDuplicates(breaks_new) && (precision < 10));
+            breaks = breaks_new;
+
+            currentGeojsonLayers.breaks = breaks;
+            //console.log(breaks)
+            map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-color',
+                [
+                    'interpolate',
+                    ['linear'],
+                    ['get', currentGeojsonLayers.dataLayer],
+                    breaks[0], currentGeojsonLayers.color[0],
+                    breaks[1], currentGeojsonLayers.color[1],
+                    breaks[2], currentGeojsonLayers.color[2],
+                    breaks[3], currentGeojsonLayers.color[3],
+                    breaks[4], currentGeojsonLayers.color[4],
+                ]
+            )
+            //console.log(currentGeojsonLayers);
+
+            //map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.7)
+
+            //addLegend(currentGeojsonLayers.color, breaks, currentGeojsonLayers.dataLayer)
+            if (isNaN(breaks[3]) || breaks[1] == 0) {
+
+                map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.0)
+                setTimeout(() => {
+                    map.setFilter(currentGeojsonLayers.hexSize, null)
+                }, 1000);
+                addNoDataLegend();
+            } else {
+                map.setFilter(currentGeojsonLayers.hexSize, ['>=', currentGeojsonLayers.dataLayer, 0])
+                addLegend(currentGeojsonLayers.color, breaks, precision, currentGeojsonLayers.dataLayer, selecteData)
+                setTimeout(() => {
+                    map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.8)
+                }, 400);
+            }
         }
     }
 
@@ -304,7 +400,7 @@ $('#basemap-switch').on('change', function () {
         map.setStyle(thisStyle.uri)
         console.log(map.getStyle().sources)
 
-    } else if(selectedBase === 'Mapbox Satellite Streets') {
+    } else if (selectedBase === 'Mapbox Satellite Streets') {
 
         console.log(basemapLabels);
 
@@ -314,7 +410,7 @@ $('#basemap-switch').on('change', function () {
 
         map.setStyle(thisStyle.uri)
         console.log(map.getStyle().sources)
-    } else if(selectedBase === 'Mapbox Dark') {
+    } else if (selectedBase === 'Mapbox Dark') {
 
         console.log(basemapLabels);
 
@@ -326,66 +422,67 @@ $('#basemap-switch').on('change', function () {
         console.log(map.getStyle().sources)
     }
 
-        /*} else if (selectedBase === 'Satellite With Labels') {
-          var thisStyle = _.find(styles, function(o){return o.title === 'Light'})
-          map.setStyle(thisStyle.uri)
-        } */
+    /*} else if (selectedBase === 'Satellite With Labels') {
+      var thisStyle = _.find(styles, function(o){return o.title === 'Light'})
+      map.setStyle(thisStyle.uri)
+    } */
 
-        map.once('idle', function () {
-            basemapLabels = [];
-            var layers = map.getStyle().layers;
+    map.once('idle', function () {
+        basemapLabels = [];
+        var layers = map.getStyle().layers;
 
-            for (var i = 0; i < layers.length; i++) {
-                if (layers[i].type === 'symbol') {
-                    firstSymbolId = layers[i].id;
-                    break;
-                }
+        for (var i = 0; i < layers.length; i++) {
+            if (layers[i].type === 'symbol') {
+                firstSymbolId = layers[i].id;
+                break;
             }
-            for (var x in layers) {
+        }
+        for (var x in layers) {
 
-                if (layers[x].type === 'symbol'|| layers[x].type === 'line') {
-                    basemapLabels.push(layers[x]);
-                }
+            if (layers[x].type === 'symbol' || layers[x].type === 'line') {
+                basemapLabels.push(layers[x]);
             }
+        }
 
-            addHexSource();
-            //console.log(map.getStyle().layers);
-            var current = _.find(sourceData, function (o) {
-                return o.name === currentGeojsonLayers.hexSize
-            })
-
-            map.addLayer({
-
-                'id': currentGeojsonLayers.hexSize,
-                'type': 'fill',
-                'source': currentGeojsonLayers.hexSize,
-                'source-layer': current.layer,
-                'layout': {
-                    'visibility': 'visible'
-                },
-                'paint': {
-                    'fill-opacity': 0.8,
-                    'fill-color': [
-              'interpolate',
-              ['linear'],
-              ['get', currentGeojsonLayers.dataLayer],
-              currentGeojsonLayers.breaks[0], currentGeojsonLayers.color[0],
-              currentGeojsonLayers.breaks[1], currentGeojsonLayers.color[1],
-              currentGeojsonLayers.breaks[2], currentGeojsonLayers.color[2],
-              currentGeojsonLayers.breaks[3], currentGeojsonLayers.color[3],
-              currentGeojsonLayers.breaks[4], currentGeojsonLayers.color[4],
-              ]
-                }
-            }, firstSymbolId)
-
-            map.setFilter(currentGeojsonLayers.hexSize, ['>=', currentGeojsonLayers.dataLayer, 0])
-            map.moveLayer('allsids', firstSymbolId)
-            console.log(map.getStyle().layers);
+        addHexSource();
+        //console.log(map.getStyle().layers);
+        var current = _.find(sourceData, function (o) {
+            return o.name === currentGeojsonLayers.hexSize
         })
-        //addHexSource();
 
-        //console.log(map.getStyle().sources)
-        //map.moveLayer(currentGeojsonLayers.hexSize, 'allsids')
+        map.addLayer({
+
+            'id': currentGeojsonLayers.hexSize,
+            'type': 'fill',
+            'source': currentGeojsonLayers.hexSize,
+            'source-layer': current.layer,
+            'layout': {
+                'visibility': 'visible'
+            },
+            'paint': {
+                'fill-opacity': 0.8,
+                'fill-color':
+                    [
+                        'interpolate',
+                        ['linear'],
+                        ['get', currentGeojsonLayers.dataLayer],
+                        currentGeojsonLayers.breaks[0], currentGeojsonLayers.color[0],
+                        currentGeojsonLayers.breaks[1], currentGeojsonLayers.color[1],
+                        currentGeojsonLayers.breaks[2], currentGeojsonLayers.color[2],
+                        currentGeojsonLayers.breaks[3], currentGeojsonLayers.color[3],
+                        currentGeojsonLayers.breaks[4], currentGeojsonLayers.color[4],
+                    ]
+            }
+        }, firstSymbolId)
+
+        map.setFilter(currentGeojsonLayers.hexSize, ['>=', currentGeojsonLayers.dataLayer, 0])
+        map.moveLayer('allsids', firstSymbolId)
+        console.log(map.getStyle().layers);
+    })
+    //addHexSource();
+
+    //console.log(map.getStyle().sources)
+    //map.moveLayer(currentGeojsonLayers.hexSize, 'allsids')
 
 })
 
@@ -545,25 +642,25 @@ button3dWrapper.addEventListener('click', (event) => {
 
             'paint': {
                 'fill-extrusion-color': [
-            'interpolate',
-            ['linear'],
-            ['get', currentGeojsonLayers.dataLayer],
-            currentGeojsonLayers.breaks[0], currentGeojsonLayers.color[0],
-            currentGeojsonLayers.breaks[1], currentGeojsonLayers.color[1],
-            currentGeojsonLayers.breaks[2], currentGeojsonLayers.color[2],
-            currentGeojsonLayers.breaks[3], currentGeojsonLayers.color[3],
-            currentGeojsonLayers.breaks[4], currentGeojsonLayers.color[4],
-            ],
+                    'interpolate',
+                    ['linear'],
+                    ['get', currentGeojsonLayers.dataLayer],
+                    currentGeojsonLayers.breaks[0], currentGeojsonLayers.color[0],
+                    currentGeojsonLayers.breaks[1], currentGeojsonLayers.color[1],
+                    currentGeojsonLayers.breaks[2], currentGeojsonLayers.color[2],
+                    currentGeojsonLayers.breaks[3], currentGeojsonLayers.color[3],
+                    currentGeojsonLayers.breaks[4], currentGeojsonLayers.color[4],
+                ],
                 'fill-extrusion-height': [
-              'interpolate',
-              ['linear'],
-              ['get', currentGeojsonLayers.dataLayer],
-              currentGeojsonLayers.breaks[0], 0,
-              currentGeojsonLayers.breaks[1], 500,
-              currentGeojsonLayers.breaks[2], 5000,
-              currentGeojsonLayers.breaks[3], 11000,
-              currentGeojsonLayers.breaks[4], 50000,
-              ],
+                    'interpolate',
+                    ['linear'],
+                    ['get', currentGeojsonLayers.dataLayer],
+                    currentGeojsonLayers.breaks[0], 0,
+                    currentGeojsonLayers.breaks[1], 500,
+                    currentGeojsonLayers.breaks[2], 5000,
+                    currentGeojsonLayers.breaks[3], 11000,
+                    currentGeojsonLayers.breaks[4], 50000,
+                ],
 
                 //'fill-opacity': 0.8,
 
@@ -658,11 +755,11 @@ map.on('zoomend', function (e) {
 
 map.on('zoom', function (e) {
 
-   /* var outline = map.queryRenderedFeatures({
-        layers: ['allsids']
-    })
+    /* var outline = map.queryRenderedFeatures({
+         layers: ['allsids']
+     })
 
-    console.log(outline); */
+     console.log(outline); */
 
     if (map.getZoom() < 5) {
 
@@ -820,14 +917,14 @@ function addAdminClick() {
 
             var newOne = []
 
-            feats.forEach(function(f){
+            feats.forEach(function (f) {
                 var geom = f.geometry
                 var props = f.properties
                 var id = f.id;
 
-                if(geom.type === 'MultiPolygon') {
+                if (geom.type === 'MultiPolygon') {
                     console.log(f);
-                    for (var i=0; i < geom.coordinates.length; i++) {
+                    for (var i = 0; i < geom.coordinates.length; i++) {
                         var poly = {
                             'type': 'Feature',
                             'geometry': {
@@ -847,16 +944,16 @@ function addAdminClick() {
 
             //console.log(turf.polygon(newOne));
 
-           /* for (var x in feats) {
-               console.log(feats[x]);
-                if (feats[x].geometry.type === 'MultiPolygon') {
-                    ////console.log('multi:')
-                    //console.log(feats[x]);
-                    for(var z in feats[x].geometry.type)
-                    //feats[x].geometry.type = 'Polygon';
-                    //feats[x].geometry.coordinates = feats[x]._geometry.coordinates[0]
-                }
-            } */
+            /* for (var x in feats) {
+                console.log(feats[x]);
+                 if (feats[x].geometry.type === 'MultiPolygon') {
+                     ////console.log('multi:')
+                     //console.log(feats[x]);
+                     for(var z in feats[x].geometry.type)
+                     //feats[x].geometry.type = 'Polygon';
+                     //feats[x].geometry.coordinates = feats[x]._geometry.coordinates[0]
+                 }
+             } */
             //var fc = turf.featureCollection(feats)
             var fc = turf.featureCollection(newOne);
             console.log(fc);
@@ -940,16 +1037,16 @@ function addAdminClick() {
 }
 
 function checkForDuplicates(array) {
-  let valuesAlreadySeen = []
+    let valuesAlreadySeen = []
 
-  for (let i = 0; i < array.length; i++) {
-    let value = array[i]
-    if (valuesAlreadySeen.indexOf(value) !== -1) {
-      return true
+    for (let i = 0; i < array.length; i++) {
+        let value = array[i]
+        if (valuesAlreadySeen.indexOf(value) !== -1) {
+            return true
+        }
+        valuesAlreadySeen.push(value)
     }
-    valuesAlreadySeen.push(value)
-  }
-  return false
+    return false
 }
 
 function changeHexagonSize(sel) {
@@ -1010,7 +1107,7 @@ function changeHexagonSize(sel) {
 
         //console.log('change bins');
         //map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.7)
-        map.moveLayer(sel,'allsids')
+        map.moveLayer(sel, 'allsids')
 
     })
 
@@ -1075,6 +1172,47 @@ function addToLayersDrop(layers) {
     //updateTime(layers)
     if (layers[0].title === 'Ocean Data') {
         addOcean(layers[0].field_name)
+        $('#bivar-control').hide();
+        $('#dataDropBivar').val('start');
+        //document.getElementById('dataDropBivar').selectedOptions[0].innerHTML = 'Select Bivariate Dataset';
+    } else {
+        changeDataOnMap(layers[0].field_name)
+    }
+
+    //$('#' + layers[0].field_name).prop('selected', true);
+}
+
+function addToLayersDropBivar(layers) {
+    //console.log("layer-bivar!");
+    //$('#layer-id-bivar').show()
+
+    //console.log(layers);
+    //console.log()
+    //console.log(yearList)
+    var layersHolder = document.getElementById('layer-drop-bivar');
+    var length = layersHolder.options.length;
+
+    for (var i = length - 1; i >= 0; i--) {
+        layersHolder.options[i] = null;
+    }
+    /*var firstBtn = document.createElement('option')
+    firstBtn.innerHTML = 'Select Layer';
+    layersHolder.appendChild(firstBtn); */
+
+    for (var x in layers) {
+        //console.log(layers[x])
+        var btn = document.createElement('option')
+        btn.innerHTML = layers[x].desc + ' ' + layers[x].time;
+        btn.setAttribute('id', layers[x].field_name)
+        btn.setAttribute('value', 'hi')
+        layersHolder.appendChild(btn);
+    }
+    //console.log(layers.map(x => x.time));
+    yearList = layers.map(x => x.time)
+    //console.log(layers);
+    //updateTime(layers)
+    if (layers[0].title === 'Ocean Data') {
+        addOcean(layers[0].field_name)
     } else {
         changeDataOnMap(layers[0].field_name)
     }
@@ -1098,7 +1236,12 @@ function addOcean(layer) {
     }
 
     currentGeojsonLayers.breaks = [-4841, -3805, -2608, -1090, 0];
-    currentGeojsonLayers.color = ['#08519c', '#3182bd', '#6baed6', '#bdd7e7', '#eff3ff']
+    currentGeojsonLayers.color = colorSeq['ocean'];
+
+    if (map.getLayer('ocean')) {
+        map.removeLayer('ocean');
+        //map.removeSource('ocean');
+    }
 
     map.addLayer({
         'id': 'ocean',
@@ -1111,15 +1254,15 @@ function addOcean(layer) {
         'filter': ['<', 'depth', 0],
         'paint': {
             'fill-color': [
-            'interpolate',
-            ['linear'],
-            ['get', 'depth'],
-            -4841, '#08519c',
-            -3805, '#3182bd',
-            -2608, '#6baed6',
-            -1090, '#bdd7e7',
-            1322, '#eff3ff',
-          ],
+                'interpolate',
+                ['linear'],
+                ['get', 'depth'],
+                -4841, colorSeq['ocean'][0],
+                -3805, colorSeq['ocean'][1],
+                -2608, colorSeq['ocean'][2],
+                -1090, colorSeq['ocean'][3],
+                1322, colorSeq['ocean'][4],
+            ],
             'fill-opacity': 0.8,
         }
     }, firstSymbolId)
@@ -1132,8 +1275,8 @@ function addOcean(layer) {
         if (features) {
             var uniFeatures;
             uniFeatures = getUniqueFeatures(features, 'depth');
-            var selecteData = uniFeatures.map(x => x.properties['depth']);          
-            addLegend(currentGeojsonLayers.color, currentGeojsonLayers.breaks, 2, layer,selecteData); 
+            var selecteData = uniFeatures.map(x => x.properties['depth']);
+            addLegend(currentGeojsonLayers.color, currentGeojsonLayers.breaks, 2, layer, selecteData);
         }
 
     }, 600)
@@ -1153,7 +1296,7 @@ function changeDataOnMap(selection) {
     currentGeojsonLayers.dataLayer = selection;
     //console.log(currentGeojsonLayers)
 
-    if(!map.getSource('hex5')) {
+    if (!map.getSource('hex5')) {
         //console.log('no source')
         addHexSource();
     } else {
@@ -1167,7 +1310,6 @@ function changeDataOnMap(selection) {
         })
 
         //console.log(firstSymbolId);
-
         //console.log(current)
 
         map.addLayer({
@@ -1179,8 +1321,8 @@ function changeDataOnMap(selection) {
                 'visibility': 'visible'
             },
             'paint': {
-                'fill-color': 'blue',
-                'fill-opacity': 0.0,
+                'fill-color': 'white',
+                'fill-opacity': 0.01,
 
             }
         });
@@ -1210,13 +1352,8 @@ function changeDataOnMap(selection) {
                 uniFeatures = getUniqueFeatures(features, 'hexid');
             }
 
-            //console.log(uniFeatures);
             var selecteData = uniFeatures.map(x => x.properties[selection])
-            //console.log(selecteData);
-            var max = Math.max(...selecteData)
-            var min = Math.min(...selecteData)
 
-            //var colorz = chroma.scale(['lightyellow', 'navy']).domain([min, max], 5, 'quantiles');
             var breaks = chroma.limits(selecteData, 'q', 4);
             //console.log("BREAK",breaks)
             var breaks_new = [];
@@ -1224,87 +1361,46 @@ function changeDataOnMap(selection) {
             do {
                 precision++;
                 for (let i = 0; i < 5; i++) {
-                    breaks_new[i] = parseFloat(breaks[i].toPrecision(precision));                    
+                    breaks_new[i] = parseFloat(breaks[i].toPrecision(precision));
                 }
                 //console.log(breaks_new);
-            }    
-            while (checkForDuplicates(breaks_new)&&(precision<10));
-            breaks = breaks_new;                        
+            }
+            while (checkForDuplicates(breaks_new) && (precision < 10));
+            breaks = breaks_new;
 
-            var colorRamp = chroma.scale(['#fafa6e', '#2A4858']).mode('lch').colors(5) // yellow to dark-blue
-            var colorRamp1 = ['#edf8fb', '#b2e2e2', '#66c2a4', '#2ca25f', '#006d2c'] // light to dark green
-            var colorRamp2 = ['#f2f0f7', '#cbc9e2', '#9e9ac8', '#756bb1', '#54278f'] // light to dark purple
-            var colorRamp4 = ['#ffffd4', '#fed98e', '#fe9929', '#d95f0e', '#993404'] // light to dark orange
-            var gdpColor = ['#ca0020', '#f4a582', '#f7f7f7', '#92c5de', '#0571b0'] // red to white to blue (diverging)
-            var pop = ['#feebe2', '#fbb4b9', '#f768a1', '#c51b8a', '#7a0177'] // light to dark pink
-            var sunIndex = ['#fdfbf6', '#FAE7B9', '#FAE39B', '#FADE7C', '#FADA5E'] // light to dark yellow (too similar)
-            var template = ['', '', '', '', '']
-            var newSun = ['#FEF65C', '#FEE745', '#FFD82F', '#FFC918', '#FFBA01'] // light to dark yellow
-            var combo = ['#fdfbf6', '#FEE745', '#FFD82F', '#FFC918', '#FFBA01'] // white to dark yellow
-            var pinkish = ['#f8eff1', '#f1d2d4', '#e7a9b1', '#c65e6a', '#af3039'] // white to red
-            var blues = ['#ABD7EC', '#59C1E8', '#3585DA', '#1061B0', '#003C72'] // light to dark blue
-            var silvers = ['#BEBEBE', '#AFAFAF', '#9F9F9F', '#909090', '#808080'] //light to dark black
-            //var pop1 = ['#f6eff7', '#bdc9e1', '#67a9cf', '#1c9099', '#016c59'] // purple to blue to green
-            //console.log(colorz.classes)
-            //var ramps = [colorRamp1, colorRamp2, colorRamp3, colorRamp4]
-            var minty = ['#aaf0d1', '#96e6c2', '#7dd8b5', '#5ec69d', '#3eb489'] // light to dark green (too similar)
-            //var colorRamp = ramps[Math.floor(Math.random() * 4)];
+            var colorRamp = colorSeq['yellow-blue'];
 
             if (selection.substring(0, 2) === '1a') {
-                colorRamp = gdpColor;
+                colorRamp = colorDiv['gdpColor'];
             } else if (selection.substring(0, 2) === '1c') {
-                colorRamp = pop;
-
+                colorRamp = colorSeq['pop'];
             } else if (selection === '7d10') {
-                colorRamp = combo
+                colorRamp = colorSeq['combo'];
             } else if (selection === '7d5') {
-                colorRamp = minty
+                colorRamp = colorSeq['minty'];
             } else if (selection === '7d7') {
-                colorRamp = blues;
+                colorRamp = colorSeq['blues'];
             } else if (selection === '7d4') {
-                colorRamp = pinkish;
+                colorRamp = colorSeq['pinkish'];
             } else if (selection === '7d8') {
-                colorRamp = silvers;
+                colorRamp = colorSeq['silvers'];
             } else if (selection === 'd') {
                 breaks = [-4841, -3805, -2608, -1090, 1322];
-                colorRamp = ['#08519c', '#3182bd', '#6baed6', '#bdd7e7', '#eff3ff']  // dark to light blue (reversed) 
-
+                colorRamp = colorSeq['ocean'];
             }
 
             currentGeojsonLayers.breaks = breaks;
             currentGeojsonLayers.color = colorRamp;
-
-            //console.log(currentGeojsonLayers)
-
-            /* map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-color',
-             [
-               'interpolate',
-               ['linear'],
-               ['get', selection],
-               breaks[0], colorRamp[0],
-               breaks[1], colorRamp[1],
-               breaks[2], colorRamp[2],
-               breaks[3], colorRamp[3],
-               breaks[4], colorRamp[4],
-               ]
-
-             ) */               
-
-            //console.log("SELECTION",selecton);
-
             map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-color',
-                ['case', ['boolean', ['feature-state', 'hover'], false],
-                'yellow',
                 [
-                'interpolate',
-                ['linear'],
-                ['get', selection],
-                breaks[0], colorRamp[0],
-                breaks[1], colorRamp[1],
-                breaks[2], colorRamp[2],
-                breaks[3], colorRamp[3],
-                breaks[4], colorRamp[4],
-                ]
+                    'interpolate',
+                    ['linear'],
+                    ['get', currentGeojsonLayers.dataLayer],
+                    breaks[0], currentGeojsonLayers.color[0],
+                    breaks[1], currentGeojsonLayers.color[1],
+                    breaks[2], currentGeojsonLayers.color[2],
+                    breaks[3], currentGeojsonLayers.color[3],
+                    breaks[4], currentGeojsonLayers.color[4],
                 ]
             )
 
@@ -1319,11 +1415,7 @@ function changeDataOnMap(selection) {
                 addNoDataLegend();
             } else {
                 map.setFilter(currentGeojsonLayers.hexSize, ['>=', selection, 0])
-
-                //console.log(selecteData)
-                //console.log(max)
-
-                addLegend(colorRamp, breaks, precision, selection, selecteData)
+                addLegend(colorRamp, breaks, precision, selection, selecteData);
                 setTimeout(() => {
                     map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.8)
                 }, 100);
@@ -1359,16 +1451,13 @@ function addNoDataLegend() {
     legendTitle.innerHTML = ''
 
     var element = document.getElementById("histogram");
-    if(typeof(element) != 'undefined' && element != null)
-    {
-        $('#histogram').remove(); 
-    }    
+    if (typeof (element) != 'undefined' && element != null) {
+        $('#histogram').remove();
+    }
 
 }
 
 function addLegend(colors, breaks, precision, current, dataset) {
-
-    //console.log(allLayers)
 
     var legData = _.find(allLayers, ['field_name', current])
 
@@ -1419,82 +1508,83 @@ function addLegend(colors, breaks, precision, current, dataset) {
 
     // histogram
     var element = document.getElementById("histogram");
-    if(typeof(element) != 'undefined' && element != null)
-    {
-        $('#histogram').remove(); 
-    }     
+    if (typeof (element) != 'undefined' && element != null) {
+        $('#histogram').remove();
+    }
     $('#histogram_frame').append('<canvas id="histogram" width="320" height="130"><canvas>')
-    var canvas = document.getElementById('histogram')    
+    var canvas = document.getElementById('histogram')
 
     // break
-    var nGroup=200
+    var nGroup = 100
     var breaks_histogram = chroma.limits(dataset, 'e', nGroup);
-    //console.log("breaks_histogram",breaks_histogram);
-
-    // old color
-    /*
-    var histogram_color = Array(nGroup).fill("");
-    var color_index=0;
-    for (var i = 0; i < nGroup; i++)   
-    {        
-        if (breaks_histogram[i]>breaks[color_index+1])
-            color_index+=1;    
-        histogram_color[i]=colors[color_index];
+    var histogram_data = Array(nGroup).fill(0);
+    for (var i = 0; i < dataset.length; i++) {
+        for (var j = 0; j < nGroup - 1; j++) {
+            if ((dataset[i] >= breaks_histogram[j]) && (dataset[i] < breaks_histogram[j + 1])) {
+                histogram_data[j] += 1
+            }
+        }
+        if (dataset[i] >= breaks_histogram[nGroup - 1]) {
+            histogram_data[nGroup - 1] += 1
+        }
     }
-    */
+    //count zero
+    var count_zero = 0;
+    for (var i = 0; i < histogram_data.length; i++) {
+        if (histogram_data[i] == 0) count_zero++;
+    }
 
-    // new color
-    var break_index=0;
-    var histogram_break_count = Array(4).fill(0);  
-    for (var i = 0; i < nGroup; i++)   
-    {
-        if (breaks_histogram[i]>breaks[break_index+1])
-            break_index+=1;
-        histogram_break_count[break_index]+=1;
-    }    
-    var colorRampNew=[];
-    for (var i = 0; i < 4; i++)
-    {           
-        colorRampPart = chroma.scale([colors[i], colors[i+1]]).mode('lch').colors(histogram_break_count[i]);
+    // re-calculation
+    //console.log(nGroup,count_zero)
+    nGroup = nGroup * ((nGroup - count_zero) / nGroup);
+    breaks_histogram = chroma.limits(dataset, 'e', nGroup);
+    histogram_data = Array(nGroup).fill(0);
+    for (var i = 0; i < dataset.length; i++) {
+        for (var j = 0; j < nGroup - 1; j++) {
+            if ((dataset[i] >= breaks_histogram[j]) && (dataset[i] < breaks_histogram[j + 1])) {
+                histogram_data[j] += 1
+            }
+        }
+        if (dataset[i] >= breaks_histogram[nGroup - 1]) {
+            histogram_data[nGroup - 1] += 1
+        }
+    }
+    //console.log("Number of groups in histogram: ", nGroup);
+
+    // color
+    var break_index = 0;
+    var histogram_break_count = Array(4).fill(0);
+    for (var i = 0; i < nGroup; i++) {
+        if (breaks_histogram[i] > breaks[break_index + 1])
+            break_index += 1;
+        histogram_break_count[break_index] += 1;
+    }
+    var colorRampNew = [];
+    for (var i = 0; i < 4; i++) {
+        colorRampPart = chroma.scale([colors[i], colors[i + 1]]).mode('lch').colors(histogram_break_count[i]);
         colorRampNew = colorRampNew.concat(colorRampPart);
         //console.log(colorRampNew);
-    }   
+    }
 
     // precision
     var breaks_precision = []
-    for (i = 0; i < breaks_histogram.length; i++) {        
+    for (i = 0; i < breaks_histogram.length; i++) {
         breaks_precision.push(nFormatter(breaks_histogram[i], precision))
     }
     //console.log("breaks_precision:",breaks_precision)
 
-    var histogram_data = Array(nGroup).fill(0);    
-    for (var i = 0; i < dataset.length; i++) {
-        for (var j = 0; j < nGroup-1; j++)
-        {
-            if ((dataset[i]>=breaks_histogram[j])&&(dataset[i]<breaks_histogram[j+1]))
-            {
-                histogram_data[j]+=1                
-            }            
-        }
-        if (dataset[i]>=breaks_histogram[nGroup-1])
-        {
-            histogram_data[nGroup-1]+=1
-        }
-    }
-    //console.log("histogram_data",histogram_data)
-
-    var colorRampN = chroma.scale([colors[0], colors[4]]).mode('lch').colors(nGroup) // yellow to dark-blue
+    //var colorRampN = chroma.scale([colors[0], colors[4]]).mode('lch').colors(nGroup) // yellow to dark-blue
 
     var data = {
-            labels: breaks_precision.slice(0, -1),
-            datasets: [{
-                data: histogram_data,
-                backgroundColor: colorRampNew,
-            }]
-        };
+        labels: breaks_precision.slice(0, -1),
+        datasets: [{
+            data: histogram_data,
+            backgroundColor: colorRampNew,
+        }]
+    };
 
-    var maxY=Math.pow(10,Math.ceil(Math.log10(Math.max(...histogram_data))));
-    var minY=Math.pow(10,Math.ceil(Math.log10(Math.min(...histogram_data))));
+    var maxY = Math.pow(10, Math.ceil(Math.log10(Math.max(...histogram_data))));
+    var minY = Math.pow(10, Math.ceil(Math.log10(Math.min(...histogram_data))));
 
     //console.log(maxY,minY);
     //console.log(Math.min(...histogram_data));
@@ -1504,86 +1594,85 @@ function addLegend(colors, breaks, precision, current, dataset) {
             enabled: true
         },
         legend: {
-                display: false
+            display: false
         },
         annotation: {
             annotations: [
-            {
-                type: "line",
-                mode: "vertical",
-                scaleID: "x-axis-0",
-                value: "70%",
-                borderColor: "black",
-                label: {
-                content: "Your Score",
-                enabled: true,
-                position: "center"
-                }
-            }]},
+                {
+                    type: "line",
+                    mode: "vertical",
+                    scaleID: "x-axis-0",
+                    value: "70%",
+                    borderColor: "black",
+                    label: {
+                        content: "Your Score",
+                        enabled: true,
+                        position: "center"
+                    }
+                }]
+        },
         scales: {
-            borderWidth:0,
-        yAxes:[{
-                display:true,
+            borderWidth: 0,
+            yAxes: [{
+                display: true,
                 type: "logarithmic",
 
                 ticks: {
                     //scaleStepWidth: 10,
-                    maxTicksLimit: 4, 
+                    maxTicksLimit: 4,
                     //autoSkip: true,
                     //stepSize:10,                                     
                     max: maxY,
                     //min: 1,
-                    callback: function (value, index, values) 
-                    {                        
-                            if (value === 100000000) return "100M";
-                            if (value === 10000000) return "10M";
-                            if (value === 1000000) return "1M";
-                            if (value === 100000) return "100K";
-                            if (value === 10000) return "10K";
-                            if (value === 1000) return "1K";
-                            if (value === 100) return "100";
-                            if (value === 10) return "10";
-                            if (value === 1) return "1";
-                            return null;
+                    callback: function (value, index, values) {
+                        if (value === 100000000) return "100M";
+                        if (value === 10000000) return "10M";
+                        if (value === 1000000) return "1M";
+                        if (value === 100000) return "100K";
+                        if (value === 10000) return "10K";
+                        if (value === 1000) return "1K";
+                        if (value === 100) return "100";
+                        if (value === 10) return "10";
+                        if (value === 1) return "1";
+                        return null;
+
+                    }
+                },
+                afterBuildTicks: function (chartObj) { //Build ticks labelling as per your need
+                    chartObj.ticks = [];
+                    var ticksScale = maxY;
+                    while ((ticksScale > minY) && (ticksScale >= 1)) {
+                        //console.log(ticksScale);
+                        chartObj.ticks.push(ticksScale);
+                        ticksScale /= 10;
+                    }
 
                 }
-            },
-            afterBuildTicks: function (chartObj) { //Build ticks labelling as per your need
-                chartObj.ticks = [];
-                var ticksScale=maxY;
-                while ((ticksScale>minY)&&(ticksScale>=1))
+
+            }],
+            xAxes: [{
+                barPercentage: 1.0,
+                categoryPercentage: 1.0,
+                gridLines:
                 {
-                    //console.log(ticksScale);
-                    chartObj.ticks.push(ticksScale);
-                    ticksScale/=10;
+                    display: true
+                },
+                scaleLabel:
+                {
+                    display: false,
+                    labelString: legData.units
+                },
+                ticks: {
+                    maxTicksLimit: 10
+
                 }
-
-            }
-
-        }],
-        xAxes:[{            
-            barPercentage: 1.0,
-            categoryPercentage: 1.0,
-            gridLines: 
-            {
-                display:true
-            },
-            scaleLabel: 
-            {
-                display: false,
-                labelString: legData.units
-            },
-            ticks: {
-                maxTicksLimit: 10
-
-            }
-        }]
-    }
+            }]
+        }
     };
 
-    var myHistogram = Chart.Bar(canvas,{
-        data:data,
-    options:option
+    var myHistogram = Chart.Bar(canvas, {
+        data: data,
+        options: option
     });
 }
 
@@ -1669,156 +1758,160 @@ var selection_scroller_options = {
 
 // Predefined data for side tooltip 
 var sdg = [
-	{
-		title: "No Poverty",
-		content: "To end poverty in all its forms, everywhere, through a powerful commitment to leave no one behind and to reach those fathest behind first."
-	},
-	{
-		title: "Zero Hunger",
-		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "Good Health and Well-being",
-		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "Quality Education",
-		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "Clean Water and Sanitation",
-		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "Affortable and Clean Energy",
-		content: "<strong> Reference: CIESIN</strong>, it is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)"
-	},
-	{
-		title: "Decent Work and Economic Growth",
-		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "Industry Innovation and Infrastructure",
-		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "Reduced Inquality",
-		content: "t is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "Blue Economy 2",
-		content: "<strong> Reference: CIESIN</strong>, it is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)"
-	},
-	{
-		title: "Blue Economy 3",
-		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "Blue Economy 4",
-		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "Blue Economy 1 ",
-		content: "t is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "Blue Economy 2",
-		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "Blue Economy 3",
-		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "Blue Economy 4",
-		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "Blue Economy 5",
-		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "Blue Economy 6",
-		content: "lastIt is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-]; 
+    {
+        title: "No Poverty",
+        content: "To end poverty in all its forms, everywhere, through a powerful commitment to leave no one behind and to reach those fathest behind first."
+    },
+    {
+        title: "Zero Hunger",
+        content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "Good Health and Well-being",
+        content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "Quality Education",
+        content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "Clean Water and Sanitation",
+        content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "Affortable and Clean Energy",
+        content: "<strong> Reference: CIESIN</strong>, it is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)"
+    },
+    {
+        title: "Decent Work and Economic Growth",
+        content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "Industry Innovation and Infrastructure",
+        content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "Reduced Inquality",
+        content: "t is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "Blue Economy 2",
+        content: "<strong> Reference: CIESIN</strong>, it is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)"
+    },
+    {
+        title: "Blue Economy 3",
+        content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "Blue Economy 4",
+        content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "Blue Economy 1 ",
+        content: "t is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "Blue Economy 2",
+        content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "Blue Economy 3",
+        content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "Blue Economy 4",
+        content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "Blue Economy 5",
+        content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "Blue Economy 6",
+        content: "lastIt is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+];
 
 var arrsamoa = [
-	{
-		title: "1",
-		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "2",
-		content: "<strong> Reference: CIESIN</strong>, it is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)"
-	},
-	{
-		title: "3",
-		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "Quality Education",
-		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "Clean Water and Sanitation",
-		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "Affortable and Clean Energy",
-		content: "<strong> Reference: CIESIN</strong>, it is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)"
-	},
-	{
-		title: "Decent Work and Economic Growth",
-		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "Industry Innovation and Infrastructure",
-		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "Reduced Inquality",
-		content: "t is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "Blue Economy 2",
-		content: "<strong> Reference: CIESIN</strong>, it is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)"
-	},
-	{
-		title: "Blue Economy 3",
-		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "Blue Economy 4",
-		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "Blue Economy 1 ",
-		content: "t is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "Blue Economy 2",
-		content: "<strong> Reference: CIESIN</strong>, it is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)"
-	},
-	{
-		title: "Blue Economy 3",
-		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "Blue Economy 4",
-		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "Blue Economy 5",
-		content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
-	{
-		title: "Blue Economy 6",
-		content: "lastIt is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-	},
+    {
+        title: "1",
+        content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "2",
+        content: "<strong> Reference: CIESIN</strong>, it is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)"
+    },
+    {
+        title: "3",
+        content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "Quality Education",
+        content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "Clean Water and Sanitation",
+        content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "Affortable and Clean Energy",
+        content: "<strong> Reference: CIESIN</strong>, it is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)"
+    },
+    {
+        title: "Decent Work and Economic Growth",
+        content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "Industry Innovation and Infrastructure",
+        content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "Reduced Inquality",
+        content: "t is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "Blue Economy 2",
+        content: "<strong> Reference: CIESIN</strong>, it is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)"
+    },
+    {
+        title: "Blue Economy 3",
+        content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "Blue Economy 4",
+        content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "Blue Economy 1 ",
+        content: "t is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "Blue Economy 2",
+        content: "<strong> Reference: CIESIN</strong>, it is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)"
+    },
+    {
+        title: "Blue Economy 3",
+        content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "Blue Economy 4",
+        content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "Blue Economy 5",
+        content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
+    {
+        title: "Blue Economy 6",
+        content: "lastIt is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+    },
 ];
 
 $('#layer-id').hide()
+$('#layer-id-bivar').hide()
+$('#dataDropBivar').val('start');
+//document.getElementById('dataDropBivar').selectedOptions[0].innerHTML = 'Select Bivariate Dataset';
+//$('#bivar-control').val(0);
 $('.year-timeline-wrapper').hide()
 
 //$(document).ready(function () {
@@ -1876,7 +1969,7 @@ function resetData() {
 /**sdg grid hover */
 $(".sdgs .icon-grid-item").click(function () {
 
-    if(!$('#resetData').is(':visible')) {
+    if (!$('#resetData').is(':visible')) {
         $('#resetData').toggle();
 
     }
@@ -1888,22 +1981,22 @@ $(".sdgs .icon-grid-item").click(function () {
     var w = $('#dataDrop')[0].options
     //console.log(w);
     for (var z in w) {
-        console.log(w[z].id)
+        //console.log(w[z].id)
         $('#dataDrop option[id=' + w[z].id + ']').show()
     }
 
     $("#sdg_slider .carousel-item").removeClass("active");
     var index = $(this).data('imgid');
     //console.log(index);
-    var filtered = _.filter(allLayers, function(o) {return o.sdg.includes(index)})
+    var filtered = _.filter(allLayers, function (o) { return o.sdg.includes(index) })
     //console.log(allLayers)
     var filteredSDG = filtered.map(x => x.field_name)
     //console.log(filteredSDG)
 
-   // var w = $('#dataDrop')[0].options
+    // var w = $('#dataDrop')[0].options
     for (var x in w) {
         //console.log(w[x].id)
-        if(!filteredSDG.includes(w[x].id)) {
+        if (!filteredSDG.includes(w[x].id)) {
             //console.log('dropped')
             $('#dataDrop option[id=' + w[x].id + ']').hide()
         }
@@ -1914,7 +2007,7 @@ $(".sdgs .icon-grid-item").click(function () {
 
 /**samoa grid hover */
 $(".samoa-grid .icon-grid-item").click(function () {
-    if(!$('#resetData').is(':visible')) {
+    if (!$('#resetData').is(':visible')) {
         $('#resetData').toggle();
 
     }
@@ -1927,7 +2020,7 @@ $(".samoa-grid .icon-grid-item").click(function () {
     $("#SAMOA_slider .carousel-item").removeClass("active");
     var index = $(this).data('imgid');
     $("#SAMOA_slider div[data-imgid='" + index + "']").addClass("active");
-    var filtered = _.filter(allLayers, function(o) {return o.samoa_path.includes(index)})
+    var filtered = _.filter(allLayers, function (o) { return o.samoa_path.includes(index) })
     var filteredSamoa = filtered.map(x => x.field_name)
     //console.log(allLayers.length)
     console.log(filtered)
@@ -1936,7 +2029,7 @@ $(".samoa-grid .icon-grid-item").click(function () {
 
     for (var x in w) {
         console.log(x)
-        if(!filteredSamoa.includes(w[x].id)) {
+        if (!filteredSamoa.includes(w[x].id)) {
             $('#dataDrop option[id=' + w[x].id + ']').hide()
         }
     }
@@ -1950,8 +2043,8 @@ $(".BE, #tooleconomy").mouseout(function () {
     $("#tooleconomy").addClass("d-none");
 });
 
-$('.BE').click(function() {
-    if(!$('#resetData').is(':visible')) {
+$('.BE').click(function () {
+    if (!$('#resetData').is(':visible')) {
         $('#resetData').toggle();
 
     }
@@ -1962,19 +2055,19 @@ $('.BE').click(function() {
     }
     console.log('BE')
 
-    var filtered = _.filter(allLayers, function(o) {return o.pillar.includes(index)})
+    var filtered = _.filter(allLayers, function (o) { return o.pillar.includes(index) })
     var filteredBE = filtered.map(x => x.field_name)
 
     for (var x in w) {
         console.log(x)
-        if(!filteredBE.includes(w[x].id)) {
+        if (!filteredBE.includes(w[x].id)) {
             $('#dataDrop option[id=' + w[x].id + ']').hide()
         }
     }
 
 })
-$('.CA').click(function() {
-    if(!$('#resetData').is(':visible')) {
+$('.CA').click(function () {
+    if (!$('#resetData').is(':visible')) {
         $('#resetData').toggle();
 
     }
@@ -1986,19 +2079,19 @@ $('.CA').click(function() {
 
     console.log('CA')
 
-    var filtered = _.filter(allLayers, function(o) {return o.pillar.includes(index)})
+    var filtered = _.filter(allLayers, function (o) { return o.pillar.includes(index) })
     var filteredCA = filtered.map(x => x.field_name)
 
     for (var x in w) {
         console.log(x)
-        if(!filteredCA.includes(w[x].id)) {
+        if (!filteredCA.includes(w[x].id)) {
             $('#dataDrop option[id=' + w[x].id + ']').hide()
         }
     }
 })
 
-$('.DT').click(function() {
-    if(!$('#resetData').is(':visible')) {
+$('.DT').click(function () {
+    if (!$('#resetData').is(':visible')) {
         $('#resetData').toggle();
 
     }
@@ -2009,12 +2102,12 @@ $('.DT').click(function() {
     }
     console.log('DT')
 
-    var filtered = _.filter(allLayers, function(o) {return o.pillar.includes(index)})
+    var filtered = _.filter(allLayers, function (o) { return o.pillar.includes(index) })
     var filteredDT = filtered.map(x => x.field_name)
 
     for (var x in w) {
         console.log(x)
-        if(!filteredDT.includes(w[x].id)) {
+        if (!filteredDT.includes(w[x].id)) {
             $('#dataDrop option[id=' + w[x].id + ']').hide()
         }
     }
@@ -2049,10 +2142,26 @@ $('.button-option-select-1').on('click', function (e) {
     e.preventDefault();
 });
 
-// 
+// better to find a different way to avoid global variables
+var main_var = '';
+var bi_var = '';
+
 $('select[name="dataset-selection"]').on('change', function () {
     //console.log('Dataset: ' + $(this).val());
     //console.log(map.getStyle().layers)
+
+    if (map.getLayer('newone')) {
+        map.removeLayer('newone');
+        map.removeSource('newone');
+    }
+    if ($(this).val() != 'start')
+        $('#bivar-control').show();
+    else
+        $('#bivar-control').hide();
+    $('#histogram_frame').show();
+
+    main_var = this.selectedOptions[0].id;
+    bi_var = '';
 
     var legendTitle = document.getElementById('legendTitle')
     var legend = document.getElementById('updateLegend')
@@ -2065,8 +2174,13 @@ $('select[name="dataset-selection"]').on('change', function () {
     infoBoxText.innerHTML = '';
     infoBoxLink.innerHTML = '';
     //console.log(this.selectedOptions[0].className);
+    //document.getElementById('dataDropBivar').selectedOptions[0].innerHTML = 'Select Bivariate Dataset';
+    $('#dataDropBivar').val('start');
 
     if (this.selectedOptions[0].className === 'basemap') {
+        $('#bivar-control').hide();
+
+        //document.getElementById('dataDropBivar').selectedOptions[0].innerHTML = 'Select Bivariate Dataset';
         $('#layer-id').hide()
         $('#icon3d').hide()
         $('.year-timeline-wrapper').hide()
@@ -2082,26 +2196,25 @@ $('select[name="dataset-selection"]').on('change', function () {
 
         var lyr = this.selectedOptions[0].innerHTML;
         legend.innerHTML = '';
-        legendTitle.innerHTML = ''
-        infoBoxTitle.innerHTML = lyr
+        legendTitle.innerHTML = '';
+        infoBoxTitle.innerHTML = lyr;
         infoBoxText.innerHTML = '';
         infoBoxLink.innerHTML = '';
 
         var element = document.getElementById("histogram");
-        if(typeof(element) != 'undefined' && element != null)
-        {
-            $('#histogram').remove(); 
-        }    
+        if (typeof (element) != 'undefined' && element != null) {
+            $('#histogram').remove();
+        }
 
         //if (map.getStyle().name != 'Mapbox Satellite Streets') {
 
-            var thisStyle = _.find(styles, function (o) {
-                return o.title === 'Satellite With Labels'
-            })
-            map.setStyle(thisStyle.uri)
-            //addHexSource()
-            //addLabels();
-            //console.log('hi')
+        var thisStyle = _.find(styles, function (o) {
+            return o.title === 'Satellite With Labels'
+        })
+        map.setStyle(thisStyle.uri)
+        //addHexSource()
+        //addLabels();
+        //console.log('hi')
         //}
 
         //addLabels();
@@ -2117,59 +2230,6 @@ $('select[name="dataset-selection"]').on('change', function () {
                 }
             }
         }
-        //currentGeojsonLayers.dataLayer = null;
-        //currentGeojsonLayers.hexSize = null;
-        //console.log(layers);
-        //console.log(firstSymbolId)
-
-        //var thisStyle = _.find(styles, function(o){return o.title === 'Satellite With Labels'})
-        //map.setStyle(thisStyle.uri)
-
-       /* if (map.getStyle().name != 'Satellite With Labels') {
-            var thisStyle = _.find(styles, function (o) {
-                return o.title === 'Satellite With Labels'
-            })
-            map.setStyle(thisStyle.uri)
-            addHexSources()
-            console.log('hi')
-        }
-
-        //console.log(basemapLabels)
-        if (lyr === 'Satellite Imagery') {
-
-            // var thisStyle = _.find(styles, function(o){return o.title === 'Light'})
-            //map.setStyle(thisStyle.uri)
-            console.log('yo');
-
-            addLabels();
-
-        } else if (map.getStyle().layers.length > 2) {
-            console.log(map.getStyle().layers);
-
-            //console.log(map.getStyle().layers)
-
-        } else {
-
-            addLabels()
-
-        }
-
-        //var thisStyle = _.find(styles, function(o){return o.title === lyr})
-        //map.setStyle(thisStyle.uri);
-        var layers = map.getStyle().layers;
-        //console.log(layers);
-        if (layers.length <= 2) {
-            firstSymbolId = null;
-        } else {
-            for (var i = 0; i < layers.length; i++) {
-                if (layers[i].type === 'symbol') {
-                    firstSymbolId = layers[i].id;
-                    break;
-                }
-            }
-        }
-
-            */
 
     } else if (this.selectedOptions[0].innerHTML === 'GDP per Capita' || this.selectedOptions[0].innerHTML === 'Population Density') {
         //map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.0)
@@ -2216,6 +2276,7 @@ $('select[name="dataset-selection"]').on('change', function () {
         }
 
         addToLayersDrop(layers);
+        addToLayersDropBivar(layers);
 
     } else {
         //$('#icon3d').hide()
@@ -2229,6 +2290,7 @@ $('select[name="dataset-selection"]').on('change', function () {
         for (var i = length - 1; i >= 0; i--) {
             layersHolder.options[i] = null;
         }
+
         $('#layer-id').hide()
         $('.year-timeline-wrapper').hide()
         $('.year-timeline').empty();
@@ -2236,6 +2298,118 @@ $('select[name="dataset-selection"]').on('change', function () {
     }
 
     //changeDataOnMap(this.selectedOptions[0].id);
+});
+
+$('select[name="dataset-selection-bivar"]').on('change', function () {
+
+    $('#histogram_frame').hide();
+    if (this.selectedOptions[0].innerHTML == 'Select Bivariate Dataset') {
+        bi_var = '';
+        if (map.getLayer('newone')) {
+            map.removeLayer('newone');
+            map.removeSource('newone');
+        }
+    } else {
+        bi_var = this.selectedOptions[0].id;
+        var features = map.queryRenderedFeatures({
+            layers: [currentGeojsonLayers.hexSize]
+        })
+
+        if (features) {
+            console.log();
+
+            var uniFeatures;
+            if (currentGeojsonLayers.hexSize === 'admin1') {
+                uniFeatures = getUniqueFeatures(features, 'GID_1');
+
+            } else if (currentGeojsonLayers.hexSize === 'admin2') {
+                uniFeatures = getUniqueFeatures(features, 'GID_2');
+            } else {
+                uniFeatures = getUniqueFeatures(features, 'hexid');
+            }
+
+            // bi-var
+            var selection = main_var;
+            var selection_bivar = bi_var;
+
+            var selecteData = uniFeatures.map(x => x.properties[selection])
+            var selecteData_biv = uniFeatures.map(x => x.properties[selection_bivar]);//popden
+            var breaksX = chroma.limits(selecteData, 'q', 3);
+            var breaksY = chroma.limits(selecteData_biv, 'q', 3);
+            var bivar_colors = colorSeqSeq3['blue-pink-purple'];
+
+            var featureCount = uniFeatures.length;
+            var bivarClass = Array(featureCount).fill(0);
+            var breaksX = chroma.limits(selecteData, 'q', 3);
+            var breaksY = chroma.limits(selecteData_biv, 'q', 3);
+
+            for (var i = 0; i < featureCount; i++) {
+                var x = selecteData[i];
+                var y = selecteData_biv[i];
+                var v1, v2;
+                if (x < breaksX[1])
+                    v1 = 1
+                else if (x < breaksX[2])
+                    v1 = 2
+                else v1 = 3;
+                if (y < breaksY[1])
+                    v2 = 1
+                else if (y < breaksY[2])
+                    v2 = 2
+                else v2 = 3;
+                switch (String(v1) + String(v2)) {
+                    case "11": bivarClass[i] = 1; break;
+                    case "12": bivarClass[i] = 2; break;
+                    case "13": bivarClass[i] = 3; break;
+                    case "21": bivarClass[i] = 4; break;
+                    case "22": bivarClass[i] = 5; break;
+                    case "23": bivarClass[i] = 6; break;
+                    case "31": bivarClass[i] = 7; break;
+                    case "32": bivarClass[i] = 8; break;
+                    case "33": bivarClass[i] = 9; break;
+                }
+                uniFeatures[i]["properties"]["bivarClass"] = bivarClass[i];
+            }
+
+            //convert rendered features to geojson format
+            var fc = turf.featureCollection(uniFeatures);
+
+            if (map.getLayer('newone')) {
+                map.removeLayer('newone');
+                map.removeSource('newone');
+            }
+
+            //add new source 
+            map.addSource('newone', {
+                type: 'geojson',
+                data: fc //data is the new geojson 
+            })
+            map.addLayer({
+                'id': 'newone',
+                'source': 'newone',
+                'type': 'fill',
+                'paint': {
+                    'fill-color':
+                        [
+                            'step',
+                            ['get', 'bivarClass'],
+                            bivar_colors[0],
+                            1, bivar_colors[1],
+                            2, bivar_colors[2],
+                            3, bivar_colors[3],
+                            4, bivar_colors[4],
+                            5, bivar_colors[5],
+                            6, bivar_colors[6],
+                            7, bivar_colors[7],
+                            8, bivar_colors[8],
+                        ],
+                    'fill-opacity': 0.9,
+                }
+            })
+
+        }
+    }
+
 });
 
 $('select[name="hexbin-change"]').on('change', function () {
@@ -2505,11 +2679,11 @@ function updateTime(layers) {
 
 // Year selection 
 /*	var isReachedToEnd = false;
-	$('body').on('change click', 'input[name="year-selected"]', function () {
-		isReachedToEnd = false;
-		var yearValue = $('[name="year-selected"]:checked').val();
-		console.log(yearValue);
-	}); */
+    $('body').on('change click', 'input[name="year-selected"]', function () {
+        isReachedToEnd = false;
+        var yearValue = $('[name="year-selected"]:checked').val();
+        console.log(yearValue);
+    }); */
 
 // play / pause
 var playPauseInterval;
@@ -2657,7 +2831,7 @@ function nFormatter(num, digits) {
             value: 1E9,
             symbol: "B"
         }
-  ];
+    ];
     var rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
     var i;
     for (i = si.length - 1; i > 0; i--) {
@@ -2669,20 +2843,20 @@ function nFormatter(num, digits) {
 }
 
 //screenshot button functions
-$('#screenshot').click(function(){
+$('#screenshot').click(function () {
 
     $('#top-right-wrap').toggle();
     html2canvas($('#map'), {
-        onrendered: function(canvas) {
+        onrendered: function (canvas) {
             console.log(canvas);
-          var img = canvas.toDataURL();
-          window.open(img)
+            var img = canvas.toDataURL();
+            window.open(img)
         }
-      });
+    });
 
-      setTimeout(() => {$('#top-right-wrap').toggle()}, 1000)
-      //$('.population-density-box')
-      //$('.population-per-km')
+    setTimeout(() => { $('#top-right-wrap').toggle() }, 1000)
+    //$('.population-density-box')
+    //$('.population-per-km')
 
 })
 
@@ -2692,7 +2866,7 @@ $('#datadownload').click(function () {
     console.log(currentGeojsonLayers.hexSize)
     //openDownloadPage()
 
-    if(hexes.includes(currentGeojsonLayers.hexSize)) {
+    if (hexes.includes(currentGeojsonLayers.hexSize)) {
 
         var features = map.queryRenderedFeatures({
             layers: [currentGeojsonLayers.hexSize]
@@ -2707,22 +2881,22 @@ $('#datadownload').click(function () {
             //console.log(uniFeatures);
 
             map.addSource('screen', {
-            type: 'geojson',
-            data: {
-                'type': 'FeatureCollection',
+                type: 'geojson',
+                data: {
+                    'type': 'FeatureCollection',
 
-                'features': uniFeatures
-            }
-            }) 
+                    'features': uniFeatures
+                }
+            })
 
             map.addLayer({
-            'id': 'screenshot',
-            'source': 'screen',
-            'type': 'line',
-            'paint': {
-                'line-color': '#66ff00',
-                'line-width': 3
-            }
+                'id': 'screenshot',
+                'source': 'screen',
+                'type': 'line',
+                'paint': {
+                    'line-color': '#66ff00',
+                    'line-width': 3
+                }
             })
 
             var gdata = uniFeatures//map.getSource('screen')._data;
@@ -2730,102 +2904,102 @@ $('#datadownload').click(function () {
             //exportGeojson(gdata);
             openDownloadPage(currentGeojsonLayers.hexSize, gdata);
 
-    }
+        }
 
-} else if(admins.includes(currentGeojsonLayers.hexSize)) {
+    } else if (admins.includes(currentGeojsonLayers.hexSize)) {
 
-    console.log('hi')
-    var features = map.queryRenderedFeatures({
-        layers: ['allsids']
-    })
+        console.log('hi')
+        var features = map.queryRenderedFeatures({
+            layers: ['allsids']
+        })
 
-    console.log(features)
-    var currentC = features.map(x => x.properties.NAME_0)
+        console.log(features)
+        var currentC = features.map(x => x.properties.NAME_0)
 
-    console.log(currentC);
+        console.log(currentC);
 
-    var features1 = map.queryRenderedFeatures({
-        layers: [currentGeojsonLayers.hexSize]
-    })
+        var features1 = map.queryRenderedFeatures({
+            layers: [currentGeojsonLayers.hexSize]
+        })
 
-    newOne = []
+        newOne = []
 
-    var propers = {}
+        var propers = {}
 
-    features1.forEach(function(f){
-        var geom = f.geometry
-        var props = f.properties
-        var id = f.id;
-        propers[id] = props
+        features1.forEach(function (f) {
+            var geom = f.geometry
+            var props = f.properties
+            var id = f.id;
+            propers[id] = props
 
-        if(geom.type === 'MultiPolygon') {
-            console.log(f);
-            for (var i=0; i < geom.coordinates.length; i++) {
-                var poly = {
-                    'type': 'Feature',
-                    'geometry': {
-                        'type': 'Polygon',
-                        'coordinates': geom.coordinates[i]
-                    },
-                    'id': id,
-                    'properties': props
+            if (geom.type === 'MultiPolygon') {
+                console.log(f);
+                for (var i = 0; i < geom.coordinates.length; i++) {
+                    var poly = {
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'Polygon',
+                            'coordinates': geom.coordinates[i]
+                        },
+                        'id': id,
+                        'properties': props
+                    }
+                    newOne.push(poly);
                 }
-                newOne.push(poly);
+            } else {
+                newOne.push(f)
             }
-        } else {
-            newOne.push(f)
+
+        })
+
+        var fc = turf.featureCollection(newOne)
+        console.log(fc);
+
+        var propName = 'GID_2'
+
+        if (currentGeojsonLayers.hexSize === 'admin1') {
+            propName = 'GID_1'
         }
 
-    })
+        var diss = turf.dissolve(fc, { propertyName: propName })
 
-    var fc = turf.featureCollection(newOne)
-    console.log(fc);
+        for (var x in diss.features) {
+            if (currentGeojsonLayers.hexSize === 'admin2') {
+                var curr = diss.features[x].properties.GID_2;
+            } else {
+                var curr = diss.features[x].properties.GID_1;
+            }
 
-    var propName = 'GID_2'
+            console.log(curr)
 
-    if(currentGeojsonLayers.hexSize === 'admin1') {
-        propName = 'GID_1'
-    }
-
-    var diss = turf.dissolve(fc, {propertyName: propName})
-
-    for (var x in diss.features) {
-        if(currentGeojsonLayers.hexSize === 'admin2') {
-            var curr = diss.features[x].properties.GID_2;
-        } else {
-            var curr = diss.features[x].properties.GID_1;
+            diss.features[x].properties = propers[curr]
         }
 
-        console.log(curr)
+        console.log(diss)
+        openDownloadPage(currentGeojsonLayers.hexSize, diss);
 
-        diss.features[x].properties = propers[curr]
-    }
+        map.addSource('screen', {
+            type: 'geojson',
+            data: {
+                'type': 'FeatureCollection',
 
-    console.log(diss)
-    openDownloadPage(currentGeojsonLayers.hexSize, diss);
-
-    map.addSource('screen', {
-        type: 'geojson',
-        data: {
-            'type': 'FeatureCollection',
-
-            'features': []
-        }
-        }) 
+                'features': []
+            }
+        })
 
         map.addLayer({
-        'id': 'screenshot',
-        'source': 'screen',
-        'type': 'line',
-        'paint': {
-            'line-color': '#66ff00',
-            'line-width': 3
-        }
+            'id': 'screenshot',
+            'source': 'screen',
+            'type': 'line',
+            'paint': {
+                'line-color': '#66ff00',
+                'line-width': 3
+            }
         })
 
         map.getSource('screen').setData(diss)
 
-}
+    }
 
 });
 
@@ -2850,39 +3024,39 @@ function openDownloadPage(hexsize, gdata) {
 
     })
 
-   /* $(':checkbox[name=res]').on('click', function(){
+    /* $(':checkbox[name=res]').on('click', function(){
 
-        var checkedBoxlength=$(':checkbox[name=res]:checked').length;
-            if(checkedBoxlength>1){
-                alert('Only 1 Resolution at a time');
-                return false;
-            }
-    }) */
+         var checkedBoxlength=$(':checkbox[name=res]:checked').length;
+             if(checkedBoxlength>1){
+                 alert('Only 1 Resolution at a time');
+                 return false;
+             }
+     }) */
 
     $('input:checkbox').change(function () {
 
-            var thisid = $(this)[0].id
-            allAttributesChecked.push(thisid);
+        var thisid = $(this)[0].id
+        allAttributesChecked.push(thisid);
 
-         /*   if ($(this).is(":checked")) {
+        /*   if ($(this).is(":checked")) {
 
-                if(allCountries.includes(thisid)) {
-                    allCountriesChecked.push(thisid)
-                } else if(userLayers.includes(thisid)) {
-                    allResolutionsChecked.push(thisid)
-                } else {
-                    allAttributesChecked.push(thisid);
-                }
-            } */
+               if(allCountries.includes(thisid)) {
+                   allCountriesChecked.push(thisid)
+               } else if(userLayers.includes(thisid)) {
+                   allResolutionsChecked.push(thisid)
+               } else {
+                   allAttributesChecked.push(thisid);
+               }
+           } */
     })
 
 }
 
-function exportShp(hexsize,obj, removeOnes) {
+function exportShp(hexsize, obj, removeOnes) {
 
     var fc = obj;
 
-    if(hexes.includes(hexsize)) {
+    if (hexes.includes(hexsize)) {
         fc = turf.featureCollection(obj)
     }
 
@@ -2913,7 +3087,7 @@ function exportGeojson(hexsize, gdata, removeOnes) {
 
     var fc = gdata;
 
-    if(hexes.includes(hexsize)) {
+    if (hexes.includes(hexsize)) {
         fc = turf.featureCollection(gdata)
     }
 
@@ -2925,66 +3099,66 @@ function exportGeojson(hexsize, gdata, removeOnes) {
 
     //window.open('http://geojson.io/#data=data:application/json,' + webdata);
 
-function convertThis(fc) {
+    function convertThis(fc) {
 
-    //console.log(fc)
+        //console.log(fc)
 
-    //var fc = turf.featureCollection(feats)
-    for (var x in fc.features) {
+        //var fc = turf.featureCollection(feats)
+        for (var x in fc.features) {
 
-        for (var y in removeOnes) {
+            for (var y in removeOnes) {
 
-            delete fc.features[x].properties[removeOnes[y]]
+                delete fc.features[x].properties[removeOnes[y]]
+            }
+
         }
+        var webdata = encodeURIComponent(JSON.stringify(fc))
+
+        window.open('http://geojson.io/#data=data:application/json,' + webdata);
+
+        /*function mapArray(ar) {
+
+            return _.map(ar.features, object =>
+                _.omit(object, ['_vectorTileFeature', 'layer', 'source', 'sourceLayer', 'state'])
+            );
+
+        }
+        var resultz = mapArray(feats)
+        console.log(resultz);
+
+        resultz.forEach(function (x) {
+            x.geometry = x._geometry
+            delete x._geometry
+        }) */
 
     }
-    var webdata = encodeURIComponent(JSON.stringify(fc))
-
-    window.open('http://geojson.io/#data=data:application/json,' + webdata);
-
-    /*function mapArray(ar) {
-
-        return _.map(ar.features, object =>
-            _.omit(object, ['_vectorTileFeature', 'layer', 'source', 'sourceLayer', 'state'])
-        );
-
-    }
-    var resultz = mapArray(feats)
-    console.log(resultz);
-
-    resultz.forEach(function (x) {
-        x.geometry = x._geometry
-        delete x._geometry
-    }) */
-
-}
 
     //console.log(resultz)
 
-   /* var fc = turf.featureCollection(resultz)
+    /* var fc = turf.featureCollection(resultz)
 
-    //console.log(fc)
+     //console.log(fc)
 
-    for (var x in fc.features) {
+     for (var x in fc.features) {
 
-        for (var y in removeOnes) {
+         for (var y in removeOnes) {
 
-            delete fc.features[x].properties[removeOnes[y]]
-        }
+             delete fc.features[x].properties[removeOnes[y]]
+         }
 
-    }
+     }
 
-    //console.log(fc);
+     //console.log(fc);
 
-    var datastring = '';
-    $('.modal').toggle();
+     var datastring = '';
+     $('.modal').toggle();
 
-    var datastring = "data:text/json;charset=utf-8, " + encodeURIComponent(JSON.stringify(fc))
-    var link = document.createElement('a');
-    link.download = 'download.geojson';
-    link.href = datastring
-    link.click();
-    link.delete; */
+     var datastring = "data:text/json;charset=utf-8, " + encodeURIComponent(JSON.stringify(fc))
+     var link = document.createElement('a');
+     link.download = 'download.geojson';
+     link.href = datastring
+     link.click();
+     link.delete; */
 
     var datastring = '';
     $('.modal').toggle();
@@ -2996,12 +3170,12 @@ function convertThis(fc) {
 $('.close').click(function () {
     map.setFilter(currentGeojsonLayers.hexSize, ['>=', currentGeojsonLayers.dataLayer, 0])
     $('.modal').toggle();
-   // map.setZoom(oldZoom);
+    // map.setZoom(oldZoom);
     //map.setCenter(oldCenter)
     map.removeLayer('screenshot')
     map.removeSource('screen');
 
-}) 
+})
 
 var checkList = document.getElementById('list1');
 var items = document.getElementById('items');

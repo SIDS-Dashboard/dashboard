@@ -6,7 +6,7 @@
 		<title>Geospatial UI</title>
 		<meta name="description" content="" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<!--<link rel="icon" type="image/png" href="./assets/undp_favicon.ico"/>-->
+		<link rel="icon" type="image/png" href="./assets/undp_favicon.ico"/>
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
 		<link rel="stylesheet"
 			href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css"
@@ -127,7 +127,39 @@
 					</div>
 				</div>
 
+				<div id="bivar-control"> 					
+
+					<div class="col-12">
+						<div class="custom-selection-dropdown selection-dropdown-1">
+							<label id='datasetLabelBivar'>Bivariate Dataset</label>							
+							<select class="form-select data-set-selection-bivar" id="dataDropBivar" 
+							aria-label="Bivar Dataset" name="dataset-selection-bivar">
+							<option value="start" selected>Select Bivariate Dataset</option>
+							</select>
+
+						</div>
+					</div>
+
+					<div class="col-12">
+						<div id="layer-id-bivar" class="custom-selection-dropdown selection-dropdown-1">
+							<label>Bivariate Layer</label>
+							<select id="layer-drop-bivar" class="form-select-bivar" aria-label="Bivar Layer" name="layer-selection">
+								<option value="default" selected>Select Bivariate Layer</option>
+								<option value="Example 2">Example 2</option>
+							</select>
+							<span class="selection-dropdown-arrow up dataset-select-uparrow"
+								style="margin-top:8px"></span>
+							<span class="selection-dropdown-arrow down dataset-select-downarrow"
+								style="margin-top:10px"></span>
+						</div>
+					</div>
+
+				</div>
 			</div>
+
+			</div>
+
+			
 
 		</div>
 		<!---- MAP END -->
@@ -770,6 +802,7 @@
 		<script src="https://d3js.org/d3.v7.min.js"></script>
 		<script src="./data/sidsNames.js"></script>
 		<script src="./newgis.js"></script>
+		<script src="./color.js"></script>
 		<script src="./addSources.js"></script>
 		<!--<script src="./drawFunc.js"></script> -->
 		<script src='./addButtons.js'></script>

@@ -80,6 +80,7 @@ function addButtons() {
         })
 
         var dataHolder = document.getElementById('dataDrop')
+        var dataHolderBivar = document.getElementById('dataDropBivar')
         var addBasemaps = ['Satellite Imagery']
 
         for (var x in addBasemaps) {
@@ -87,8 +88,21 @@ function addButtons() {
             btn2.innerHTML = addBasemaps[x];
             btn2.classList.add('basemap')
             //btn2.setAttribute('id', addBasemaps[x])
+            //console.log(btn2)
             dataHolder.appendChild(btn2)
         }
+
+        /*
+        for (var x in addBasemaps) {
+            var btn2 = document.createElement("option");
+            btn2.innerHTML = addBasemaps[x];
+            btn2.classList.add('basemap')
+            //btn2.setAttribute('id', addBasemaps[x])
+            console.log(btn2)         
+            dataHolderBivar.appendChild(btn2)
+        }*/
+
+        
 
         var uniqueNames = allLayers.map(x => x.title)
 
@@ -104,9 +118,29 @@ function addButtons() {
             })
             //console.log(correctFI);
             btn1.setAttribute('id', correctFI.field_name)
+            //console.log(btn1)            
             dataHolder.appendChild(btn1)
-
+            //dataHolderBivar.appendChild(btn1)
         }
+
+        for (var x in actualu) {
+            //console.log(actualu[x]);
+            var btn1 = document.createElement("option");
+            btn1.innerHTML = actualu[x];
+            btn1.classList.add('data')
+            var correctFI = _.find(allLayers, function (o) {
+                return o.title === actualu[x]
+            })
+            //console.log(correctFI);
+            btn1.setAttribute('id', correctFI.field_name)
+            //console.log(btn1)
+            //dataHolder.appendChild(btn1)
+            if (btn1.id=="depth") continue;            
+            //if (btn1.id==main_var) continue;
+            dataHolderBivar.appendChild(btn1)
+        }
+        $('#icon3d').hide()
+        $('#bivar-control').hide();
 
     })
 }

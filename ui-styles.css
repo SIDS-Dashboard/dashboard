@@ -20,6 +20,8 @@ body {
 
 #volume {
     color: #DDDDDD;
+    height:10px;
+    padding-top:-10px;
 }
 
 #map {
@@ -119,6 +121,8 @@ input[type=checkbox] {
     font-size: 14px;
     position: relative;
     width: 120px;
+    height: 30px;
+    padding-top:5px;
     margin: 10px auto 10px auto;
     cursor: pointer;
 }
@@ -347,6 +351,39 @@ input[type=checkbox] {
     background-image: none;
 }
 
+.form-select .data-set-selection{
+    font-size: 12px;
+    border-radius: 5px;
+    height: 30px;
+    padding: 4px 20px;
+    background-image: none;
+    width:220px;
+    margin-left:10px;
+    margin-bottom:5px;
+
+}
+
+.custom-selection-dropdown .data-set-selection-bivar {
+    font-size: 12px;
+    border-radius: 0px;
+    height: 30px;    
+    background-image: none;
+    width:225px;
+    margin-left:0px;
+    margin-bottom:10px;
+}
+
+.form-select-bivar{
+    font-size: 12px;
+    border-radius: 5px;
+    height: 30px;
+    padding: 4px 20px;
+    background-image: none;
+    width:220px;
+    margin-left:10px;
+    margin-bottom:10px;
+}
+
 .select2-container--default .select2-selection--single .select2-selection__rendered {
     line-height: 18px;
 }
@@ -480,6 +517,8 @@ input[type=checkbox] {
 
 #icon3d {
     display: none;
+    height:30px;
+    width:30px;
 }
 
 #icon3d:hover {
