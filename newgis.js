@@ -356,9 +356,7 @@ function recolorBasedOnWhatsOnPage() {
                 ]
             )
             //console.log(currentGeojsonLayers);
-
             //map.setPaintProperty(currentGeojsonLayers.hexSize, 'fill-opacity', 0.7)
-
             //addLegend(currentGeojsonLayers.color, breaks, currentGeojsonLayers.dataLayer)
             if (isNaN(breaks[3]) || breaks[1] == 0) {
 
@@ -1646,7 +1644,6 @@ function addLegend(colors, breaks, precision, current, dataset) {
                         chartObj.ticks.push(ticksScale);
                         ticksScale /= 10;
                     }
-
                 }
 
             }],
@@ -2158,7 +2155,16 @@ $('select[name="dataset-selection"]').on('change', function () {
         $('#bivar-control').show();
     else
         $('#bivar-control').hide();
-    $('#histogram_frame').show();
+    //$('#histogram_frame').show();
+
+
+    $('#legendTitle').show();
+    $('#updateLegend').show();
+    $('#bivarPlot').hide();
+
+    if (map.getLayer(currentGeojsonLayers.hexSize)) {
+        map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 1.0);
+    }
 
     main_var = this.selectedOptions[0].id;
     bi_var = '';
@@ -2302,7 +2308,14 @@ $('select[name="dataset-selection"]').on('change', function () {
 
 $('select[name="dataset-selection-bivar"]').on('change', function () {
 
-    $('#histogram_frame').hide();
+    //$('#histogram_frame').hide();
+    $('#legendTitle').show();
+    $('#updateLegend').show();
+
+    if (map.getLayer(currentGeojsonLayers.hexSize)) {
+        map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 0.0);
+    }
+
     if (this.selectedOptions[0].innerHTML == 'Select Bivariate Dataset') {
         bi_var = '';
         if (map.getLayer('newone')) {
@@ -2342,10 +2355,18 @@ $('select[name="dataset-selection-bivar"]').on('change', function () {
             var bivarClass = Array(featureCount).fill(0);
             var breaksX = chroma.limits(selecteData, 'q', 3);
             var breaksY = chroma.limits(selecteData_biv, 'q', 3);
-
+            //console.log(breaksX,breaksY)
+            var bivarScatter = new Array(10);
+            for (var i = 0; i < 10; i++) {
+                bivarScatter[i] = [];
+            }
             for (var i = 0; i < featureCount; i++) {
+                
                 var x = selecteData[i];
                 var y = selecteData_biv[i];
+                
+
+                //bivarScatter.push({'x':x,'y':y});
                 var v1, v2;
                 if (x < breaksX[1])
                     v1 = 1
@@ -2357,22 +2378,37 @@ $('select[name="dataset-selection-bivar"]').on('change', function () {
                 else if (y < breaksY[2])
                     v2 = 2
                 else v2 = 3;
-                switch (String(v1) + String(v2)) {
-                    case "11": bivarClass[i] = 1; break;
-                    case "12": bivarClass[i] = 2; break;
-                    case "13": bivarClass[i] = 3; break;
-                    case "21": bivarClass[i] = 4; break;
-                    case "22": bivarClass[i] = 5; break;
-                    case "23": bivarClass[i] = 6; break;
-                    case "31": bivarClass[i] = 7; break;
-                    case "32": bivarClass[i] = 8; break;
-                    case "33": bivarClass[i] = 9; break;
+                var bivar = String(v1) + String(v2);
+
+                if (typeof (x) == 'undefined' || typeof (y) == 'undefined') 
+                {
+                    bivar = "Null";               
                 }
+                
+                //console.log(bivar);
+                switch (bivar) {
+                    case "11": bivarClass[i] = 0; break;//LL
+                    case "12": bivarClass[i] = 1; break;//LM
+                    case "13": bivarClass[i] = 2; break;//LH
+                    case "21": bivarClass[i] = 3; break;//ML
+                    case "22": bivarClass[i] = 4; break;//MM
+                    case "23": bivarClass[i] = 5; break;//MH
+                    case "31": bivarClass[i] = 6; break;//HL
+                    case "32": bivarClass[i] = 7; break;//HM
+                    case "33": bivarClass[i] = 8; break;//HH
+                    case "Null": bivarClass[i] = 9; break;//NULL
+                }
+                bivarScatter[bivarClass[i]].push({'x':x,'y':y});
                 uniFeatures[i]["properties"]["bivarClass"] = bivarClass[i];
             }
 
             //convert rendered features to geojson format
             var fc = turf.featureCollection(uniFeatures);
+
+            /*
+            if (map.getLayer(currentGeojsonLayers.hexSize)) {
+                map.removeLayer(currentGeojsonLayers.hexSize)
+            }*/
 
             if (map.getLayer('newone')) {
                 map.removeLayer('newone');
@@ -2394,18 +2430,172 @@ $('select[name="dataset-selection-bivar"]').on('change', function () {
                             'step',
                             ['get', 'bivarClass'],
                             bivar_colors[0],
-                            1, bivar_colors[1],
-                            2, bivar_colors[2],
-                            3, bivar_colors[3],
-                            4, bivar_colors[4],
-                            5, bivar_colors[5],
-                            6, bivar_colors[6],
-                            7, bivar_colors[7],
-                            8, bivar_colors[8],
+                            0, bivar_colors[1],
+                            1, bivar_colors[2],
+                            2, bivar_colors[3],
+                            3, bivar_colors[4],
+                            4, bivar_colors[5],
+                            5, bivar_colors[6],
+                            6, bivar_colors[7],
+                            7, bivar_colors[8],
+                            8, 'rgba(255,255,255,0)',
                         ],
                     'fill-opacity': 0.9,
                 }
             })
+
+            // bi-var legend
+            $('#legendTitle').hide();
+            $('#updateLegend').hide();
+            
+            var element = document.getElementById("bivarPlot");
+            if (typeof (element) != 'undefined' && element != null) {
+                $('#bivarPlot').remove();
+            }
+            var element = document.getElementById("histogram");
+            if (typeof (element) != 'undefined' && element != null) {
+                $('#histogram').remove();
+            }
+            $('#histogram_frame').append('<canvas id="bivarPlot" width="300" height="170"><canvas>')
+            var canvas = document.getElementById('bivarPlot');        
+            
+            var maxX = Math.pow(10, Math.ceil(Math.log10(breaksX[3])));
+            var minX = Math.pow(10, Math.ceil(Math.log10(breaksX[0])));
+            var maxY = Math.pow(10, Math.ceil(Math.log10(breaksY[3])));
+            var minY = Math.pow(10, Math.ceil(Math.log10(breaksY[0])));
+
+            var bivarOptions = {
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        type: 'logarithmic',     
+
+                        ticks: {
+                            min: minX, //minimum tick
+                            max: maxX, //maximum tick
+                            //maxTicksLimit: 4,    
+                            maxRotation: 45,
+                            minRotation: 45,
+
+                            callback: function (valueX, index, values) {        
+                                if (valueX === 100000000) return "100M";
+                                if (valueX === 10000000) return "10M";
+                                if (valueX === 1000000) return "1M";
+                                if (valueX === 100000) return "100K";
+                                if (valueX === 10000) return "10K";
+                                if (valueX === 1000) return "1K";
+                                if (valueX === 100) return "100";
+                                if (valueX === 10) return "10";
+                                if (valueX === 1) return "1";
+                                if (valueX === 0.1) return "0.1";
+                                if (valueX>10)
+                                    return nFormatter(valueX,1)
+                                else 
+                                    return nFormatter(valueX,2);
+
+                            }
+                        },
+                        
+                        afterBuildTicks: function(chartObjX) { 
+                            chartObjX.ticks = [];
+                            chartObjX.ticks.push(maxX);
+                            chartObjX.ticks.push(breaksX[2]);
+                            chartObjX.ticks.push(breaksX[1]);
+                            chartObjX.ticks.push(minX);
+                            /*
+                            var ticksScale = maxX;
+                            while ((ticksScale > minX) && (ticksScale >= 1)) {
+                                //console.log(ticksScale);
+                                chartObjX.ticks.push(ticksScale);
+                                ticksScale /= 10;
+                            }
+                            */
+                        }
+
+                    }],
+                    yAxes: [{
+                        display: true,
+                        type: "logarithmic",    
+
+                        ticks: {
+                            min: minY, //minimum tick
+                            max: maxY, //maximum tick
+                            //maxTicksLimit: 4,
+                            maxRotation: 45,
+                            minRotation: 45,
+                            
+                            callback: function (valueY, index, values) {
+                                if (valueY === 100000000) return "100M";
+                                if (valueY === 10000000) return "10M";
+                                if (valueY === 1000000) return "1M";
+                                if (valueY === 100000) return "100K";
+                                if (valueY === 10000) return "10K";
+                                if (valueY === 1000) return "1K";
+                                if (valueY === 100) return "100";
+                                if (valueY === 10) return "10";
+                                if (valueY === 1) return "1";
+                                if (valueY === 0.1) return "0.1";
+                                if (valueY>10)
+                                    return nFormatter(valueY,1)
+                                else 
+                                    return nFormatter(valueY,2);
+                            }
+                        },                        
+                        
+                        afterBuildTicks: function(chartObjY) {
+                            chartObjY.ticks = [];
+                            chartObjY.ticks.push(maxY);
+                            chartObjY.ticks.push(breaksY[2]);
+                            chartObjY.ticks.push(breaksY[1]);
+                            chartObjY.ticks.push(minY);
+
+                            /*
+                            var ticksScale = maxY;
+                            while ((ticksScale > minY) && (ticksScale >= 1)) {
+                                //console.log(ticksScale);
+                                chartObjY.ticks.push(ticksScale);
+                                ticksScale /= 10;
+                            }
+                            */   
+                            
+                            
+                            
+                        }        
+                    }]
+                },
+                
+                legend: {
+                    position: 'top',
+                    display: false,                        
+                }
+
+            }
+
+            var bivarClasses = ['L-L','L-Mid','L-H',
+                                'Mid-L','Mid-Mid','Mid-H',
+                                'H-L','H-Mid','H-H'];
+            var bivarDatasets = [];            
+            for (var i = 0; i < 9; i++) {
+                bivarDatasets.push(
+                    {
+                        label: bivarClasses[i],
+                        data: bivarScatter[i],
+                        pointRadius: 1.8,
+                        pointHoverRadius: 3,
+                        backgroundColor: bivar_colors[i],
+                        hoverBorderColor: 'rgba(0,0,0,1)',
+                        pointHoverBorderWidth: 2,
+                        borderWidth: 1,
+                    }
+                )
+            }
+            
+            var scatterChart = new Chart(canvas, {
+                type: 'scatter',
+                data: {datasets: bivarDatasets},
+                options: bivarOptions            
+            });           
+
 
         }
     }
