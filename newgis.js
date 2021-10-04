@@ -2142,6 +2142,8 @@ $('.button-option-select-1').on('click', function (e) {
 // better to find a different way to avoid global variables
 var main_var = '';
 var bi_var = '';
+var bivar_option;
+var scatterChart;
 
 $('select[name="dataset-selection"]').on('change', function () {
     //console.log('Dataset: ' + $(this).val());
@@ -2161,6 +2163,7 @@ $('select[name="dataset-selection"]').on('change', function () {
     $('#legendTitle').show();
     $('#updateLegend').show();
     $('#bivarPlot').hide();
+    $('#bivarSwitcher').hide();
 
     if (map.getLayer(currentGeojsonLayers.hexSize)) {
         map.setPaintProperty(currentGeojsonLayers.hexSize,'fill-opacity', 1.0);
@@ -2451,12 +2454,14 @@ $('select[name="dataset-selection-bivar"]').on('change', function () {
             var element = document.getElementById("bivarPlot");
             if (typeof (element) != 'undefined' && element != null) {
                 $('#bivarPlot').remove();
+                $('#bivarSwitcher').remove();
             }
             var element = document.getElementById("histogram");
             if (typeof (element) != 'undefined' && element != null) {
                 $('#histogram').remove();
             }
             $('#histogram_frame').append('<canvas id="bivarPlot" width="300" height="170"><canvas>')
+            $('#histogram_frame').append('<select id="bivarSwitcher" onChange="bivarScaleSwitch(this.value);"><option value="logarithmic">logarithmic</option><option value="linear">linear</option></select>')
             var canvas = document.getElementById('bivarPlot');        
             
             var maxX = Math.pow(10, Math.ceil(Math.log10(breaksX[3])));
@@ -2464,15 +2469,28 @@ $('select[name="dataset-selection-bivar"]').on('change', function () {
             var maxY = Math.pow(10, Math.ceil(Math.log10(breaksY[3])));
             var minY = Math.pow(10, Math.ceil(Math.log10(breaksY[0])));
 
-            var bivarOptions = {
+            // dynamic point size
+            var point_radius;
+            if (featureCount<100){
+                point_radius = 3.3;
+            } else if (featureCount>1000){
+                point_radius = 1.5;                
+            } else {
+                point_radius = ((featureCount-100)/100)*0.2                
+            }            
+
+            bivar_option = {
                 scales: {
                     xAxes: [{
                         display: true,
-                        type: 'logarithmic',     
-
+                        type: 'logarithmic',                            
+                        scaleLabel: {
+                            display: true,
+                            labelString: _.find(allLayers, ['field_name', main_var])["title"],
+                        },
                         ticks: {
-                            min: minX, //minimum tick
-                            max: maxX, //maximum tick
+                            min: breaksX[0], //minimum tick
+                            max: breaksX[3], //maximum tick
                             //maxTicksLimit: 4,    
                             maxRotation: 45,
                             minRotation: 45,
@@ -2498,28 +2516,23 @@ $('select[name="dataset-selection-bivar"]').on('change', function () {
                         
                         afterBuildTicks: function(chartObjX) { 
                             chartObjX.ticks = [];
-                            chartObjX.ticks.push(maxX);
+                            chartObjX.ticks.push(breaksX[3]);
                             chartObjX.ticks.push(breaksX[2]);
                             chartObjX.ticks.push(breaksX[1]);
-                            chartObjX.ticks.push(minX);
-                            /*
-                            var ticksScale = maxX;
-                            while ((ticksScale > minX) && (ticksScale >= 1)) {
-                                //console.log(ticksScale);
-                                chartObjX.ticks.push(ticksScale);
-                                ticksScale /= 10;
-                            }
-                            */
+                            chartObjX.ticks.push(breaksX[0]);
                         }
 
                     }],
                     yAxes: [{
                         display: true,
                         type: "logarithmic",    
-
+                        scaleLabel: {
+                            display: true,
+                            labelString: _.find(allLayers, ['field_name', bi_var])["title"],
+                        },
                         ticks: {
-                            min: minY, //minimum tick
-                            max: maxY, //maximum tick
+                            min: breaksY[0], //minimum tick
+                            max: breaksY[3], //maximum tick
                             //maxTicksLimit: 4,
                             maxRotation: 45,
                             minRotation: 45,
@@ -2544,22 +2557,10 @@ $('select[name="dataset-selection-bivar"]').on('change', function () {
                         
                         afterBuildTicks: function(chartObjY) {
                             chartObjY.ticks = [];
-                            chartObjY.ticks.push(maxY);
+                            chartObjY.ticks.push(breaksY[3]);
                             chartObjY.ticks.push(breaksY[2]);
                             chartObjY.ticks.push(breaksY[1]);
-                            chartObjY.ticks.push(minY);
-
-                            /*
-                            var ticksScale = maxY;
-                            while ((ticksScale > minY) && (ticksScale >= 1)) {
-                                //console.log(ticksScale);
-                                chartObjY.ticks.push(ticksScale);
-                                ticksScale /= 10;
-                            }
-                            */   
-                            
-                            
-                            
+                            chartObjY.ticks.push(breaksY[0]); 
                         }        
                     }]
                 },
@@ -2580,22 +2581,21 @@ $('select[name="dataset-selection-bivar"]').on('change', function () {
                     {
                         label: bivarClasses[i],
                         data: bivarScatter[i],
-                        pointRadius: 1.8,
+                        pointRadius: point_radius,
                         pointHoverRadius: 3,
                         backgroundColor: bivar_colors[i],
                         hoverBorderColor: 'rgba(0,0,0,1)',
                         pointHoverBorderWidth: 2,
-                        borderWidth: 1,
+                        borderWidth: 1.5,
                     }
                 )
             }
             
-            var scatterChart = new Chart(canvas, {
+            scatterChart = new Chart(canvas, {
                 type: 'scatter',
                 data: {datasets: bivarDatasets},
-                options: bivarOptions            
-            });           
-
+                options: bivar_option            
+            });       
 
         }
     }
@@ -2605,8 +2605,16 @@ $('select[name="dataset-selection-bivar"]').on('change', function () {
 $('select[name="hexbin-change"]').on('change', function () {
 
     console.log(this.selectedOptions[0].value);
-    changeHexagonSize(this.selectedOptions[0].value)
+    changeHexagonSize(this.selectedOptions[0].value);
 })
+
+function bivarScaleSwitch(value){
+    bivar_option["scales"]["xAxes"][0]["type"]=value;
+    bivar_option["scales"]["yAxes"][0]["type"]=value;
+    scatterChart.options = bivar_option;
+    scatterChart.update();    
+}
+
 
 /*$('select[name="overlay-select"]').on('change', function() {
 
